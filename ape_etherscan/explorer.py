@@ -9,7 +9,7 @@ ETHERSCAN_URI = (
     + "{0}/{1}/"
 )
 
-ETHERSCAN_API_URI = lambda n: (
+def get_etherscan_uri(network_name):
     f"https://api-{n}.etherscan.io/api" if n != "mainnet" else "https://api.etherscan.io/api"
 )
 
