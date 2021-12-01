@@ -10,8 +10,13 @@ ETHERSCAN_URI = (
     + "{0}/{1}/"
 )
 
+
 def get_etherscan_uri(network_name):
-    return f"https://api-{n}.etherscan.io/api" if network_name != "mainnet" else "https://api.etherscan.io/api"
+    return (
+        f"https://api-{n}.etherscan.io/api"
+        if network_name != "mainnet"
+        else "https://api.etherscan.io/api"
+    )
 
 
 class Etherscan(ExplorerAPI):
@@ -37,5 +42,5 @@ class Etherscan(ExplorerAPI):
         except JSONDecodeError:
             return None
         abi = [ABI.from_dict(item) for item in abi_list]
-        contractName = result[0].get("ContractName","unknown")
+        contractName = result[0].get("ContractName", "unknown")
         return ContractType(abi=abi, contractName=contractName)
