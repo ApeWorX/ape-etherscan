@@ -24,9 +24,9 @@ class Etherscan(ExplorerAPI):
     def get_contract_abi(self, address: str) -> List[ABI]:
         response = requests.get(
             ETHERSCAN_API_URI(self.network.name),
-            params={"module": "contract", "action": "getabi", "address": address},
+            params={"module": "contract", "action": "getsourcecode", "address": address},
         )
-        abi_string = response.json()["result"]
-        return [ABI.from_dict(item) for item in json.loads(abi_string)]
-        # needs to return ContractType
-        # return ContractType.from_dict(item) for item in json.loads(abi_string)
+        abi_string = response.json()['result'][0]['ABI']
+        abi = [ABI.from_dict(item) for item in json.loads(abi_string)]
+        contractName = response.json()['result'][0]['ContractName']
+        return ContractType(abi=abi,contractName=contractName)
