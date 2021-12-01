@@ -10,8 +10,7 @@ ETHERSCAN_URI = (
 )
 
 def get_etherscan_uri(network_name):
-    f"https://api-{n}.etherscan.io/api" if n != "mainnet" else "https://api.etherscan.io/api"
-)
+    return f"https://api-{n}.etherscan.io/api" if network_name != "mainnet" else "https://api.etherscan.io/api"
 
 
 class Etherscan(ExplorerAPI):
@@ -23,7 +22,7 @@ class Etherscan(ExplorerAPI):
 
     def get_contract_type(self, address: str) -> List[ABI]:
         response = requests.get(
-            ETHERSCAN_API_URI(self.network.name),
+            get_etherscan_uri(self.network.name),
             params={"module": "contract", "action": "getsourcecode", "address": address},
         )
         abi_string = response.json()["result"][0]["ABI"]
