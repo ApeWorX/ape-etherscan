@@ -21,7 +21,7 @@ class Etherscan(ExplorerAPI):
     def get_transaction_url(self, transaction_hash: str) -> str:
         return ETHERSCAN_URI(self.network.name).format("tx", transaction_hash)
 
-    def get_contract_abi(self, address: str) -> List[ABI]:
+    def get_contract_type(self, address: str) -> List[ABI]:
         response = requests.get(
             ETHERSCAN_API_URI(self.network.name),
             params={"module": "contract", "action": "getsourcecode", "address": address},
