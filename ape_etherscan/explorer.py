@@ -1,9 +1,10 @@
+import json
 from json.decoder import JSONDecodeError
+from typing import Optional
+
+import requests
 from ape.api import ExplorerAPI
 from ape.types import ABI, ContractType
-from typing import Optional
-import requests
-import json
 
 ETHERSCAN_URI = (
     lambda n: (f"https://{n}.etherscan.io/" if n != "mainnet" else "https://etherscan.io/")
