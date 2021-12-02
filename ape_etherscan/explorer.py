@@ -32,6 +32,7 @@ class Etherscan(ExplorerAPI):
             get_etherscan_uri(self.network.name),
             params={"module": "contract", "action": "getsourcecode", "address": address},
         )
+        response.raise_for_status()
         result = response.json().get("result")
         if not result or len(result) != 1:
             return None
