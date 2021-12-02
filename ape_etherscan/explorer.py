@@ -1,7 +1,7 @@
 from json.decoder import JSONDecodeError
 from ape.api import ExplorerAPI
 from ape.types import ABI, ContractType
-from typing import List, Optional
+from typing import Optional
 import requests
 import json
 
@@ -13,7 +13,7 @@ ETHERSCAN_URI = (
 
 def get_etherscan_uri(network_name):
     return (
-        f"https://api-{n}.etherscan.io/api"
+        f"https://api-{network_name}.etherscan.io/api"
         if network_name != "mainnet"
         else "https://api.etherscan.io/api"
     )
