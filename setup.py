@@ -8,6 +8,7 @@ extras_require = {
         "pytest-xdist",  # multi-process runner
         "pytest-cov",  # Coverage analyzer plugin
         "hypothesis>=6.2.0,<7.0",  # Strategy-based fuzzer
+        "pytest-mock",  # Test mocker
     ],
     "lint": [
         "black>=20.8b1,<21.0",  # auto-formatter and linter
@@ -63,7 +64,7 @@ setup(
         "eth-ape>=0.1.0a14",
         "importlib-metadata ; python_version<'3.8'",
     ],  # NOTE: Add 3rd party libraries here
-    python_requires=">=3.6,<4",
+    python_requires=">=3.7,<4",
     extras_require=extras_require,
     py_modules=["ape_etherscan"],
     license="Apache-2.0",
