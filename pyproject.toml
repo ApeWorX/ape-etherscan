@@ -50,3 +50,6 @@ known_third_party = ["ape", "requests", "setuptools"]
 known_first_party = ["ape_etherscan"]
 multi_line_output = 3
 use_parentheses = true
+
+[tool.mypy]
+exclude = "build/"
