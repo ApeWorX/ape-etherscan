@@ -13,21 +13,6 @@ write_to = "ape_etherscan/version.py"
 line-length = 100
 target-version = ['py36', 'py37', 'py38']
 include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | build
-  | dist
-  | env
-  | venv
-)/
-'''
 
 [tool.pytest.ini_options]
 addopts = """
