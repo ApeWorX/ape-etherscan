@@ -11,12 +11,13 @@ write_to = "ape_etherscan/version.py"
 
 [tool.black]
 line-length = 100
-target-version = ['py36', 'py37', 'py38']
+target-version = ['py37', 'py38', 'py39']
 include = '\.pyi?$'
 
 [tool.pytest.ini_options]
 addopts = """
     -n auto
+    -p no:ape_test
     --cov-branch
     --cov-report term
     --cov-report html
