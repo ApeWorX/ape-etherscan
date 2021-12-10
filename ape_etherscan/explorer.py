@@ -45,4 +45,4 @@ class Etherscan(ExplorerAPI):
             return None
         abi = [ABI.from_dict(item) for item in abi_list]
         contractName = result[0].get("ContractName", "unknown")
-        return ContractType(abi=abi, contractName=contractName) # type: ignore
+        return ContractType(abi=abi, contractName=contractName)  # type: ignore
