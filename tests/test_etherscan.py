@@ -8,7 +8,7 @@ from requests import Response
 @pytest.fixture
 def etherscan_abi_response(mocker):
     response = mocker.MagicMock(spec=Response)
-    f = open("get_contract_response.json")
+    f = open("tests/get_contract_response.json")
     response.json.return_value = json.load(f)
     f.close()
     return response
