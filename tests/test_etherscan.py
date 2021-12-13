@@ -9,6 +9,7 @@ def etherscan_abi_response(mocker):
     response = mocker.MagicMock(spec=Response)
     f = open("api.json")
     response.json.return_value = json.load(f)
+    f.close()
     return response
 
 
