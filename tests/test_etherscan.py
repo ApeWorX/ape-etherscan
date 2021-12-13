@@ -13,6 +13,6 @@ def etherscan_abi_response(mocker):
     return response
 
 
-def test(mocker):
+def test_get_contract_type(mocker):
     get_patch = mocker.patch("ape_etherscan.explorer.requests")
     get_patch.get.return_value = etherscan_abi_response
