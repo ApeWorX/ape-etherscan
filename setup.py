@@ -14,7 +14,7 @@ extras_require = {
         "black>=21.10b0,<22.0",  # auto-formatter and linter
         "mypy>=0.910,<1.0",  # Static type analyzer
         "types-requests",  # NOTE: Needed due to mypy typeshed
-        "flake8>=3.8.3,<4.0",  # Style linter
+        "flake8>=3.9.2,<4.0",  # Style linter
         "isort>=5.7.0,<6.0",  # Import sorting linter
     ],
     "doc": [
@@ -62,7 +62,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.1.0a31",
+        "eth-ape>=0.1.0b2",
         "importlib-metadata ; python_version<'3.8'",
     ],  # NOTE: Add 3rd party libraries here
     python_requires=">=3.7,<4",
@@ -81,7 +81,6 @@ setup(
         "Operating System :: MacOS",
         "Operating System :: POSIX",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
