@@ -45,7 +45,7 @@ class _APIClient:
 
         result = response_data.get("result")
         if not result:
-            raise ResponseError(response.text)
+            raise ResponseError(response)
 
         return result
 
