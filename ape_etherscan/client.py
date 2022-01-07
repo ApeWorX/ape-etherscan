@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import requests
 from ape.exceptions import ApeException
@@ -34,7 +34,7 @@ class _APIClient:
     def base_params(self) -> Dict:
         return {"module": self._module_name}
 
-    def _get(self, params: Optional[Dict] = None) -> Dict:
+    def _get(self, params: Optional[Dict] = None) -> List:
         headers = {"User-Agent": USER_AGENT}
         response = requests.get(self.base_uri, params=params, headers=headers)
         response.raise_for_status()
