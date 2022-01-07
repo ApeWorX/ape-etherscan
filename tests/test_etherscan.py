@@ -5,7 +5,13 @@ import pytest
 from ape import networks
 from requests import Response
 
-CONTRACT_ADDRESS = "0x112233966B444443fe4b875411e2877777777AaA"
+ADDRESS = "0xab5801a7d398351b8be11c439e05c5b3259aec9b"
+TRANSACITON = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
+
+
+@pytest.fixture
+def explorer():
+    return networks.ethereum.mainnet.explorer
 
 
 @pytest.fixture
@@ -30,15 +36,27 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
     return get_patch
 
 
-def test_get_contract_type(mocker, etherscan_abi_response):
+def test_get_address_url(explorer):
+    expected = f"https://etherscan.io/address/{ADDRESS}"
+    actual = explorer.get_address_url(ADDRESS)
+    assert actual == expected
+
+
+def test_get_transaction_url(explorer):
+    expected = f"https://etherscan.io/tx/{TRANSACITON}"
+    actual = explorer.get_transaction_url(TRANSACITON)
+    assert actual == expected
+
+
+def test_get_contract_type(mocker, etherscan_abi_response, exlporer):
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
-        "address": CONTRACT_ADDRESS,
+        "address": ADDRESS,
     }
     setup_mock_get(mocker, etherscan_abi_response, expected_params)
 
-    actual = networks.ethereum.mainnet.explorer.get_contract_type(CONTRACT_ADDRESS)
+    actual = explorer.get_contract_type(ADDRESS)
 
     # Name comes from the 'get_contract_response.json' file
     expected = "BoredApeYachtClub"

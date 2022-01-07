@@ -5,16 +5,20 @@ from ape.exceptions import ApeException
 from ape.utils import USER_AGENT
 
 
-def get_etherscan_uri(network_name):
+def get_etherscan_uri(network_name: str):
     return (
-        f"https://api-{network_name}.etherscan.io"
+        f"https://{network_name}.etherscan.io"
         if network_name != "mainnet"
-        else "https://api.etherscan.io"
+        else "https://etherscan.io"
     )
 
 
-def get_etherscan_api_uri(network_name):
-    return f"{get_etherscan_uri(network_name)}/api"
+def get_etherscan_api_uri(network_name: str, is_api=True):
+    return (
+        f"https://api-{network_name}.etherscan.io/api"
+        if network_name != "mainnet"
+        else "https://api.etherscan.io/api"
+    )
 
 
 class _APIClient:
