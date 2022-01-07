@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 import requests
 from ape.exceptions import ApeException
@@ -34,7 +34,7 @@ class _APIClient:
     def base_params(self) -> Dict:
         return {"module": self._module_name}
 
-    def _get(self, params: Optional[Dict] = None) -> Dict:
+    def _get(self, params: Optional[Dict] = None) -> List:
         headers = {"User-Agent": USER_AGENT}
         response = requests.get(self.base_uri, params=params, headers=headers)
         response.raise_for_status()
@@ -57,13 +57,16 @@ class ContractClient(_APIClient):
         return result[0] if len(result) == 1 else None
 
 
-class ResponseError(ApeException):
-    """
-    Raised when the response is not correct.
-    """
+class AccountClient(_APIClient):
+    def __init__(self, network_name: str, address: str):
+        self._address = address
+        super().__init__(network_name, "account")
 
-    def __init__(self, response_text: str):
-        super().__init__(f"Response is not expected:\n{response_text}")
+    def get_normal_transactions(self) -> List[Dict]:
+        params = {**self.base_params, "action": "txlist", "address": self._address}
+        result = self._get(params=params)
+        return result
+
 
 
 class ClientFactory:
@@ -72,3 +75,15 @@ class ClientFactory:
 
     def get_contract_client(self, contract_address: str) -> ContractClient:
         return ContractClient(self._network_name, contract_address)
+
+    def get_account_client(self, account_address: str) -> AccountClient:
+        return AccountClient(self._network_name, account_address)
+
+
+class ResponseError(ApeException):
+    """
+    Raised when the response is not correct.
+    """
+
+    def __init__(self, response_text: str):
+        super().__init__(f"Response is not expected:\n{response_text}")
