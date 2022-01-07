@@ -1,8 +1,9 @@
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional, Iterator
 
 import requests
 from ape.exceptions import ApeException
 from ape.utils import USER_AGENT
+from requests import Response
 
 
 def get_etherscan_uri(network_name: str):
@@ -39,6 +40,9 @@ class _APIClient:
         response = requests.get(self.base_uri, params=params, headers=headers)
         response.raise_for_status()
         response_data = response.json()
+        if response_data.get("isError", 0) or response_data.get("message", "") == "NOTOK":
+            raise ResponseError(response)
+
         result = response_data.get("result")
         if not result:
             raise ResponseError(response.text)
@@ -62,11 +66,41 @@ class AccountClient(_APIClient):
         self._address = address
         super().__init__(network_name, "account")
 
-    def get_normal_transactions(self) -> List[Dict]:
-        params = {**self.base_params, "action": "txlist", "address": self._address}
+    def get_all_normal_transactions(
+        self,
+        start_block: Optional[int] = None,
+        end_block: Optional[int] = None,
+        offset: int = 10,
+        sort: str = "asc",
+    ) -> Iterator[List[Dict]]:
+        page_num = 1
+        last_page_results = offset  # Start at offset to trigger iteration
+        while last_page_results == offset:
+            page = self._get_page_of_normal_transactions(
+                page_num, start_block, end_block, offset=offset, sort=sort
+            )
+
+            if len(page):
+                yield page
+
+            last_page_results = len(page)
+            page_num += 1
+
+    def _get_page_of_normal_transactions(
+        self, page: int, start_block: int, end_block: int, offset: int = 10, sort: str = "asc"
+    ) -> List[Dict]:
+        params = {
+            **self.base_params,
+            "action": "txlist",
+            "address": self._address,
+            "startblock": start_block,
+            "endblock": end_block,
+            "page": page,
+            "offset": offset,
+            "sort": sort,
+        }
         result = self._get(params=params)
         return result
-
 
 
 class ClientFactory:
@@ -85,5 +119,14 @@ class ResponseError(ApeException):
     Raised when the response is not correct.
     """
 
-    def __init__(self, response_text: str):
-        super().__init__(f"Response is not expected:\n{response_text}")
+    def __init__(self, response: Response):
+        self.response = response
+        response_data = response.json()
+        if "result" in response_data:
+            message = response_data["result"]
+        elif "message" in response_data:
+            message = response_data["message"]
+        else:
+            message = response.text
+
+        super().__init__(f"Response indicated failure: {message}")
