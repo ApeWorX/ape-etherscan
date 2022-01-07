@@ -2,16 +2,15 @@ import json
 from pathlib import Path
 
 import pytest
-from ape import networks
+from ape import convert, networks
+from ape.api.explorers import ExplorerAPI
+from ape.types import AddressType
 from requests import Response
 
-ADDRESS = "0xab5801a7d398351b8be11c439e05c5b3259aec9b"
-TRANSACITON = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
+from ape_etherscan import NETWORKS
 
-
-@pytest.fixture
-def explorer():
-    return networks.ethereum.mainnet.explorer
+ADDRESS = "https://etherscan.io/address/0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
+TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 
 
 @pytest.fixture
@@ -21,6 +20,10 @@ def etherscan_abi_response(mocker):
     with open(test_data_path) as response_data_file:
         response.json.return_value = json.load(response_data_file)
         yield response
+
+
+def get_explorer(network_name: str) -> ExplorerAPI:
+    return getattr(networks.ethereum, network_name).explorer
 
 
 def setup_mock_get(mocker, etherscan_abi_response, expected_params):
@@ -36,19 +39,29 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
     return get_patch
 
 
-def test_get_address_url(explorer):
-    expected = f"https://etherscan.io/address/{ADDRESS}"
-    actual = explorer.get_address_url(ADDRESS)
+@pytest.mark.parametrize(
+    "network,expected_prefix,address",
+    [(NETWORKS[0], "etherscan.io", ADDRESS), (NETWORKS[1], "ropsten.etherscan.io", ADDRESS)],
+)
+def test_get_address_url(network, expected_prefix, address):
+    expected = f"https://{expected_prefix}/address/{ADDRESS}"
+    explorer = get_explorer(network)
+    actual = explorer.get_address_url(address)  # type: ignore
     assert actual == expected
 
 
-def test_get_transaction_url(explorer):
-    expected = f"https://etherscan.io/tx/{TRANSACITON}"
-    actual = explorer.get_transaction_url(TRANSACITON)
+@pytest.mark.parametrize(
+    "network,expected_prefix,tx_hash",
+    [(NETWORKS[0], "etherscan.io", TRANSACTION), (NETWORKS[1], "ropsten.etherscan.io", TRANSACTION)],
+)
+def test_get_transaction_url(network, expected_prefix, tx_hash):
+    expected = f"https://{expected_prefix}/tx/{tx_hash}"
+    explorer = get_explorer(network)
+    actual = explorer.get_transaction_url(tx_hash)
     assert actual == expected
 
 
-def test_get_contract_type(mocker, etherscan_abi_response, explorer):
+def test_get_contract_type(mocker, etherscan_abi_response):
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
@@ -56,7 +69,8 @@ def test_get_contract_type(mocker, etherscan_abi_response, explorer):
     }
     setup_mock_get(mocker, etherscan_abi_response, expected_params)
 
-    actual = explorer.get_contract_type(ADDRESS)
+    explorer = get_explorer("mainnet")
+    actual = explorer.get_contract_type(ADDRESS)  # type: ignore
 
     # Name comes from the 'get_contract_response.json' file
     expected = "BoredApeYachtClub"
