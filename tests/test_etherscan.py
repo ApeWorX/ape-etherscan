@@ -2,9 +2,8 @@ import json
 from pathlib import Path
 
 import pytest
-from ape import convert, networks
+from ape import networks
 from ape.api.explorers import ExplorerAPI
-from ape.types import AddressType
 from requests import Response
 
 from ape_etherscan import NETWORKS
@@ -52,7 +51,10 @@ def test_get_address_url(network, expected_prefix, address):
 
 @pytest.mark.parametrize(
     "network,expected_prefix,tx_hash",
-    [(NETWORKS[0], "etherscan.io", TRANSACTION), (NETWORKS[1], "ropsten.etherscan.io", TRANSACTION)],
+    [
+        (NETWORKS[0], "etherscan.io", TRANSACTION),
+        (NETWORKS[1], "ropsten.etherscan.io", TRANSACTION),
+    ],
 )
 def test_get_transaction_url(network, expected_prefix, tx_hash):
     expected = f"https://{expected_prefix}/tx/{tx_hash}"
