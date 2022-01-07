@@ -30,7 +30,7 @@ extras_require = {
     ],
     "dev": [
         "commitizen",  # Manage commits and publishing releases
-        "pre-commit",  # Ensure that linters are run prior to commiting
+        "pre-commit",  # Ensure that linters are run prior to committing
         "pytest-watch",  # `ptw` test watcher/runner
         "IPython",  # Console for interacting
         "ipdb",  # Debugger (Must use `export PYTHONBREAKPOINT=ipdb.set_trace`)
@@ -62,8 +62,9 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.1.0b2",
+        "eth-ape>=0.1.0b3",
         "importlib-metadata ; python_version<'3.8'",
+        "requests>=2.25.1,<3.0.0",
     ],  # NOTE: Add 3rd party libraries here
     python_requires=">=3.7,<4",
     extras_require=extras_require,

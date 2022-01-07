@@ -1,48 +1,40 @@
 import json
 from json.decoder import JSONDecodeError
-from typing import Optional
+from typing import Iterator, Optional
 
-import requests
-from ape.api import ExplorerAPI
-from ape.types import ABI, ContractType
+from ape.api import ExplorerAPI, ReceiptAPI
+from ape.types import ABI, AddressType, ContractType
 
-ETHERSCAN_URI = (
-    lambda n: (f"https://{n}.etherscan.io/" if n != "mainnet" else "https://etherscan.io/")
-    + "{0}/{1}/"
-)
-
-
-def get_etherscan_uri(network_name):
-    return (
-        f"https://api-{network_name}.etherscan.io/api"
-        if network_name != "mainnet"
-        else "https://api.etherscan.io/api"
-    )
+from ape_etherscan.client import ClientFactory, get_etherscan_uri
 
 
 class Etherscan(ExplorerAPI):
     def get_address_url(self, address: str) -> str:
-        return ETHERSCAN_URI(self.network.name).format("address", address)
+        return f"{get_etherscan_uri(self.network.name)}/address/{address}"
 
     def get_transaction_url(self, transaction_hash: str) -> str:
-        return ETHERSCAN_URI(self.network.name).format("tx", transaction_hash)
+        return f"{get_etherscan_uri(self.network.name)}/tx/{transaction_hash}"
+
+    @property
+    def _client_factory(self):
+        return ClientFactory(self.network.name)
 
     def get_contract_type(self, address: str) -> Optional[ContractType]:
-        response = requests.get(
-            get_etherscan_uri(self.network.name),
-            params={"module": "contract", "action": "getsourcecode", "address": address},
-        )
-        response.raise_for_status()
-        result = response.json().get("result")
-        if not result or len(result) != 1:
-            return None
-        abi_string = result[0].get("ABI")
+        client = self._client_factory.get_contract_client(address)
+        source_code = client.get_source_code() or {}
+        source_code = client.get_source_code() or {}
+        abi_string = source_code.get("ABI")
         if not abi_string:
             return None
+
         try:
             abi_list = json.loads(abi_string)
         except JSONDecodeError:
             return None
+
         abi = [ABI.from_dict(item) for item in abi_list]
-        contractName = result[0].get("ContractName", "unknown")
-        return ContractType(abi=abi, contractName=contractName)  # type: ignore
+        contract_name = source_code.get("ContractName", "unknown")
+        return ContractType(abi=abi, contractName=contract_name)  # type: ignore
+
+    def get_account_transactions(self, address: AddressType) -> Iterator[ReceiptAPI]:
+        pass
