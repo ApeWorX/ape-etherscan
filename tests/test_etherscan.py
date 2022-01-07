@@ -48,7 +48,7 @@ def test_get_transaction_url(explorer):
     assert actual == expected
 
 
-def test_get_contract_type(mocker, etherscan_abi_response, exlporer):
+def test_get_contract_type(mocker, etherscan_abi_response, explorer):
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
