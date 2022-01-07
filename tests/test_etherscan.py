@@ -17,21 +17,29 @@ def etherscan_abi_response(mocker):
         yield response
 
 
-def test_get_contract_type(mocker, etherscan_abi_response):
+def setup_mock_get(mocker, etherscan_abi_response, expected_params):
     get_patch = mocker.patch("ape_etherscan.client.requests")
 
     def get(base_uri, params=None, *args, **kwargs):
         # Request will fail if made with incorrect parameters.
         assert base_uri == "https://api.etherscan.io/api"
-        assert params == {
-            "module": "contract",
-            "action": "getsourcecode",
-            "address": CONTRACT_ADDRESS,
-        }
+        assert params == expected_params
         return etherscan_abi_response
 
     get_patch.get.side_effect = get
+    return get_patch
+
+
+def test_get_contract_type(mocker, etherscan_abi_response):
+    expected_params = {
+        "module": "contract",
+        "action": "getsourcecode",
+        "address": CONTRACT_ADDRESS,
+    }
+    setup_mock_get(mocker, etherscan_abi_response, expected_params)
 
     actual = networks.ethereum.mainnet.explorer.get_contract_type(CONTRACT_ADDRESS)
-    expected = "BoredApeYachtClub"  # Name comes from the 'get_contract_response.json' file
+
+    # Name comes from the 'get_contract_response.json' file
+    expected = "BoredApeYachtClub"
     assert actual.contractName == expected

@@ -17,7 +17,7 @@ def get_etherscan_api_uri(network_name):
     return f"{get_etherscan_uri(network_name)}/api"
 
 
-class _BaseClient:
+class _APIClient:
     def __init__(self, network_name: str, module_name: str):
         self._network_name = network_name
         self._module_name = module_name
@@ -42,7 +42,7 @@ class _BaseClient:
         return result
 
 
-class ContractClient(_BaseClient):
+class ContractClient(_APIClient):
     def __init__(self, network_name: str, address: str):
         self._address = address
         super().__init__(network_name, "contract")
