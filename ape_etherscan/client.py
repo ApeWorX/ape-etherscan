@@ -14,7 +14,7 @@ def get_etherscan_uri(network_name: str):
     )
 
 
-def get_etherscan_api_uri(network_name: str, is_api=True):
+def get_etherscan_api_uri(network_name: str):
     return (
         f"https://api-{network_name}.etherscan.io/api"
         if network_name != "mainnet"
