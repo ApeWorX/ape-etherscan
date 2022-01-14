@@ -10,12 +10,13 @@ from ape_etherscan import NETWORKS
 
 ADDRESS = "https://etherscan.io/address/0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
+MOCK_RESPONSES_PATH = Path(__file__).parent / "mock_responses"
 
 
 @pytest.fixture
 def etherscan_abi_response(mocker):
     response = mocker.MagicMock(spec=Response)
-    test_data_path = Path(__file__).parent / "get_contract_response.json"
+    test_data_path = MOCK_RESPONSES_PATH / "get_contract_response.json"
     with open(test_data_path) as response_data_file:
         response.json.return_value = json.load(response_data_file)
         yield response
