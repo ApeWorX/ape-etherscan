@@ -13,16 +13,16 @@ TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e
 MOCK_RESPONSES_PATH = Path(__file__).parent / "mock_responses"
 
 
-@pytest.fixture
-def etherscan_abi_response(mocker):
+@pytest.fixture(params=([f.name for f in MOCK_RESPONSES_PATH.iterdir()]))
+def etherscan_abi_response(request, mocker):
     response = mocker.MagicMock(spec=Response)
-    test_data_path = MOCK_RESPONSES_PATH / "get_contract_response.json"
+    test_data_path = MOCK_RESPONSES_PATH / request.param
     with open(test_data_path) as response_data_file:
         response.json.return_value = json.load(response_data_file)
         yield response
 
 
-def get_explorer(network_name: str) -> ExplorerAPI:
+def get_explorer(network_name: str = "development") -> ExplorerAPI:
     return getattr(networks.ethereum, network_name).explorer
 
 
@@ -72,7 +72,7 @@ def test_get_contract_type(mocker, etherscan_abi_response):
     }
     setup_mock_get(mocker, etherscan_abi_response, expected_params)
 
-    explorer = get_explorer("mainnet")
+    explorer = get_explorer()
     actual = explorer.get_contract_type(ADDRESS)  # type: ignore
 
     # Name comes from the 'get_contract_response.json' file
