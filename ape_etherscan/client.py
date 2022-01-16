@@ -1,3 +1,4 @@
+import json
 from typing import Dict, List, Optional
 
 import requests
@@ -46,6 +47,10 @@ class _APIClient:
         result = response_data.get("result")
         if not result:
             raise ResponseError(response)
+
+        if isinstance(result, str):
+            # Sometimes, ABI is stored as a stringified-list
+            result = json.loads(result)
 
         return result
 

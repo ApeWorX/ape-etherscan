@@ -72,7 +72,7 @@ def test_get_contract_type(mocker, etherscan_abi_response):
     }
     setup_mock_get(mocker, etherscan_abi_response, expected_params)
 
-    explorer = get_explorer()
+    explorer = get_explorer("mainnet")
     actual = explorer.get_contract_type(ADDRESS)  # type: ignore
 
     # Name comes from the 'get_contract_response.json' file
