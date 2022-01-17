@@ -94,7 +94,7 @@ class AccountClient(_APIClient):
         self,
         start_block: Optional[int] = None,
         end_block: Optional[int] = None,
-        offset: int = 10,
+        offset: int = 100,
         sort: str = "asc",
     ) -> Iterator[List[Dict]]:
         page_num = 1
