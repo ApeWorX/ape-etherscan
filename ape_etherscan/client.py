@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, List, Optional, Iterator, Union
+from typing import Dict, Iterator, List, Optional, Union
 
 import requests
 from ape.utils import USER_AGENT
@@ -111,7 +111,12 @@ class AccountClient(_APIClient):
             page_num += 1
 
     def _get_page_of_normal_transactions(
-        self, page: int, start_block: int, end_block: int, offset: int = 10, sort: str = "asc"
+        self,
+        page: int,
+        start_block: Optional[int] = None,
+        end_block: Optional[int] = None,
+        offset: int = 100,
+        sort: str = "asc",
     ) -> List[Dict]:
         params = {
             **self.base_params,
@@ -124,7 +129,7 @@ class AccountClient(_APIClient):
             "sort": sort,
         }
         result = self._get(params=params)
-        return result
+        return result  # type: ignore
 
 
 class ClientFactory:

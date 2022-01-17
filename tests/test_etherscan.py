@@ -24,7 +24,7 @@ def mock_abi_response(request, mocker):
     test_data_path = MOCK_RESPONSES_PATH / request.param
 
     with open(test_data_path) as response_data_file:
-        yield _mock_response(mocker, file_name, response_data_file)
+        yield _mock_response(mocker, request.param, response_data_file)
 
 
 def _mock_response(mocker, file_name: str, response_data_file):
@@ -87,7 +87,19 @@ def test_get_transaction_url(network, expected_prefix, tx_hash):
     assert actual == expected
 
 
-def test_get_contract_type(mocker, mock_abi_response):
+def etherscan_abi_response(request, mocker):
+    response = mocker.MagicMock(spec=Response)
+    test_data_path = MOCK_RESPONSES_PATH / request.param
+
+    with open(test_data_path) as response_data_file:
+        mock_response_dict = json.load(response_data_file)
+        response.json.return_value = mock_response_dict
+        response.text.return_value = json.dumps(mock_response_dict)
+        response.file_name = request.param
+        yield response
+
+
+def test_get_contract_type(mocker, etherscan_abi_response):
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
@@ -119,4 +131,5 @@ def test_get_account_transactions(mocker, mock_account_transactions_response):
     explorer = get_explorer("mainnet")
     actual = [r for r in explorer.get_account_transactions(ADDRESS)]  # type: ignore
 
+    # From `get_account_transactions.json` response.
     assert actual[0].txn_hash == "GENESIS_ddbd2b932c763ba5b1b7ae3b362eac3e8d40121a"

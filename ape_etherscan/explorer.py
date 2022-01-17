@@ -1,12 +1,12 @@
 import json
 from json.decoder import JSONDecodeError
-from typing import Optional, Iterator
+from typing import Iterator, Optional
 
-from ape.api import ExplorerAPI, ReceiptAPI, TransactionStatusEnum
-from ape.types import ABI, ContractType, AddressType
+from ape.api import ExplorerAPI, ReceiptAPI
+from ape.types import ABI, AddressType, ContractType
+from ape_ethereum.ecosystem import Receipt
 
 from ape_etherscan.client import ClientFactory, get_etherscan_uri
-from ape_ethereum.ecosystem import Receipt
 
 
 class Etherscan(ExplorerAPI):
