@@ -46,10 +46,9 @@ class _APIClient:
 
     def _post(self, json_dict: Optional[Dict] = None) -> Dict:
         json_dict = self.__authorize(json_dict)
-        return self._request("POST", json=json_dict)
+        return self._request("POST", json=json_dict)  # type: ignore
 
     def _request(self, method: str, *args, **kwargs) -> Union[List, Dict]:
-        uri = f"{self.base_uri}"
         response = requests.request(method.upper(), self.base_uri, *args, **kwargs)
         response.raise_for_status()
         response_data = response.json()
@@ -68,7 +67,7 @@ class _APIClient:
 
     def __authorize(self, params_or_data: Optional[Dict] = None) -> Optional[Dict]:
         api_key = os.environ.get(API_KEY_ENV_VAR_NAME)
-        if api_key and "apikey" not in params_or_data:
+        if api_key and (not params_or_data or "apikey" not in params_or_data):
             params_or_data = params_or_data or {}
             params_or_data["apikey"] = api_key
 

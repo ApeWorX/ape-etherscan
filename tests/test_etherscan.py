@@ -15,7 +15,7 @@ MOCK_RESPONSES_PATH = Path(__file__).parent / "mock_responses"
 # A map of each mock response to its contract name for testing `get_contract_type()`.
 EXPECTED_CONTRACT_NAME_MAP = {
     "get_contract_response.json": "BoredApeYachtClub",
-    "get_proxy_contract_response.json": "Vyper_contract"
+    "get_proxy_contract_response.json": "Vyper_contract",
 }
 
 
@@ -23,10 +23,6 @@ EXPECTED_CONTRACT_NAME_MAP = {
 def etherscan_abi_response(request, mocker):
     response = mocker.MagicMock(spec=Response)
     test_data_path = MOCK_RESPONSES_PATH / request.param
-    expected_name_map = {
-        "get_contract_response.json": "BoredApeYachtClub",
-        "get_proxy_contract_response.json": "Vyper_contract"
-    }
 
     with open(test_data_path) as response_data_file:
         mock_response_dict = json.load(response_data_file)
