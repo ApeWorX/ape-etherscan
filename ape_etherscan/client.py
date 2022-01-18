@@ -56,10 +56,7 @@ class _APIClient:
             raise get_request_error(response)
 
         result = response_data.get("result")
-        if not result:
-            raise get_request_error(response)
-
-        if isinstance(result, str):
+        if result and isinstance(result, str):
             # Sometimes, the response is a stringified JSON object or list
             result = json.loads(result)
 
@@ -82,6 +79,10 @@ class ContractClient(_APIClient):
     def get_source_code(self) -> Optional[Dict]:
         params = {**self.base_params, "action": "getsourcecode", "address": self._address}
         result = self._get(params=params)
+
+        if not result:
+            raise get_request_error(response)
+
         return result[0] if len(result) == 1 else None
 
 
