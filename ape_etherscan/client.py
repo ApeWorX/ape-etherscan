@@ -42,11 +42,11 @@ class _APIClient:
 
     def _get(self, params: Optional[Dict] = None) -> Union[List, Dict]:
         params = self.__authorize(params)
-        return self._request("GET", params=params)
+        return self._request("GET", params=params, headers=self.DEFAULT_HEADERS)
 
     def _post(self, json_dict: Optional[Dict] = None) -> Dict:
         json_dict = self.__authorize(json_dict)
-        return self._request("POST", json=json_dict)  # type: ignore
+        return self._request("POST", json=json_dict, headers=self.DEFAULT_HEADERS)  # type: ignore
 
     def _request(self, method: str, *args, **kwargs) -> Union[List, Dict]:
         response = requests.request(method.upper(), self.base_uri, *args, **kwargs)
