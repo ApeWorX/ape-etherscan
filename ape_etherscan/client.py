@@ -140,7 +140,7 @@ class AccountClient(_APIClient):
             "sort": sort,
         }
         result = self._get(params=params)
-        return result
+        return result  # type: ignore
 
 
 class ClientFactory:
