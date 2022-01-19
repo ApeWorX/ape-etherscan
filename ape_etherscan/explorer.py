@@ -22,7 +22,7 @@ class Etherscan(ExplorerAPI):
     def get_contract_type(self, address: str) -> Optional[ContractType]:
         client = self._client_factory.get_contract_client(address)
         source_code = client.get_source_code()
-        abi_string = source_code.ABI
+        abi_string = source_code.abi
         if not abi_string:
             return None
 
@@ -32,8 +32,7 @@ class Etherscan(ExplorerAPI):
             return None
 
         abi = [ABI(**item) for item in abi_list]
-        contract_name = source_code.ContractName
-        return ContractType(abi=abi, contractName=contract_name)  # type: ignore
+        return ContractType(abi=abi, contractName=source_code.name)  # type: ignore
 
     def get_account_transactions(self, address: AddressType) -> Iterator[ReceiptAPI]:
         client = self._client_factory.get_account_client(address)

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import json
 import os
 from typing import Dict, Iterator, List, Optional, Union
@@ -5,7 +6,6 @@ from typing import Dict, Iterator, List, Optional, Union
 import requests
 from ape.utils import USER_AGENT
 from ape_ethereum.ecosystem import Receipt
-from pydantic import BaseModel
 
 from ape_etherscan.exceptions import get_request_error
 from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
@@ -27,9 +27,10 @@ def get_etherscan_api_uri(network_name: str):
     )
 
 
-class SourceCodeResponse(BaseModel):
-    ABI: str = ""
-    ContractName: str = "unknown"
+@dataclass
+class SourceCodeResponse:
+    abi: str = ""
+    name: str = "unknown"
 
 
 class _APIClient:
@@ -86,7 +87,14 @@ class ContractClient(_APIClient):
     def get_source_code(self) -> SourceCodeResponse:
         params = {**self.base_params, "action": "getsourcecode", "address": self._address}
         result = self._get(params=params) or []
-        return SourceCodeResponse(**result[0]) if len(result) == 1 else SourceCodeResponse()
+
+        if len(result) != 1:
+            return SourceCodeResponse()
+
+        data = result[0]
+        abi = data.get("ABI") or ""
+        name = data.get("ContractName") or "unknown"
+        return SourceCodeResponse(abi, name)
 
 
 class AccountClient(_APIClient):
