@@ -1,11 +1,10 @@
-from dataclasses import dataclass
 import json
 import os
+from dataclasses import dataclass
 from typing import Dict, Iterator, List, Optional, Union
 
 import requests
 from ape.utils import USER_AGENT
-from ape_ethereum.ecosystem import Receipt
 
 from ape_etherscan.exceptions import get_request_error
 from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
@@ -108,7 +107,7 @@ class AccountClient(_APIClient):
         end_block: Optional[int] = None,
         offset: int = 100,
         sort: str = "asc",
-    ) -> Iterator[Receipt]:
+    ) -> Iterator[Dict]:
         page_num = 1
         last_page_results = offset  # Start at offset to trigger iteration
         while last_page_results == offset:
@@ -117,14 +116,7 @@ class AccountClient(_APIClient):
             )
 
             if len(page):
-                for receipt_data in page:
-                    if "confirmations" in receipt_data:
-                        receipt_data["required_confirmations"] = receipt_data.pop("confirmations")
-                    if "txreceipt_status" in receipt_data:
-                        receipt_data["status"] = receipt_data.pop("txreceipt_status")
-
-                    receipt: Receipt = Receipt.decode(receipt_data)  # type: ignore
-                    yield receipt
+                yield from page
 
             last_page_results = len(page)
             page_num += 1
@@ -148,7 +140,7 @@ class AccountClient(_APIClient):
             "sort": sort,
         }
         result = self._get(params=params)
-        return result  # type: ignore
+        return result
 
 
 class ClientFactory:
