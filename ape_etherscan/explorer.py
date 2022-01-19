@@ -32,7 +32,7 @@ class Etherscan(ExplorerAPI):
         except JSONDecodeError:
             return None
 
-        abi = [ABI.from_dict(item) for item in abi_list]
+        abi = [ABI(**item) for item in abi_list]
         contract_name = source_code.get("ContractName", "unknown")
         return ContractType(abi=abi, contractName=contract_name)  # type: ignore
 

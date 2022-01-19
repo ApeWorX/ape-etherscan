@@ -19,7 +19,7 @@ EXPECTED_CONTRACT_NAME_MAP = {
 }
 
 
-@pytest.fixture(params=([f.name for f in MOCK_RESPONSES_PATH.iterdir()]))
+@pytest.fixture(params=("get_contract_response.json", "get_proxy_contract_response.json"))
 def mock_abi_response(request, mocker):
     test_data_path = MOCK_RESPONSES_PATH / request.param
 
@@ -55,6 +55,11 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
         # Request will fail if made with incorrect parameters.
         assert method == "GET"
         assert base_uri == "https://api.etherscan.io/api"
+
+        # Ignore API key in tests for now
+        if params and "apikey" in params:
+            del params["apikey"]
+
         assert params == expected_params, "Was not called with the expected request parameters."
         return etherscan_abi_response
 
@@ -99,7 +104,7 @@ def etherscan_abi_response(request, mocker):
         yield response
 
 
-def test_get_contract_type(mocker, etherscan_abi_response):
+def test_get_contract_type(mocker, mock_abi_response):
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
@@ -109,8 +114,9 @@ def test_get_contract_type(mocker, etherscan_abi_response):
 
     explorer = get_explorer("mainnet")
     actual = explorer.get_contract_type(ADDRESS)  # type: ignore
+    assert actual is not None
 
-    actual = actual.contractName
+    actual = actual.name
     expected = EXPECTED_CONTRACT_NAME_MAP[mock_abi_response.file_name]
     assert actual == expected
 
