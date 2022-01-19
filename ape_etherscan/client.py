@@ -93,7 +93,7 @@ class AccountClient(_APIClient):
         end_block: Optional[int] = None,
         offset: int = 100,
         sort: str = "asc",
-    ) -> Iterator[List[Dict]]:
+    ) -> Iterator[Dict]:
         page_num = 1
         last_page_results = offset  # Start at offset to trigger iteration
         while last_page_results == offset:
@@ -102,7 +102,7 @@ class AccountClient(_APIClient):
             )
 
             if len(page):
-                yield page
+                yield from page
 
             last_page_results = len(page)
             page_num += 1

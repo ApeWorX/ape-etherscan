@@ -38,12 +38,10 @@ class Etherscan(ExplorerAPI):
 
     def get_account_transactions(self, address: AddressType) -> Iterator[ReceiptAPI]:
         client = self._client_factory.get_account_client(address)
-        for page_of_transactions in client.get_all_normal_transactions():
-            transactions = page_of_transactions
-            for transaction in transactions:
-                if "confirmations" in transaction:
-                    transaction["required_confirmations"] = transaction.pop("confirmations")
-                if "txreceipt_status" in transaction:
-                    transaction["status"] = transaction.pop("txreceipt_status")
+        for transaction in client.get_all_normal_transactions():
+            if "confirmations" in transaction:
+                transaction["required_confirmations"] = transaction.pop("confirmations")
+            if "txreceipt_status" in transaction:
+                transaction["status"] = transaction.pop("txreceipt_status")
 
-                yield Receipt.decode(transaction)
+            yield Receipt.decode(transaction)
