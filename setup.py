@@ -64,6 +64,7 @@ setup(
     install_requires=[
         "eth-ape>=0.1.0b4",
         "importlib-metadata ; python_version<'3.8'",
+        "pydantic>=1.8.2,<2",
         "requests>=2.25.1,<3.0.0",
     ],  # NOTE: Add 3rd party libraries here
     python_requires=">=3.7,<4",

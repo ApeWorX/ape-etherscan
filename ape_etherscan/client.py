@@ -4,6 +4,8 @@ from typing import Dict, Iterator, List, Optional, Union
 
 import requests
 from ape.utils import USER_AGENT
+from ape_ethereum.ecosystem import Receipt
+from pydantic import BaseModel
 
 from ape_etherscan.exceptions import get_request_error
 from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
@@ -23,6 +25,11 @@ def get_etherscan_api_uri(network_name: str):
         if network_name != "mainnet"
         else "https://api.etherscan.io/api"
     )
+
+
+class SourceCodeResponse(BaseModel):
+    ABI: str = ""
+    ContractName: str = "unknown"
 
 
 class _APIClient:
@@ -76,10 +83,10 @@ class ContractClient(_APIClient):
         self._address = address
         super().__init__(network_name, "contract")
 
-    def get_source_code(self) -> Optional[Dict]:
+    def get_source_code(self) -> SourceCodeResponse:
         params = {**self.base_params, "action": "getsourcecode", "address": self._address}
         result = self._get(params=params) or []
-        return result[0] if len(result) == 1 else None
+        return SourceCodeResponse(**result[0]) if len(result) == 1 else SourceCodeResponse()
 
 
 class AccountClient(_APIClient):
@@ -93,7 +100,7 @@ class AccountClient(_APIClient):
         end_block: Optional[int] = None,
         offset: int = 100,
         sort: str = "asc",
-    ) -> Iterator[Dict]:
+    ) -> Iterator[Receipt]:
         page_num = 1
         last_page_results = offset  # Start at offset to trigger iteration
         while last_page_results == offset:
@@ -102,7 +109,14 @@ class AccountClient(_APIClient):
             )
 
             if len(page):
-                yield from page
+                for receipt_data in page:
+                    if "confirmations" in receipt_data:
+                        receipt_data["required_confirmations"] = receipt_data.pop("confirmations")
+                    if "txreceipt_status" in receipt_data:
+                        receipt_data["status"] = receipt_data.pop("txreceipt_status")
+
+                    receipt: Receipt = Receipt.decode(receipt_data)  # type: ignore
+                    yield receipt
 
             last_page_results = len(page)
             page_num += 1
