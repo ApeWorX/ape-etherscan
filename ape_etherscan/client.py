@@ -78,11 +78,7 @@ class ContractClient(_APIClient):
 
     def get_source_code(self) -> Optional[Dict]:
         params = {**self.base_params, "action": "getsourcecode", "address": self._address}
-        result = self._get(params=params)
-
-        if not result:
-            raise get_request_error(response)
-
+        result = self._get(params=params) or []
         return result[0] if len(result) == 1 else None
 
 

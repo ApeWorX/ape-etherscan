@@ -6,7 +6,13 @@ from requests import Response
 from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
 
 
-class EtherscanResponseError(ApeException):
+class ApeEtherscanException(ApeException):
+    """
+    A base exception in the ape-etherscan plugin.
+    """
+
+
+class EtherscanResponseError(ApeEtherscanException):
     """
     Raised when the response is not correct.
     """
