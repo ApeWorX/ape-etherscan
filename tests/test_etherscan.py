@@ -19,17 +19,29 @@ EXPECTED_CONTRACT_NAME_MAP = {
 }
 
 
-@pytest.fixture(params=([f.name for f in MOCK_RESPONSES_PATH.iterdir()]))
-def etherscan_abi_response(request, mocker):
-    response = mocker.MagicMock(spec=Response)
+@pytest.fixture(params=("get_contract_response.json", "get_proxy_contract_response.json"))
+def mock_abi_response(request, mocker):
     test_data_path = MOCK_RESPONSES_PATH / request.param
 
     with open(test_data_path) as response_data_file:
-        mock_response_dict = json.load(response_data_file)
-        response.json.return_value = mock_response_dict
-        response.text.return_value = json.dumps(mock_response_dict)
-        response.file_name = request.param
-        yield response
+        yield _mock_response(mocker, request.param, response_data_file)
+
+
+def _mock_response(mocker, file_name: str, response_data_file):
+    response = mocker.MagicMock(spec=Response)
+    mock_response_dict = json.load(response_data_file)
+    response.json.return_value = mock_response_dict
+    response.text.return_value = json.dumps(mock_response_dict)
+    response.file_name = file_name
+    return response
+
+
+@pytest.fixture
+def mock_account_transactions_response(mocker):
+    file_name = "get_account_transactions.json"
+    test_data_path = MOCK_RESPONSES_PATH / file_name
+    with open(test_data_path) as response_data_file:
+        return _mock_response(mocker, file_name, response_data_file)
 
 
 def get_explorer(network_name: str = "development") -> ExplorerAPI:
@@ -43,7 +55,12 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
         # Request will fail if made with incorrect parameters.
         assert method == "GET"
         assert base_uri == "https://api.etherscan.io/api"
-        assert params == expected_params
+
+        # Ignore API key in tests for now
+        if params and "apikey" in params:
+            del params["apikey"]
+
+        assert params == expected_params, "Was not called with the expected request parameters."
         return etherscan_abi_response
 
     get_patch.request.side_effect = get_mock_response
@@ -75,17 +92,50 @@ def test_get_transaction_url(network, expected_prefix, tx_hash):
     assert actual == expected
 
 
-def test_get_contract_type(mocker, etherscan_abi_response):
+def etherscan_abi_response(request, mocker):
+    response = mocker.MagicMock(spec=Response)
+    test_data_path = MOCK_RESPONSES_PATH / request.param
+
+    with open(test_data_path) as response_data_file:
+        mock_response_dict = json.load(response_data_file)
+        response.json.return_value = mock_response_dict
+        response.text.return_value = json.dumps(mock_response_dict)
+        response.file_name = request.param
+        yield response
+
+
+def test_get_contract_type(mocker, mock_abi_response):
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
         "address": ADDRESS,
     }
-    setup_mock_get(mocker, etherscan_abi_response, expected_params)
+    setup_mock_get(mocker, mock_abi_response, expected_params)
 
     explorer = get_explorer("mainnet")
     actual = explorer.get_contract_type(ADDRESS)  # type: ignore
+    assert actual is not None
 
-    actual = actual.contractName
-    expected = EXPECTED_CONTRACT_NAME_MAP[etherscan_abi_response.file_name]
+    actual = actual.name
+    expected = EXPECTED_CONTRACT_NAME_MAP[mock_abi_response.file_name]
     assert actual == expected
+
+
+def test_get_account_transactions(mocker, mock_account_transactions_response):
+    expected_params = {
+        "module": "account",
+        "action": "txlist",
+        "address": ADDRESS,
+        "endblock": None,
+        "startblock": None,
+        "offset": 100,
+        "page": 1,
+        "sort": "asc",
+    }
+    setup_mock_get(mocker, mock_account_transactions_response, expected_params)
+
+    explorer = get_explorer("mainnet")
+    actual = [r for r in explorer.get_account_transactions(ADDRESS)]  # type: ignore
+
+    # From `get_account_transactions.json` response.
+    assert actual[0].txn_hash == "GENESIS_ddbd2b932c763ba5b1b7ae3b362eac3e8d40121a"

@@ -6,7 +6,13 @@ from requests import Response
 from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
 
 
-class EtherscanResponseError(ApeException):
+class ApeEtherscanException(ApeException):
+    """
+    A base exception in the ape-etherscan plugin.
+    """
+
+
+class EtherscanResponseError(ApeEtherscanException):
     """
     Raised when the response is not correct.
     """
@@ -31,14 +37,14 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
 
 def get_request_error(response: Response) -> EtherscanResponseError:
     response_data = response.json()
-    if "result" in response_data:
+    if "result" in response_data and response_data["result"]:
         message = response_data["result"]
     elif "message" in response_data:
         message = response_data["message"]
     else:
         message = response.text
 
-    if "max rate limit reached" in message.lower():
+    if "max rate limit reached" in response.text.lower():
         return EtherscanTooManyRequestsError(response)
 
     return EtherscanResponseError(response, message)

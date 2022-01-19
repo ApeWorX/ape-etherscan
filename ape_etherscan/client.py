@@ -1,6 +1,7 @@
 import json
 import os
-from typing import Dict, List, Optional, Union
+from dataclasses import dataclass
+from typing import Dict, Iterator, List, Optional, Union
 
 import requests
 from ape.utils import USER_AGENT
@@ -25,6 +26,12 @@ def get_etherscan_api_uri(network_name: str):
     )
 
 
+@dataclass
+class SourceCodeResponse:
+    abi: str = ""
+    name: str = "unknown"
+
+
 class _APIClient:
     DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
 
@@ -42,11 +49,11 @@ class _APIClient:
 
     def _get(self, params: Optional[Dict] = None) -> Union[List, Dict]:
         params = self.__authorize(params)
-        return self._request("GET", params=params)
+        return self._request("GET", params=params, headers=self.DEFAULT_HEADERS)
 
     def _post(self, json_dict: Optional[Dict] = None) -> Dict:
         json_dict = self.__authorize(json_dict)
-        return self._request("POST", json=json_dict)  # type: ignore
+        return self._request("POST", json=json_dict, headers=self.DEFAULT_HEADERS)  # type: ignore
 
     def _request(self, method: str, *args, **kwargs) -> Union[List, Dict]:
         response = requests.request(method.upper(), self.base_uri, *args, **kwargs)
@@ -56,10 +63,7 @@ class _APIClient:
             raise get_request_error(response)
 
         result = response_data.get("result")
-        if not result:
-            raise get_request_error(response)
-
-        if isinstance(result, str):
+        if result and isinstance(result, str):
             # Sometimes, the response is a stringified JSON object or list
             result = json.loads(result)
 
@@ -79,10 +83,64 @@ class ContractClient(_APIClient):
         self._address = address
         super().__init__(network_name, "contract")
 
-    def get_source_code(self) -> Optional[Dict]:
+    def get_source_code(self) -> SourceCodeResponse:
         params = {**self.base_params, "action": "getsourcecode", "address": self._address}
+        result = self._get(params=params) or []
+
+        if len(result) != 1:
+            return SourceCodeResponse()
+
+        data = result[0]
+        abi = data.get("ABI") or ""
+        name = data.get("ContractName") or "unknown"
+        return SourceCodeResponse(abi, name)
+
+
+class AccountClient(_APIClient):
+    def __init__(self, network_name: str, address: str):
+        self._address = address
+        super().__init__(network_name, "account")
+
+    def get_all_normal_transactions(
+        self,
+        start_block: Optional[int] = None,
+        end_block: Optional[int] = None,
+        offset: int = 100,
+        sort: str = "asc",
+    ) -> Iterator[Dict]:
+        page_num = 1
+        last_page_results = offset  # Start at offset to trigger iteration
+        while last_page_results == offset:
+            page = self._get_page_of_normal_transactions(
+                page_num, start_block, end_block, offset=offset, sort=sort
+            )
+
+            if len(page):
+                yield from page
+
+            last_page_results = len(page)
+            page_num += 1
+
+    def _get_page_of_normal_transactions(
+        self,
+        page: int,
+        start_block: Optional[int] = None,
+        end_block: Optional[int] = None,
+        offset: int = 100,
+        sort: str = "asc",
+    ) -> List[Dict]:
+        params = {
+            **self.base_params,
+            "action": "txlist",
+            "address": self._address,
+            "startblock": start_block,
+            "endblock": end_block,
+            "page": page,
+            "offset": offset,
+            "sort": sort,
+        }
         result = self._get(params=params)
-        return result[0] if len(result) == 1 else None
+        return result  # type: ignore
 
 
 class ClientFactory:
@@ -91,3 +149,6 @@ class ClientFactory:
 
     def get_contract_client(self, contract_address: str) -> ContractClient:
         return ContractClient(self._network_name, contract_address)
+
+    def get_account_client(self, account_address: str) -> AccountClient:
+        return AccountClient(self._network_name, account_address)
