@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 from typing import Iterator, Optional
 
 from ape.api import ExplorerAPI, ReceiptAPI
-from ape.types import ABI, AddressType, ContractType
+from ape.types import AddressType, ContractType
 
 from ape_etherscan.client import ClientFactory, get_etherscan_uri
 
@@ -27,12 +27,11 @@ class Etherscan(ExplorerAPI):
             return None
 
         try:
-            abi_list = json.loads(abi_string)
+            abi = json.loads(abi_string)
         except JSONDecodeError:
             return None
 
-        abi = [ABI(**item) for item in abi_list]
-        return ContractType(abi=abi, contractName=source_code.name)  # type: ignore
+        return ContractType.parse_obj({"abi": abi, "contractName": source_code.name})
 
     def get_account_transactions(self, address: AddressType) -> Iterator[ReceiptAPI]:
         client = self._client_factory.get_account_client(address)
