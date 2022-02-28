@@ -76,6 +76,8 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
     [
         ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", ADDRESS),
         ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", ADDRESS),
+        ("fantom", NETWORKS["fantom"][0], "ftmscan.com", ADDRESS),
+        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com", ADDRESS),
     ],
 )
 def test_get_address_url(ecosystem, network, expected_prefix, address):
@@ -90,6 +92,8 @@ def test_get_address_url(ecosystem, network, expected_prefix, address):
     [
         ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", TRANSACTION),
         ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", TRANSACTION),
+        ("fantom", NETWORKS["fantom"][0], "ftmscan.com", TRANSACTION),
+        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com", TRANSACTION),
     ],
 )
 def test_get_transaction_url(ecosystem, network, expected_prefix, tx_hash):

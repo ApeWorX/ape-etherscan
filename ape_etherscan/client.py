@@ -18,6 +18,13 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             else "https://etherscan.io"
         )
 
+    elif ecosystem_name == "fantom":
+        return (
+            f"https://{network_name}.ftmscan.com"
+            if network_name != "opera"
+            else "https://ftmscan.com"
+        )
+
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
@@ -27,6 +34,13 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
             f"https://api-{network_name}.etherscan.io/api"
             if network_name != "mainnet"
             else "https://api.etherscan.io/api"
+        )
+
+    elif ecosystem_name == "fantom":
+        return (
+            f"https://api-{network_name}.ftmscan.com"
+            if network_name != "opera"
+            else "https://api.ftmscan.com"
         )
 
     raise UnsupportedEcosystemError(ecosystem_name)

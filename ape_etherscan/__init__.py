@@ -10,6 +10,10 @@ NETWORKS = {
         "kovan",
         "goerli",
     ],
+    "fantom": [
+        "opera",
+        "testnet",
+    ],
 }
 
 
