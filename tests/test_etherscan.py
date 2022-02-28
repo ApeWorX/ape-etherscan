@@ -44,8 +44,12 @@ def mock_account_transactions_response(mocker):
         return _mock_response(mocker, file_name, response_data_file)
 
 
-def get_explorer(network_name: str = "development") -> ExplorerAPI:
-    return getattr(networks.ethereum, network_name).explorer
+def get_explorer(
+    ecosystem_name: str = "ethereum",
+    network_name: str = "development",
+) -> ExplorerAPI:
+    ecosystem = getattr(networks, ecosystem_name)
+    return getattr(ecosystem, network_name).explorer
 
 
 def setup_mock_get(mocker, etherscan_abi_response, expected_params):
@@ -68,26 +72,29 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
 
 
 @pytest.mark.parametrize(
-    "network,expected_prefix,address",
-    [(NETWORKS[0], "etherscan.io", ADDRESS), (NETWORKS[1], "ropsten.etherscan.io", ADDRESS)],
+    "ecosystem,network,expected_prefix,address",
+    [
+        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", ADDRESS),
+        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", ADDRESS),
+    ],
 )
-def test_get_address_url(network, expected_prefix, address):
+def test_get_address_url(ecosystem, network, expected_prefix, address):
     expected = f"https://{expected_prefix}/address/{ADDRESS}"
-    explorer = get_explorer(network)
+    explorer = get_explorer(ecosystem, network)
     actual = explorer.get_address_url(address)  # type: ignore
     assert actual == expected
 
 
 @pytest.mark.parametrize(
-    "network,expected_prefix,tx_hash",
+    "ecosystem,network,expected_prefix,tx_hash",
     [
-        (NETWORKS[0], "etherscan.io", TRANSACTION),
-        (NETWORKS[1], "ropsten.etherscan.io", TRANSACTION),
+        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", TRANSACTION),
+        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", TRANSACTION),
     ],
 )
-def test_get_transaction_url(network, expected_prefix, tx_hash):
+def test_get_transaction_url(ecosystem, network, expected_prefix, tx_hash):
     expected = f"https://{expected_prefix}/tx/{tx_hash}"
-    explorer = get_explorer(network)
+    explorer = get_explorer(ecosystem, network)
     actual = explorer.get_transaction_url(tx_hash)
     assert actual == expected
 
@@ -112,7 +119,7 @@ def test_get_contract_type(mocker, mock_abi_response):
     }
     setup_mock_get(mocker, mock_abi_response, expected_params)
 
-    explorer = get_explorer("mainnet")
+    explorer = get_explorer("ethereum", "mainnet")
     actual = explorer.get_contract_type(ADDRESS)  # type: ignore
     assert actual is not None
 
@@ -134,7 +141,7 @@ def test_get_account_transactions(mocker, mock_account_transactions_response):
     }
     setup_mock_get(mocker, mock_account_transactions_response, expected_params)
 
-    explorer = get_explorer("mainnet")
+    explorer = get_explorer("ethereum", "mainnet")
     actual = [r for r in explorer.get_account_transactions(ADDRESS)]  # type: ignore
 
     # From `get_account_transactions.json` response.
