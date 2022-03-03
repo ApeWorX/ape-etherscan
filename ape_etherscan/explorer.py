@@ -16,7 +16,7 @@ class Etherscan(ExplorerAPI):
         return f"{get_etherscan_uri(self.network.name)}/tx/{transaction_hash}"
 
     @property
-    def _client_factory(self):
+    def _client_factory(self) -> ClientFactory:
         return ClientFactory(self.network.name)
 
     def get_contract_type(self, address: str) -> Optional[ContractType]:
@@ -41,4 +41,4 @@ class Etherscan(ExplorerAPI):
             if "txreceipt_status" in receipt_data:
                 receipt_data["status"] = receipt_data.pop("txreceipt_status")
 
-            yield self.network.ecosystem.receipt_class.decode(receipt_data)
+            yield self.network.ecosystem.decode_receipt(receipt_data)
