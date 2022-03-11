@@ -28,12 +28,16 @@ python3 setup.py install
 
 ## Quick Usage
 
-TODO: Describe library overview in code
+When you have this plugin installed, Etherscan explorer URLs appear in CLI output.
+
+```bash
+INFO: Submitted 0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a9646
+etherscan URL: https://rinkeby.etherscan.io/tx/0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a9646
+```
 
 ## Development
 
-This project is in development and should be considered a beta.
-Things might not be in their final state and breaking changes may occur.
+Please see the [contributing guide](CONTRIBUTING.md) to learn more how to contribute to this project.
 Comments, questions, criticisms and pull requests are welcomed.
 
 ## License
