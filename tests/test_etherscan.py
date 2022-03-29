@@ -48,8 +48,8 @@ def get_explorer(
     ecosystem_name: str = "ethereum",
     network_name: str = "development",
 ) -> ExplorerAPI:
-    ecosystem = getattr(networks, ecosystem_name)
-    return getattr(ecosystem, network_name).explorer
+    ecosystem = networks.get_ecosystem(ecosystem_name)
+    return ecosystem.get_network(network_name).explorer
 
 
 def setup_mock_get(mocker, etherscan_abi_response, expected_params):

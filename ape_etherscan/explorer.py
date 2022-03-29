@@ -41,6 +41,8 @@ class Etherscan(ExplorerAPI):
             if "confirmations" in receipt_data:
                 receipt_data["required_confirmations"] = receipt_data.pop("confirmations")
             if "txreceipt_status" in receipt_data:
-                receipt_data["status"] = receipt_data.pop("txreceipt_status")
+                # NOTE: Ethrscan uses `""` for `0` in the receipt status.
+                status = receipt_data.pop("txreceipt_status") or 0
+                receipt_data["status"] = status
 
-            yield self.network.ecosystem.receipt_class.decode(receipt_data)
+            yield self.network.ecosystem.decode_receipt(receipt_data)
