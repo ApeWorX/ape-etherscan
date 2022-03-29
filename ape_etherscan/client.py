@@ -6,24 +6,44 @@ from typing import Dict, Iterator, List, Optional, Union
 import requests
 from ape.utils import USER_AGENT
 
-from ape_etherscan.exceptions import get_request_error
+from ape_etherscan.exceptions import UnsupportedEcosystemError, get_request_error
 from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
 
 
-def get_etherscan_uri(network_name: str):
-    return (
-        f"https://{network_name}.etherscan.io"
-        if network_name != "mainnet"
-        else "https://etherscan.io"
-    )
+def get_etherscan_uri(ecosystem_name: str, network_name: str):
+    if ecosystem_name == "ethereum":
+        return (
+            f"https://{network_name}.etherscan.io"
+            if network_name != "mainnet"
+            else "https://etherscan.io"
+        )
+
+    elif ecosystem_name == "fantom":
+        return (
+            f"https://{network_name}.ftmscan.com"
+            if network_name != "opera"
+            else "https://ftmscan.com"
+        )
+
+    raise UnsupportedEcosystemError(ecosystem_name)
 
 
-def get_etherscan_api_uri(network_name: str):
-    return (
-        f"https://api-{network_name}.etherscan.io/api"
-        if network_name != "mainnet"
-        else "https://api.etherscan.io/api"
-    )
+def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
+    if ecosystem_name == "ethereum":
+        return (
+            f"https://api-{network_name}.etherscan.io/api"
+            if network_name != "mainnet"
+            else "https://api.etherscan.io/api"
+        )
+
+    elif ecosystem_name == "fantom":
+        return (
+            f"https://api-{network_name}.ftmscan.com"
+            if network_name != "opera"
+            else "https://api.ftmscan.com"
+        )
+
+    raise UnsupportedEcosystemError(ecosystem_name)
 
 
 @dataclass
@@ -35,13 +55,14 @@ class SourceCodeResponse:
 class _APIClient:
     DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
 
-    def __init__(self, network_name: str, module_name: str):
+    def __init__(self, ecosystem_name: str, network_name: str, module_name: str):
+        self._ecosystem_name = ecosystem_name
         self._network_name = network_name
         self._module_name = module_name
 
     @property
     def base_uri(self) -> str:
-        return get_etherscan_api_uri(self._network_name)
+        return get_etherscan_api_uri(self._ecosystem_name, self._network_name)
 
     @property
     def base_params(self) -> Dict:
@@ -79,9 +100,9 @@ class _APIClient:
 
 
 class ContractClient(_APIClient):
-    def __init__(self, network_name: str, address: str):
+    def __init__(self, ecosystem_name: str, network_name: str, address: str):
         self._address = address
-        super().__init__(network_name, "contract")
+        super().__init__(ecosystem_name, network_name, "contract")
 
     def get_source_code(self) -> SourceCodeResponse:
         params = {**self.base_params, "action": "getsourcecode", "address": self._address}
@@ -97,9 +118,9 @@ class ContractClient(_APIClient):
 
 
 class AccountClient(_APIClient):
-    def __init__(self, network_name: str, address: str):
+    def __init__(self, ecosystem_name: str, network_name: str, address: str):
         self._address = address
-        super().__init__(network_name, "account")
+        super().__init__(ecosystem_name, network_name, "account")
 
     def get_all_normal_transactions(
         self,
@@ -144,11 +165,12 @@ class AccountClient(_APIClient):
 
 
 class ClientFactory:
-    def __init__(self, network_name: str):
+    def __init__(self, ecosystem_name: str, network_name: str):
+        self._ecosystem_name = ecosystem_name
         self._network_name = network_name
 
     def get_contract_client(self, contract_address: str) -> ContractClient:
-        return ContractClient(self._network_name, contract_address)
+        return ContractClient(self._ecosystem_name, self._network_name, contract_address)
 
     def get_account_client(self, account_address: str) -> AccountClient:
-        return AccountClient(self._network_name, account_address)
+        return AccountClient(self._ecosystem_name, self._network_name, account_address)

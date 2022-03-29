@@ -4,6 +4,7 @@ from setuptools import find_packages, setup  # type: ignore
 
 extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
+        "ape-fantom",  # NOTE: Needed to test Fantom integration
         "pytest>=6.0,<7.0",  # Core testing package
         "pytest-xdist",  # multi-process runner
         "pytest-cov",  # Coverage analyzer plugin
@@ -11,9 +12,9 @@ extras_require = {
         "pytest-mock",  # Test mocker
     ],
     "lint": [
-        "black>=21.12b0,<22.0",  # auto-formatter and linter
-        "mypy>=0.910,<1.0",  # Static type analyzer
-        "types-requests",  # NOTE: Needed due to mypy typeshed
+        "black>=22.3.0,<23.0",  # auto-formatter and linter
+        "mypy>=0.942,<1.0",  # Static type analyzer
+        "types-requests>=2.27.15",  # NOTE: Needed due to mypy typeshed
         "flake8>=3.9.2,<4.0",  # Style linter
         "isort>=5.7.0,<6.0",  # Import sorting linter
     ],
