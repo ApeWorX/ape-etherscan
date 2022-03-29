@@ -18,7 +18,7 @@ class Etherscan(ExplorerAPI):
         return f"{etherscan_uri}/tx/{transaction_hash}"
 
     @property
-    def _client_factory(self):
+    def _client_factory(self) -> ClientFactory:
         return ClientFactory(self.network.ecosystem.name, self.network.name)
 
     def get_contract_type(self, address: str) -> Optional[ContractType]:
