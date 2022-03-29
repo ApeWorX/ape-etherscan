@@ -49,7 +49,9 @@ def get_explorer(
     network_name: str = "development",
 ) -> ExplorerAPI:
     ecosystem = networks.get_ecosystem(ecosystem_name)
-    return ecosystem.get_network(network_name).explorer
+    explorer = ecosystem.get_network(network_name).explorer
+    assert explorer is not None
+    return explorer
 
 
 def setup_mock_get(mocker, etherscan_abi_response, expected_params):
