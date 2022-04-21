@@ -16,7 +16,7 @@ extras_require = {
         "mypy>=0.942,<1.0",  # Static type analyzer
         "types-requests>=2.27.15",  # NOTE: Needed due to mypy typeshed
         "flake8>=3.9.2,<4.0",  # Style linter
-        "isort>=5.7.0,<6.0",  # Import sorting linter
+        "isort>=5.10.1,<6.0",  # Import sorting linter
     ],
     "doc": [
         "Sphinx>=3.4.3,<4",  # Documentation generator
@@ -63,7 +63,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.1.0,<0.2.0",
+        "eth-ape>=0.2.1,<0.3.0",
         "importlib-metadata ; python_version<'3.8'",
         "requests>=2.25.1,<3.0.0",
     ],  # NOTE: Add 3rd party libraries here
