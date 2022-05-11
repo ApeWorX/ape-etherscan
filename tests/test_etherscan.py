@@ -74,38 +74,34 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
 
 
 @pytest.mark.parametrize(
-    "ecosystem,network,expected_prefix",
+    "ecosystem,network,expected_prefix,address",
     [
-        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io"),
-        ("ethereum", f"{NETWORKS['ethereum'][0]}-fork", "etherscan.io"),
-        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
-        ("ethereum", f"{NETWORKS['ethereum'][1]}-fork", "ropsten.etherscan.io"),
-        ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
-        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
+        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", ADDRESS),
+        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", ADDRESS),
+        ("fantom", NETWORKS["fantom"][0], "ftmscan.com", ADDRESS),
+        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com", ADDRESS),
     ],
 )
-def test_get_address_url(ecosystem, network, expected_prefix):
+def test_get_address_url(ecosystem, network, expected_prefix, address):
     expected = f"https://{expected_prefix}/address/{ADDRESS}"
     explorer = get_explorer(ecosystem, network)
-    actual = explorer.get_address_url(ADDRESS)  # type: ignore
+    actual = explorer.get_address_url(address)  # type: ignore
     assert actual == expected
 
 
 @pytest.mark.parametrize(
-    "ecosystem,network,expected_prefix",
+    "ecosystem,network,expected_prefix,tx_hash",
     [
-        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io"),
-        ("ethereum", f"{NETWORKS['ethereum'][0]}-fork", "etherscan.io"),
-        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
-        ("ethereum", f"{NETWORKS['ethereum'][1]}-fork", "ropsten.etherscan.io"),
-        ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
-        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
+        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", TRANSACTION),
+        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", TRANSACTION),
+        ("fantom", NETWORKS["fantom"][0], "ftmscan.com", TRANSACTION),
+        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com", TRANSACTION),
     ],
 )
-def test_get_transaction_url(ecosystem, network, expected_prefix):
-    expected = f"https://{expected_prefix}/tx/{TRANSACTION}"
+def test_get_transaction_url(ecosystem, network, expected_prefix, tx_hash):
+    expected = f"https://{expected_prefix}/tx/{tx_hash}"
     explorer = get_explorer(ecosystem, network)
-    actual = explorer.get_transaction_url(TRANSACTION)
+    actual = explorer.get_transaction_url(tx_hash)
     assert actual == expected
 
 
