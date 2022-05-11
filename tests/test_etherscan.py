@@ -95,6 +95,7 @@ def test_get_address_url(ecosystem, network, expected_prefix):
         ("ethereum", NETWORKS["ethereum"][0], "etherscan.io"),
         ("ethereum", f"{NETWORKS['ethereum'][0]}-fork", "etherscan.io"),
         ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
+        ("ethereum", f"{NETWORKS['ethereum'][1]}-fork", "ropsten.etherscan.io"),
         ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
         ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
     ],
