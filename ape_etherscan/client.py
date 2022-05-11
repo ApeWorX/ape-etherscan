@@ -29,6 +29,7 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
 
 
 def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
+    """comment"""
     if ecosystem_name == "ethereum":
         return (
             f"https://api-{network_name}.etherscan.io/api"
