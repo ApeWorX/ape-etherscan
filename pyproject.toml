@@ -11,7 +11,7 @@ write_to = "ape_etherscan/version.py"
 
 [tool.black]
 line-length = 100
-target-version = ['py37', 'py38', 'py39']
+target-version = ['py37', 'py38', 'py39', 'py310']
 include = '\.pyi?$'
 
 [tool.pytest.ini_options]
@@ -31,8 +31,6 @@ markers = "fuzzing: Run Hypothesis fuzz test suite"
 line_length = 100
 force_grid_wrap = 0
 include_trailing_comma = true
-known_third_party = ["ape", "pytest", "requests", "setuptools"]
-known_first_party = ["ape_etherscan"]
 multi_line_output = 3
 use_parentheses = true
 
