@@ -1,16 +1,11 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.1.0
+    rev: v4.1.0
     hooks:
     -   id: check-yaml
 
--   repo: https://github.com/asottile/seed-isort-config
-    rev: v2.2.0
-    hooks:
-    -   id: seed-isort-config
-
 -   repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.8.0
+    rev: v5.10.1
     hooks:
       - id: isort
 
@@ -26,9 +21,10 @@ repos:
     -   id: flake8
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.942
+    rev: v0.950
     hooks:
     -   id: mypy
+        additional_dependencies: [types-requests]
 
 
 default_language_version:
