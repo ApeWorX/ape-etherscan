@@ -74,34 +74,36 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
 
 
 @pytest.mark.parametrize(
-    "ecosystem,network,expected_prefix,address",
+    "ecosystem,network,expected_prefix",
     [
-        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", ADDRESS),
-        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", ADDRESS),
-        ("fantom", NETWORKS["fantom"][0], "ftmscan.com", ADDRESS),
-        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com", ADDRESS),
+        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io"),
+        ("ethereum", f"{NETWORKS['ethereum'][0]}-fork", "etherscan.io"),
+        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
+        ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
+        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
     ],
 )
-def test_get_address_url(ecosystem, network, expected_prefix, address):
+def test_get_address_url(ecosystem, network, expected_prefix):
     expected = f"https://{expected_prefix}/address/{ADDRESS}"
     explorer = get_explorer(ecosystem, network)
-    actual = explorer.get_address_url(address)  # type: ignore
+    actual = explorer.get_address_url(ADDRESS)  # type: ignore
     assert actual == expected
 
 
 @pytest.mark.parametrize(
-    "ecosystem,network,expected_prefix,tx_hash",
+    "ecosystem,network,expected_prefix",
     [
-        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", TRANSACTION),
-        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", TRANSACTION),
-        ("fantom", NETWORKS["fantom"][0], "ftmscan.com", TRANSACTION),
-        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com", TRANSACTION),
+        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io"),
+        ("ethereum", f"{NETWORKS['ethereum'][0]}-fork", "etherscan.io"),
+        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
+        ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
+        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
     ],
 )
-def test_get_transaction_url(ecosystem, network, expected_prefix, tx_hash):
-    expected = f"https://{expected_prefix}/tx/{tx_hash}"
+def test_get_transaction_url(ecosystem, network, expected_prefix):
+    expected = f"https://{expected_prefix}/tx/{TRANSACTION}"
     explorer = get_explorer(ecosystem, network)
-    actual = explorer.get_transaction_url(tx_hash)
+    actual = explorer.get_transaction_url(TRANSACTION)
     assert actual == expected
 
 
@@ -117,7 +119,8 @@ def etherscan_abi_response(request, mocker):
         yield response
 
 
-def test_get_contract_type(mocker, mock_abi_response):
+@pytest.mark.parametrize("network", ("mainnet", "mainnet-fork"))
+def test_get_contract_type(mocker, mock_abi_response, network):
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
@@ -125,7 +128,7 @@ def test_get_contract_type(mocker, mock_abi_response):
     }
     setup_mock_get(mocker, mock_abi_response, expected_params)
 
-    explorer = get_explorer("ethereum", "mainnet")
+    explorer = get_explorer("ethereum", network)
     actual = explorer.get_contract_type(ADDRESS)  # type: ignore
     assert actual is not None
 
