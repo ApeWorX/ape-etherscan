@@ -90,18 +90,18 @@ def test_get_address_url(ecosystem, network, expected_prefix):
 
 
 @pytest.mark.parametrize(
-    "ecosystem,network,expected_prefix,tx_hash",
+    "ecosystem,network,expected_prefix",
     [
-        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io", TRANSACTION),
-        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io", TRANSACTION),
-        ("fantom", NETWORKS["fantom"][0], "ftmscan.com", TRANSACTION),
-        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com", TRANSACTION),
+        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io"),
+        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
+        ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
+        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
     ],
 )
-def test_get_transaction_url(ecosystem, network, expected_prefix, tx_hash):
-    expected = f"https://{expected_prefix}/tx/{tx_hash}"
+def test_get_transaction_url(ecosystem, network, expected_prefix):
+    expected = f"https://{expected_prefix}/tx/{TRANSACTION}"
     explorer = get_explorer(ecosystem, network)
-    actual = explorer.get_transaction_url(tx_hash)
+    actual = explorer.get_transaction_url(TRANSACTION)
     assert actual == expected
 
 
