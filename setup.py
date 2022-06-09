@@ -35,7 +35,7 @@ extras_require = {
         "pre-commit",  # Ensure that linters are run prior to committing
         "pytest-watch",  # `ptw` test watcher/runner
         "IPython",  # Console for interacting
-        "ipdb",  # Debugger (Must use `export PethpmYTHONBREAKPOINT=ipdb.set_trace`)
+        "ipdb",  # Debugger (Must use `export PYTHONBREAKPOINT=ipdb.set_trace`)
     ],
 }
 
