@@ -80,6 +80,7 @@ class _APIClient:
         response = requests.request(method.upper(), self.base_uri, *args, **kwargs)
         response.raise_for_status()
         response_data = response.json()
+
         if response_data.get("isError", 0) or response_data.get("message", "") == "NOTOK":
             raise get_request_error(response)
 

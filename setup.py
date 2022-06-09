@@ -5,6 +5,7 @@ from setuptools import find_packages, setup  # type: ignore
 extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
         "ape-fantom",  # NOTE: Needed to test Fantom integration
+        "ape-infura",  # Needed for live network tests
         "pytest>=6.0,<7.0",  # Core testing package
         "pytest-xdist",  # multi-process runner
         "pytest-cov",  # Coverage analyzer plugin
@@ -34,7 +35,7 @@ extras_require = {
         "pre-commit",  # Ensure that linters are run prior to committing
         "pytest-watch",  # `ptw` test watcher/runner
         "IPython",  # Console for interacting
-        "ipdb",  # Debugger (Must use `export PYTHONBREAKPOINT=ipdb.set_trace`)
+        "ipdb",  # Debugger (Must use `export PethpmYTHONBREAKPOINT=ipdb.set_trace`)
     ],
 }
 
@@ -63,7 +64,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.2.1,<0.3.0",
+        "eth-ape>=0.2.8,<0.3.0",
         "importlib-metadata ; python_version<'3.8'",
         "requests>=2.25.1,<3.0.0",
     ],  # NOTE: Add 3rd party libraries here
