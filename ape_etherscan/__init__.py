@@ -14,6 +14,10 @@ NETWORKS = {
         "opera",
         "testnet",
     ],
+    "arbitrum": [
+        "mainnet",
+        "testnet",
+    ],
 }
 
 
