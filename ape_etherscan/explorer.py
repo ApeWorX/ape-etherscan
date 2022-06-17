@@ -3,6 +3,7 @@ from json.decoder import JSONDecodeError
 from typing import Iterator, Optional
 
 from ape.api import ExplorerAPI, ReceiptAPI
+from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
 
 from ape_etherscan.client import ClientFactory, get_etherscan_uri
@@ -37,7 +38,16 @@ class Etherscan(ExplorerAPI):
         except JSONDecodeError:
             return None
 
-        return ContractType.parse_obj({"abi": abi, "contractName": source_code.name})
+        contract_type = ContractType.parse_obj({"abi": abi, "contractName": source_code.name})
+        if source_code.name == "Vyper_contract" and "symbol" in contract_type.view_methods:
+            try:
+                checksummed_address = self.provider.network.ecosystem.decode_address(address)
+                contract = self.create_contract(checksummed_address, contract_type=contract_type)
+                contract_type.name = contract.symbol() or contract_type.name
+            except ProviderNotConnectedError:
+                pass
+
+        return contract_type
 
     def get_account_transactions(self, address: AddressType) -> Iterator[ReceiptAPI]:
         client = self._client_factory.get_account_client(address)

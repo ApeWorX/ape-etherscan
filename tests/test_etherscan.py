@@ -8,23 +8,48 @@ from requests import Response
 
 from ape_etherscan import NETWORKS
 
-ADDRESS = "https://etherscan.io/address/0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 MOCK_RESPONSES_PATH = Path(__file__).parent / "mock_responses"
 
 # A map of each mock response to its contract name for testing `get_contract_type()`.
 EXPECTED_CONTRACT_NAME_MAP = {
     "get_contract_response.json": "BoredApeYachtClub",
-    "get_proxy_contract_response.json": "Vyper_contract",
+    "get_proxy_contract_response.json": "MIM-UST-f",
+    "get_vyper_contract_response.json": "yvDAI",
+}
+CONTRACT_ADDRESS_MAP = {
+    "get_contract_response.json": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+    "get_proxy_contract_response.json": "0x55A8a39bc9694714E2874c1ce77aa1E599461E18",
+    "get_vyper_contract_response.json": "0xdA816459F1AB5631232FE5e97a05BBBb94970c95",
 }
 
 
-@pytest.fixture(params=("get_contract_response.json", "get_proxy_contract_response.json"))
+@pytest.fixture
+def address():
+    return [k for k in CONTRACT_ADDRESS_MAP.keys()][0]
+
+
+@pytest.fixture(
+    params=(
+        "get_contract_response.json",
+        "get_proxy_contract_response.json",
+        "get_vyper_contract_response.json",
+    )
+)
 def mock_abi_response(request, mocker):
     test_data_path = MOCK_RESPONSES_PATH / request.param
 
     with open(test_data_path) as response_data_file:
         yield _mock_response(mocker, request.param, response_data_file)
+
+
+@pytest.fixture
+def mock_vyper_response(mocker):
+    response_name = "get_vyper_contract_response.json"
+    test_data_path = MOCK_RESPONSES_PATH / response_name
+
+    with open(test_data_path) as response_data_file:
+        yield _mock_response(mocker, response_name, response_data_file)
 
 
 def _mock_response(mocker, file_name: str, response_data_file):
@@ -42,6 +67,12 @@ def mock_account_transactions_response(mocker):
     test_data_path = MOCK_RESPONSES_PATH / file_name
     with open(test_data_path) as response_data_file:
         return _mock_response(mocker, file_name, response_data_file)
+
+
+@pytest.fixture
+def infura_connection():
+    with networks.parse_network_choice("ethereum:mainnet:infura") as provider:
+        yield provider
 
 
 def get_explorer(
@@ -83,10 +114,10 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params):
         ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
     ],
 )
-def test_get_address_url(ecosystem, network, expected_prefix):
-    expected = f"https://{expected_prefix}/address/{ADDRESS}"
+def test_get_address_url(ecosystem, network, expected_prefix, address):
+    expected = f"https://{expected_prefix}/address/{address}"
     explorer = get_explorer(ecosystem, network)
-    actual = explorer.get_address_url(ADDRESS)  # type: ignore
+    actual = explorer.get_address_url(address)  # type: ignore
     assert actual == expected
 
 
@@ -120,16 +151,17 @@ def etherscan_abi_response(request, mocker):
 
 
 @pytest.mark.parametrize("network", ("mainnet", "mainnet-fork"))
-def test_get_contract_type(mocker, mock_abi_response, network):
+def test_get_contract_type(mocker, mock_abi_response, network, infura_connection):
+    expected_address = CONTRACT_ADDRESS_MAP[mock_abi_response.file_name]
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
-        "address": ADDRESS,
+        "address": expected_address,
     }
     setup_mock_get(mocker, mock_abi_response, expected_params)
 
     explorer = get_explorer("ethereum", network)
-    actual = explorer.get_contract_type(ADDRESS)  # type: ignore
+    actual = explorer.get_contract_type(expected_address)  # type: ignore
     assert actual is not None
 
     actual = actual.name
@@ -137,11 +169,11 @@ def test_get_contract_type(mocker, mock_abi_response, network):
     assert actual == expected
 
 
-def test_get_account_transactions(mocker, mock_account_transactions_response):
+def test_get_account_transactions(mocker, mock_account_transactions_response, address):
     expected_params = {
         "module": "account",
         "action": "txlist",
-        "address": ADDRESS,
+        "address": address,
         "endblock": None,
         "startblock": None,
         "offset": 100,
@@ -151,7 +183,7 @@ def test_get_account_transactions(mocker, mock_account_transactions_response):
     setup_mock_get(mocker, mock_account_transactions_response, expected_params)
 
     explorer = get_explorer("ethereum", "mainnet")
-    actual = [r for r in explorer.get_account_transactions(ADDRESS)]  # type: ignore
+    actual = [r for r in explorer.get_account_transactions(address)]  # type: ignore
 
     # From `get_account_transactions.json` response.
     assert actual[0].txn_hash == "GENESIS_ddbd2b932c763ba5b1b7ae3b362eac3e8d40121a"

@@ -5,6 +5,7 @@ from setuptools import find_packages, setup  # type: ignore
 extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
         "ape-fantom",  # NOTE: Needed to test Fantom integration
+        "ape-infura",  # Needed for live network tests
         "pytest>=6.0,<7.0",  # Core testing package
         "pytest-xdist",  # multi-process runner
         "pytest-cov",  # Coverage analyzer plugin
