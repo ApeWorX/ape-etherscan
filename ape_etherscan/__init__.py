@@ -18,6 +18,10 @@ NETWORKS = {
         "mainnet",
         "testnet",
     ],
+    "optimism": [
+        "mainnet",
+        "kovan"
+    ]
 }
 
 
