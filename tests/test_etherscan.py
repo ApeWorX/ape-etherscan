@@ -140,7 +140,6 @@ def test_get_transaction_url(ecosystem, network, expected_prefix):
     expected = f"https://{expected_prefix}/tx/{TRANSACTION}"
     explorer = get_explorer(ecosystem, network)
     actual = explorer.get_transaction_url(TRANSACTION)
-    breakpoint()
     assert actual == expected
 
 
