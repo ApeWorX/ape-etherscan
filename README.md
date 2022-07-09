@@ -4,6 +4,7 @@ The following blockchain explorers are supported in this plugin:
 
 * [Etherscan](https://etherscan.io/) for Ethereum networks.
 * [Ftmscan](https://ftmscan.com) plugin for Fantom networks.
+* [Arbiscan]("https://arbiscan.io") plugin for Arbitrum networks.
 
 ## Dependencies
 
