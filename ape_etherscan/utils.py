@@ -1,1 +1,5 @@
-API_KEY_ENV_KEY_MAP = {"ethereum": "ETHERSCAN_API_KEY", "fantom": "FTMSCAN_API_KEY"}
+API_KEY_ENV_KEY_MAP = {
+    "arbitrum": "ARBISCAN_API_KEY",
+    "ethereum": "ETHERSCAN_API_KEY",
+    "fantom": "FTMSCAN_API_KEY",
+}
