@@ -6,7 +6,11 @@ from typing import Dict, Iterator, List, Optional, Union
 import requests
 from ape.utils import USER_AGENT
 
-from ape_etherscan.exceptions import UnsupportedEcosystemError, get_request_error
+from ape_etherscan.exceptions import (
+    EtherscanResponseError,
+    UnsupportedEcosystemError,
+    get_request_error,
+)
 from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
 
 
@@ -93,7 +97,12 @@ class _APIClient:
     def _request(self, method: str, *args, **kwargs) -> Union[List, Dict]:
         response = requests.request(method.upper(), self.base_uri, *args, **kwargs)
         response.raise_for_status()
-        response_data = response.json()
+
+        try:
+            response_data = response.json()
+        except json.JSONDecodeError as err:
+            # Etherscan may resond with HTML content.
+            raise EtherscanResponseError(response, "Resource not found") from err
 
         if response_data.get("isError", 0) or response_data.get("message", "") == "NOTOK":
             raise get_request_error(response)
