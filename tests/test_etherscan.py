@@ -85,13 +85,19 @@ def get_explorer(
     return explorer
 
 
-def setup_mock_get(mocker, etherscan_abi_response, expected_params):
+def setup_mock_get(mocker, etherscan_abi_response, expected_params, ecosystem):
     get_patch = mocker.patch("ape_etherscan.client.requests")
+
+    expected_uri_map = {
+        "arbitrum": "https://api.arbiscan.io/api",
+        "ethereum": "https://api.etherscan.io/api",
+        "fantom": "https://api.ftmscan.com/api",
+    }
 
     def get_mock_response(method, base_uri, params=None, *args, **kwargs):
         # Request will fail if made with incorrect parameters.
         assert method == "GET"
-        assert base_uri == "https://api.etherscan.io/api"
+        assert base_uri == expected_uri_map[ecosystem]
 
         # Ignore API key in tests for now
         if params and "apikey" in params:
@@ -150,17 +156,26 @@ def etherscan_abi_response(request, mocker):
         yield response
 
 
-@pytest.mark.parametrize("network", ("mainnet", "mainnet-fork"))
-def test_get_contract_type(mocker, mock_abi_response, network, infura_connection):
+@pytest.mark.parametrize(
+    "ecosystem,network",
+    [
+        ("ethereum", "mainnet"),
+        ("ethereum", "mainnet-fork"),
+        ("fantom", "opera"),
+        ("fantom", "opera"),
+        ("arbitrum", "mainnet"),
+    ],
+)
+def test_get_contract_type(mocker, mock_abi_response, ecosystem, network, infura_connection):
     expected_address = CONTRACT_ADDRESS_MAP[mock_abi_response.file_name]
     expected_params = {
         "module": "contract",
         "action": "getsourcecode",
         "address": expected_address,
     }
-    setup_mock_get(mocker, mock_abi_response, expected_params)
+    setup_mock_get(mocker, mock_abi_response, expected_params, ecosystem)
 
-    explorer = get_explorer("ethereum", network)
+    explorer = get_explorer(ecosystem, network)
     actual = explorer.get_contract_type(expected_address)  # type: ignore
     assert actual is not None
 
@@ -180,7 +195,7 @@ def test_get_account_transactions(mocker, mock_account_transactions_response, ad
         "page": 1,
         "sort": "asc",
     }
-    setup_mock_get(mocker, mock_account_transactions_response, expected_params)
+    setup_mock_get(mocker, mock_account_transactions_response, expected_params, "ethereum")
 
     explorer = get_explorer("ethereum", "mainnet")
     actual = [r for r in explorer.get_account_transactions(address)]  # type: ignore

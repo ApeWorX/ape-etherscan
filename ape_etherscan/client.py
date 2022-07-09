@@ -6,8 +6,12 @@ from typing import Dict, Iterator, List, Optional, Union
 import requests
 from ape.utils import USER_AGENT
 
-from ape_etherscan.exceptions import UnsupportedEcosystemError, get_request_error
-from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
+from ape_etherscan.exceptions import (
+    EtherscanResponseError,
+    UnsupportedEcosystemError,
+    get_request_error,
+)
+from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 
 def get_etherscan_uri(ecosystem_name: str, network_name: str):
@@ -47,7 +51,7 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
         return (
             f"https://api-{network_name}.ftmscan.com"
             if network_name != "opera"
-            else "https://api.ftmscan.com"
+            else "https://api.ftmscan.com/api"
         )
 
     elif ecosystem_name == "arbitrum":
@@ -93,7 +97,12 @@ class _APIClient:
     def _request(self, method: str, *args, **kwargs) -> Union[List, Dict]:
         response = requests.request(method.upper(), self.base_uri, *args, **kwargs)
         response.raise_for_status()
-        response_data = response.json()
+
+        try:
+            response_data = response.json()
+        except json.JSONDecodeError as err:
+            # Etherscan may resond with HTML content.
+            raise EtherscanResponseError(response, "Resource not found") from err
 
         if response_data.get("isError", 0) or response_data.get("message", "") == "NOTOK":
             raise get_request_error(response)
@@ -106,7 +115,11 @@ class _APIClient:
         return result
 
     def __authorize(self, params_or_data: Optional[Dict] = None) -> Optional[Dict]:
-        api_key = os.environ.get(API_KEY_ENV_VAR_NAME)
+        env_var_key = API_KEY_ENV_KEY_MAP.get(self._ecosystem_name)
+        if not env_var_key:
+            return params_or_data
+
+        api_key = os.environ.get(env_var_key)
         if api_key and (not params_or_data or "apikey" not in params_or_data):
             params_or_data = params_or_data or {}
             params_or_data["apikey"] = api_key

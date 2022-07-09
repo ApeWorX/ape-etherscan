@@ -1,6 +1,10 @@
 # Ape Etherscan Plugin
 
-Etherscan Explorer Plugin for Ethereum-based networks.
+The following blockchain explorers are supported in this plugin:
+
+* [Etherscan](https://etherscan.io/) for Ethereum networks.
+* [Ftmscan](https://ftmscan.com) for Fantom networks.
+* [Arbiscan]("https://arbiscan.io") for Arbitrum networks.
 
 ## Dependencies
 
@@ -40,18 +44,20 @@ etherscan URL: https://rinkeby.etherscan.io/tx/0x123321123321123321123321123aaaa
 ## Contract Types
 
 The `ape-etherscan` plugin also assists in fetching `contract_types`.
-Use the `Contract` top-level ape construct to create contract instances.
-When you have an explorer plugin installed and it locates a contract type at the give address, the `Contract` return-value will use that contract type.
+Use the `Contract` top-level construct to create contract instances.
+When the explorer plugin locates a contract type for a given address, the `Contract` return-value uses that contract type.
 
 ```python
 from ape import accounts, Contract
 
-# The following with fetch a contract type from mainnet using the `ape-explorer` plugin.
-# The contract type is then cached to disc (and in memory for the active session) so that subsequent invocations don't require HTTP calls.
-# The return value from `Contract` is a `ContractInstance`, so it is connected to your active provider and ready for transactions.
-contract_from_mainnet = Contract("0x55a8a39bc9694714e2874c1ce77aa1e599461e18")
-receipt = contract_from_mainnet.call_mutable_method("arg0", sender=accounts.load("acct"))
+contract = Contract("0x55a8a39bc9694714e2874c1ce77aa1e599461e18")
+receipt = contract.call_mutable_method("arg0", sender=accounts.load("acct"))
 ```
+
+The first line `contract = Contract("0x55a8a39bc9694714e2874c1ce77aa1e599461e18")` checks if ape has a cached contract-type for the address `0x55a8a39bc9694714e2874c1ce77aa1e599461e18`.
+If it does not find a cached contract type, it uses an explorer plugin to attempt to find one.
+If found, the contract type is then cached to disk and in memory for the active session so that subsequent invocations don't require HTTP calls.
+The return value from `Contract` is a `ContractInstance`, so it is connected to your active provider and ready for transactions.
 
 **NOTE**: Vyper contracts from Etherscan always return the name `Vyper_contract`.
 However, if the plugin detects that the contract type has a method named `symbol`, it will use the return value from that call instead.
