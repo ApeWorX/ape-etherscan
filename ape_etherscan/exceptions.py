@@ -3,7 +3,7 @@ import os
 from ape.exceptions import ApeException
 from requests import Response
 
-from ape_etherscan.utils import API_KEY_ENV_VAR_NAME
+from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 
 class ApeEtherscanException(ApeException):
@@ -38,8 +38,9 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
 
     def __init__(self, response: Response):
         message = "Etherscan API server rate limit exceeded."
-        if not os.environ.get(API_KEY_ENV_VAR_NAME):
-            message = f"{message}. Try setting environment variable '{API_KEY_ENV_VAR_NAME}'."
+        options = API_KEY_ENV_KEY_MAP.keys()
+        if not any(os.environ.get(o) for o in options):
+            message = f"{message}. Try setting one of '{', '.join(options)}'."
 
         super().__init__(response, message)
 
