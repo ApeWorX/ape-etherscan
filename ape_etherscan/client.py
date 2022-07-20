@@ -124,7 +124,7 @@ class _APIClient:
         if api_key and (not params_or_data or "apikey" not in params_or_data):
             params_or_data = params_or_data or {}
             api_key = random.choice(api_key.split(","))
-            params_or_data["apikey"] = api_key
+            params_or_data["apikey"] = api_key.strip()
 
         return params_or_data
 
