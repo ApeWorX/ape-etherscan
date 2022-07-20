@@ -20,8 +20,8 @@ NETWORKS = {
     ],
     "optimism": [
         "mainnet",
-        "kovan"
-    ]
+        "kovan",
+    ],
 }
 
 
