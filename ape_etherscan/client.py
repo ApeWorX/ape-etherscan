@@ -36,6 +36,12 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             if network_name != "mainnet"
             else "https://arbiscan.io"
         )
+    elif ecosystem_name == "optimism":
+        return (
+            "https://optimistic.etherscan.io"
+            if network_name == "mainnet"
+            else "https://kovan-optimistic.etherscan.io"
+        )
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -61,7 +67,12 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
             if network_name != "mainnet"
             else "https://api.arbiscan.io/api"
         )
-
+    elif ecosystem_name == "optimism":
+        return (
+            "https://api-optimistic.etherscan.io/api"
+            if network_name == "mainnet"
+            else "https://api-kovan-optimistic.etherscan.io/api"
+        )
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
