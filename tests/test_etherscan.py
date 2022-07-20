@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -7,7 +8,6 @@ from ape.api.explorers import ExplorerAPI
 from requests import Response
 
 from ape_etherscan import NETWORKS
-import os
 from ape_etherscan.exceptions import EtherscanTooManyRequestsError
 
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
