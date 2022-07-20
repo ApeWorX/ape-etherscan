@@ -38,7 +38,7 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
 
     def __init__(self, response: Response):
         message = "Etherscan API server rate limit exceeded."
-        options = API_KEY_ENV_KEY_MAP.keys()
+        options = API_KEY_ENV_KEY_MAP.values()
         if not any(os.environ.get(o) for o in options):
             message = f"{message}. Try setting one of '{', '.join(options)}'."
 

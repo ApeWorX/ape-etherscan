@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -7,6 +8,7 @@ from ape.api.explorers import ExplorerAPI
 from requests import Response
 
 from ape_etherscan import NETWORKS
+from ape_etherscan.exceptions import EtherscanTooManyRequestsError
 
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 MOCK_RESPONSES_PATH = Path(__file__).parent / "mock_responses"
@@ -202,3 +204,10 @@ def test_get_account_transactions(mocker, mock_account_transactions_response, ad
 
     # From `get_account_transactions.json` response.
     assert actual[0].txn_hash == "GENESIS_ddbd2b932c763ba5b1b7ae3b362eac3e8d40121a"
+
+
+def test_too_many_requests_error(mocker):
+    response = mocker.MagicMock()
+    os.environ.pop("ETHERSCAN_API_KEY", None)
+    error = EtherscanTooManyRequestsError(response)
+    assert "ETHERSCAN_API_KEY" in str(error)
