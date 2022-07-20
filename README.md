@@ -32,6 +32,22 @@ python3 setup.py install
 
 ## Quick Usage
 
+## Set up the environment
+
+Specify API keys as environment variables. You could put them in your shell's config like `~/.profile`
+or use a tool like [direnv](https://direnv.net/) and store them locally in `.envrc`.
+
+You can also specify multiple comma-separated keys, a random key will be chosen for each request.
+This could be useful if you hit API rate limits.
+
+You can obtain an API key by registering with Etherscan and visitng [this page](https://etherscan.io/myapikey).
+
+```bash
+export ETHERSCAN_API_KEY=SAMPLE_KEY
+export FTMSCAN_API_KEY=SAMPLE_KEY
+export ARBISCAN_API_KEY=SAMPLE_KEY
+```
+
 ## Transaction URLs
 
 When you have this plugin installed, Etherscan explorer URLs appear in CLI output.
