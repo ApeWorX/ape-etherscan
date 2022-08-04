@@ -93,6 +93,7 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params, ecosystem):
     expected_uri_map = {
         "ethereum": "https://api.etherscan.io/api",
         "fantom": "https://api.ftmscan.com/api",
+        "optimism": "https://api-optimistic.etherscan.io/api",
     }
 
     def get_mock_response(method, base_uri, params=None, *args, **kwargs):
@@ -119,6 +120,9 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params, ecosystem):
         ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
         ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
         ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
+        # TODO: Uncomment when Alchemy supports Optimism
+        # ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
+        # ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
     ],
 )
 def test_get_address_url(ecosystem, network, expected_prefix, address):
@@ -136,6 +140,9 @@ def test_get_address_url(ecosystem, network, expected_prefix, address):
         ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
         ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
         ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
+        # TODO: Uncomment when Alchemy supports Optimism
+        # ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
+        # ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
     ],
 )
 def test_get_transaction_url(ecosystem, network, expected_prefix):
@@ -163,7 +170,7 @@ def etherscan_abi_response(request, mocker):
         ("ethereum", "mainnet"),
         ("ethereum", "mainnet-fork"),
         ("fantom", "opera"),
-        ("fantom", "opera"),
+        ("optimism", "mainnet"),
     ],
 )
 def test_get_contract_type(mocker, mock_abi_response, ecosystem, network, infura_connection):
