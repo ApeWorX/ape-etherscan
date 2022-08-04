@@ -91,7 +91,6 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params, ecosystem):
     get_patch = mocker.patch("ape_etherscan.client.requests")
 
     expected_uri_map = {
-        "arbitrum": "https://api.arbiscan.io/api",
         "ethereum": "https://api.etherscan.io/api",
         "fantom": "https://api.ftmscan.com/api",
     }
@@ -165,7 +164,6 @@ def etherscan_abi_response(request, mocker):
         ("ethereum", "mainnet-fork"),
         ("fantom", "opera"),
         ("fantom", "opera"),
-        ("arbitrum", "mainnet"),
     ],
 )
 def test_get_contract_type(mocker, mock_abi_response, ecosystem, network, infura_connection):
