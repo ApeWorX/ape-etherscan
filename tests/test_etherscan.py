@@ -213,6 +213,9 @@ def test_get_account_transactions(mocker, mock_account_transactions_response, ad
 
 def test_too_many_requests_error(mocker):
     response = mocker.MagicMock()
-    os.environ.pop("ETHERSCAN_API_KEY", None)
-    error = EtherscanTooManyRequestsError(response)
+    key = os.environ.pop("ETHERSCAN_API_KEY", None)
+    error = EtherscanTooManyRequestsError(response, "ethereum")
     assert "ETHERSCAN_API_KEY" in str(error)
+
+    if key:
+        os.environ["ETHERSCAN_API_KEY"] = key

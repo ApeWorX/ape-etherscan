@@ -117,7 +117,7 @@ class _APIClient:
             raise EtherscanResponseError(response, "Resource not found") from err
 
         if response_data.get("isError", 0) or response_data.get("message", "") == "NOTOK":
-            raise get_request_error(response)
+            raise get_request_error(response, self._network_name)
 
         result = response_data.get("result")
         if result and isinstance(result, str):
