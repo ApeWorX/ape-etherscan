@@ -91,7 +91,6 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params, ecosystem):
     get_patch = mocker.patch("ape_etherscan.client.requests")
 
     expected_uri_map = {
-        "arbitrum": "https://api.arbiscan.io/api",
         "ethereum": "https://api.etherscan.io/api",
         "fantom": "https://api.ftmscan.com/api",
         "optimism": "https://api-optimistic.etherscan.io/api",
@@ -171,8 +170,6 @@ def etherscan_abi_response(request, mocker):
         ("ethereum", "mainnet"),
         ("ethereum", "mainnet-fork"),
         ("fantom", "opera"),
-        ("fantom", "opera"),
-        ("arbitrum", "mainnet"),
         ("optimism", "mainnet"),
     ],
 )
@@ -216,6 +213,9 @@ def test_get_account_transactions(mocker, mock_account_transactions_response, ad
 
 def test_too_many_requests_error(mocker):
     response = mocker.MagicMock()
-    os.environ.pop("ETHERSCAN_API_KEY", None)
-    error = EtherscanTooManyRequestsError(response)
+    key = os.environ.pop("ETHERSCAN_API_KEY", None)
+    error = EtherscanTooManyRequestsError(response, "ethereum")
     assert "ETHERSCAN_API_KEY" in str(error)
+
+    if key:
+        os.environ["ETHERSCAN_API_KEY"] = key

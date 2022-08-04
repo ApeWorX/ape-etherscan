@@ -36,16 +36,16 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
     Raised after being rate-limited by Etherscan.
     """
 
-    def __init__(self, response: Response):
+    def __init__(self, response: Response, network: str):
         message = "Etherscan API server rate limit exceeded."
-        options = API_KEY_ENV_KEY_MAP.values()
-        if not any(os.environ.get(o) for o in options):
-            message = f"{message}. Try setting one of '{', '.join(options)}'."
+        api_key_name = API_KEY_ENV_KEY_MAP[network]
+        if not os.environ.get(api_key_name):
+            message = f"{message}. Try setting {api_key_name}'."
 
         super().__init__(response, message)
 
 
-def get_request_error(response: Response) -> EtherscanResponseError:
+def get_request_error(response: Response, network: str) -> EtherscanResponseError:
     response_data = response.json()
     if "result" in response_data and response_data["result"]:
         message = response_data["result"]
@@ -55,6 +55,6 @@ def get_request_error(response: Response) -> EtherscanResponseError:
         message = response.text
 
     if "max rate limit reached" in response.text.lower():
-        return EtherscanTooManyRequestsError(response)
+        return EtherscanTooManyRequestsError(response, network)
 
     return EtherscanResponseError(response, message)

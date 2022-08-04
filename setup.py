@@ -5,26 +5,25 @@ from setuptools import find_packages, setup  # type: ignore
 extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
         "ape-fantom",  # For testing Fantom integration
-        "ape-arbitrum",  # For testing Arbitrum integration
         "ape-optimism",  # Needed for Optimism integration
         "ape-infura",  # Needed for live network tests
-        "pytest>=6.0,<7.0",  # Core testing package
+        "pytest>=6.0",  # Core testing package
         "pytest-xdist",  # multi-process runner
         "pytest-cov",  # Coverage analyzer plugin
         "hypothesis>=6.2.0,<7.0",  # Strategy-based fuzzer
         "pytest-mock",  # Test mocker
     ],
     "lint": [
-        "black>=22.3.0,<23.0",  # auto-formatter and linter
-        "mypy>=0.961,<1.0",  # Static type analyzer
-        "types-requests>=2.27.15",  # NOTE: Needed due to mypy typeshed
+        "black>=22.6.0",  # auto-formatter and linter
+        "mypy>=0.971,<1.0",  # Static type analyzer
+        "types-requests>=2.28.7",  # NOTE: Needed due to mypy typeshed
         "flake8>=4.0.1,<5.0",  # Style linter
         "isort>=5.10.1,<6.0",  # Import sorting linter
     ],
     "doc": [
         "Sphinx>=3.4.3,<4",  # Documentation generator
         "sphinx_rtd_theme>=0.1.9,<1",  # Readthedocs.org theme
-        "towncrier>=19.2.0, <20",  # Generate release notes
+        "towncrier>=19.2.0,<20",  # Generate release notes
     ],
     "release": [  # `release` GitHub Action job uses this
         "setuptools",  # Installation tool
@@ -66,9 +65,9 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.3.5,<0.4.0",
+        "eth-ape>=0.4.0,<0.5.0",
         "importlib-metadata ; python_version<'3.8'",
-        "requests>=2.25.1,<3.0.0",
+        "requests>=2.28.1,<3.0.0",
     ],
     python_requires=">=3.7.2,<4",
     extras_require=extras_require,
