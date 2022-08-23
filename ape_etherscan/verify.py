@@ -103,8 +103,7 @@ class SourceVerifier(ManagerAccessMixin):
             Version(str(compiler_version).split("+")[0])
         ]
 
-        # TODO: Move output selection back to ape-solidity
-        # TODO: sHandle evmVersion, libraries, and metadata.
+        # TODO: Handle evmVersion, libraries, and metadata.
         settings["outputSelection"] = {"*": {"*": ["evm.bytecode", "evm.deployedBytecode", "abi"]}}
         source_code = {
             "language": compiler.name.capitalize(),
@@ -134,6 +133,9 @@ class SourceVerifier(ManagerAccessMixin):
             if verification_update.startswith(fail_key):
                 err_msg = verification_update.split(fail_key)[-1].strip()
                 raise ContractVerificationError(err_msg)
+            elif verification_update == "Already Verified":
+                logger.success("Contract verification successful!")
+                break
 
             status_message = f"Contract verification status: {verification_update}"
             logger.info(status_message)
