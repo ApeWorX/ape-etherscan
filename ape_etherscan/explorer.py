@@ -1,13 +1,17 @@
 import json
+import time
 from json.decoder import JSONDecodeError
 from typing import Iterator, Optional
 
 from ape.api import ExplorerAPI, ReceiptAPI
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
+from ape.logging import logger
 from ape.types import AddressType, ContractType
 
 from ape_etherscan.client import ClientFactory, get_etherscan_uri
+from ape_etherscan.exceptions import ContractVerificationError
+from ape_etherscan.verify import SourceVerifier
 
 
 class Etherscan(ExplorerAPI):
@@ -61,3 +65,25 @@ class Etherscan(ExplorerAPI):
                 receipt_data["status"] = status
 
             yield self.network.ecosystem.decode_receipt(receipt_data)
+
+    def publish_contract(self, address: AddressType):
+        verifier = SourceVerifier(address, self._client_factory)
+        return verifier.attempt_verification()
+
+    def _wait_for_verification(self, contract_client, guid: str):
+        iterations = 0
+        timeout = 100
+        while iterations < 25:
+            verification_update = contract_client.check_verify_status(guid)
+            fail_key = "Fail - "
+            if verification_update.startswith(fail_key):
+                err_msg = verification_update.split(fail_key)[-1].strip()
+                raise ContractVerificationError(err_msg)
+
+            status_message = f"Contract verification status: {verification_update}"
+            logger.info(status_message)
+
+            time.sleep(2.5)
+            iterations += 1
+            if iterations == timeout:
+                raise ContractVerificationError("Timed out waiting for contract verification.")

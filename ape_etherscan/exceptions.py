@@ -45,6 +45,12 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
         super().__init__(response, message)
 
 
+class ContractVerificationError(ApeEtherscanException):
+    """
+    An error that occurs when unable to verify or publish a contract.
+    """
+
+
 def get_request_error(response: Response, network: str) -> EtherscanResponseError:
     response_data = response.json()
     if "result" in response_data and response_data["result"]:
