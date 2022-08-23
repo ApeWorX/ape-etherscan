@@ -49,8 +49,27 @@ class SourceVerifier(ManagerAccessMixin):
     @cached_property
     def constructor_arguments(self):
         # The first receipt of a contract is its deploy
-        contract_txns = self.account_client.get_all_normal_transactions()
-        deploy_receipt = [tx for tx in contract_txns][0]
+        call = self.account_client.get_all_normal_transactions
+        contract_txns = [tx for tx in call()]
+
+        timeout = 20
+        checks_done = 0
+        while checks_done <= timeout:
+            # If was just deployed, it takes a few seconds to show up in API response
+            contract_txns = [tx for tx in call()]
+            if contract_txns:
+                break
+
+            logger.debug("Waiting for deploy receipt in Etherscan...")
+            checks_done += 1
+            time.sleep(2.5)
+
+        if not contract_txns:
+            raise ContractVerificationError(
+                f"Failed to find to deploy receipt for '{self.address}'"
+            )
+
+        deploy_receipt = contract_txns[0]
         bytecode_len = len(self._contract_type.runtime_bytecode.bytecode)
         start_index = bytecode_len + 2
         return deploy_receipt["input"][start_index:]
@@ -130,10 +149,13 @@ class SourceVerifier(ManagerAccessMixin):
         while iterations < 25:
             verification_update = self.contract_client.check_verify_status(guid)
             fail_key = "Fail - "
+            pass_key = "Pass - "
             if verification_update.startswith(fail_key):
                 err_msg = verification_update.split(fail_key)[-1].strip()
                 raise ContractVerificationError(err_msg)
-            elif verification_update == "Already Verified":
+            elif verification_update == "Already Verified" or verification_update.startswith(
+                pass_key
+            ):
                 logger.success("Contract verification successful!")
                 break
 
