@@ -7,7 +7,7 @@ from ape.logging import logger
 from ape.types import AddressType
 from ape.utils import ManagerAccessMixin, cached_property
 from ethpm_types import ContractType
-from semantic_version import Version
+from semantic_version import Version  # type: ignore
 
 from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 from ape_etherscan.exceptions import ContractVerificationError
@@ -111,9 +111,10 @@ class SourceVerifier(ManagerAccessMixin):
 
     def attempt_verification(self):
         compiler = self.compiler_manager.registered_compilers[self._ext]
-        compiler_version = Version(compiler.get_versions({self._source_path}).pop())
         manifest = self.project_manager.extract_manifest()
-        compiler_used = [c for c in manifest.compilers if c.version == str(compiler_version)][0]
+        compiler_used = [
+            c for c in manifest.compilers if self._contract_type.name in c.contractTypes
+        ][0]
         optimizer = compiler_used.settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", 200)
@@ -122,7 +123,7 @@ class SourceVerifier(ManagerAccessMixin):
         all_settings = compiler.get_compiler_settings(
             [self._source_path], base_path=self._base_path
         )
-        settings = all_settings[compiler_version]
+        settings = all_settings[Version(compiler_used.version)]
 
         # TODO: Handle libraries, and metadata.
         source_code = {
