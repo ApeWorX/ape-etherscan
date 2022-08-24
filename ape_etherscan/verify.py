@@ -49,6 +49,7 @@ class SourceVerifier(ManagerAccessMixin):
     @cached_property
     def constructor_arguments(self):
         # The first receipt of a contract is its deploy
+        # TODO: Replace with chain.history.get_txn call
         call = self.account_client.get_all_normal_transactions
         contract_txns = [tx for tx in call()]
 
@@ -71,7 +72,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         deploy_receipt = contract_txns[0]
         bytecode_len = len(self._contract_type.runtime_bytecode.bytecode)
-        start_index = bytecode_len + 2
+        start_index = bytecode_len
         return deploy_receipt["input"][start_index:]
 
     @cached_property
