@@ -114,7 +114,7 @@ class SourceVerifier(ManagerAccessMixin):
         manifest = self.project_manager.extract_manifest()
         compiler_used = [c for c in manifest.compilers if c.version == str(compiler_version)][0]
         optimizer = compiler_used.settings.get("optimizer", {})
-        optimized = compiler_used.settings.get("optimizer", {}).get("enabled", False)
+        optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", 200)
         source_name = self._contract_type.source_id
         sources = {source_name: {"content": manifest.sources[source_name].content}}
@@ -124,7 +124,6 @@ class SourceVerifier(ManagerAccessMixin):
         settings = all_settings[compiler_version]
 
         # TODO: Handle evmVersion, libraries, and metadata.
-        settings["outputSelection"] = {"*": {"*": ["evm.bytecode", "evm.deployedBytecode", "abi"]}}
         source_code = {
             "language": compiler.name.capitalize(),
             "sources": sources,
