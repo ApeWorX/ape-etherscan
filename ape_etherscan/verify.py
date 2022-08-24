@@ -123,7 +123,7 @@ class SourceVerifier(ManagerAccessMixin):
         )
         settings = all_settings[compiler_version]
 
-        # TODO: Handle evmVersion, libraries, and metadata.
+        # TODO: Handle libraries, and metadata.
         source_code = {
             "language": compiler.name.capitalize(),
             "sources": sources,
