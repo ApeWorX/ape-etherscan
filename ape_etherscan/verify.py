@@ -157,7 +157,8 @@ class SourceVerifier(ManagerAccessMixin):
             elif verification_update == "Already Verified" or verification_update.startswith(
                 pass_key
             ):
-                logger.success("Contract verification successful!")
+                uri = self.provider.network.explorer.get_address_url(self.address)
+                logger.success(f"Contract verification successful!\n{uri}#code")
                 break
 
             status_message = f"Contract verification status: {verification_update}"
