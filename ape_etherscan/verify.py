@@ -110,7 +110,7 @@ class SourceVerifier(ManagerAccessMixin):
 
     def attempt_verification(self):
         compiler = self.compiler_manager.registered_compilers[self._ext]
-        compiler_version = compiler.get_versions({self._source_path}, with_commit_hash=True).pop()
+        compiler_version = Version(compiler.get_versions({self._source_path}).pop())
         manifest = self.project_manager.extract_manifest()
         compiler_used = [c for c in manifest.compilers if c.version == str(compiler_version)][0]
         optimizer = compiler_used.settings.get("optimizer", {})
@@ -118,9 +118,10 @@ class SourceVerifier(ManagerAccessMixin):
         runs = optimizer.get("runs", 200)
         source_name = self._contract_type.source_id
         sources = {source_name: {"content": manifest.sources[source_name].content}}
-        settings = compiler.get_compiler_settings([self._source_path], base_path=self._base_path)[
-            Version(str(compiler_version).split("+")[0])
-        ]
+        all_settings = compiler.get_compiler_settings(
+            [self._source_path], base_path=self._base_path
+        )
+        settings = all_settings[compiler_version]
 
         # TODO: Handle evmVersion, libraries, and metadata.
         settings["outputSelection"] = {"*": {"*": ["evm.bytecode", "evm.deployedBytecode", "abi"]}}
