@@ -19,8 +19,9 @@ EXPECTED_CONTRACT_NAME_MAP = {
     "get_proxy_contract_response.json": "MIM-UST-f",
     "get_vyper_contract_response.json": "yvDAI",
 }
+CONTRACT_ADDRESS = "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"
 CONTRACT_ADDRESS_MAP = {
-    "get_contract_response.json": "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
+    "get_contract_response.json": CONTRACT_ADDRESS,
     "get_proxy_contract_response.json": "0x55A8a39bc9694714E2874c1ce77aa1E599461E18",
     "get_vyper_contract_response.json": "0xdA816459F1AB5631232FE5e97a05BBBb94970c95",
 }
@@ -77,6 +78,14 @@ def infura_connection():
         yield provider
 
 
+@pytest.fixture
+def no_api_key():
+    key = os.environ.pop("ETHERSCAN_API_KEY", None)
+    yield
+    if key:
+        os.environ["ETHERSCAN_API_KEY"] = key
+
+
 def get_explorer(
     ecosystem_name: str = "ethereum",
     network_name: str = "development",
@@ -85,6 +94,11 @@ def get_explorer(
     explorer = ecosystem.get_network(network_name).explorer
     assert explorer is not None
     return explorer
+
+
+@pytest.fixture
+def explorer():
+    return get_explorer("ethereum", "mainnet")
 
 
 def setup_mock_get(mocker, etherscan_abi_response, expected_params, ecosystem):
@@ -120,9 +134,8 @@ def setup_mock_get(mocker, etherscan_abi_response, expected_params, ecosystem):
         ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
         ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
         ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
-        # TODO: Uncomment when Alchemy supports Optimism
-        # ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
-        # ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
+        ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
+        ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
     ],
 )
 def test_get_address_url(ecosystem, network, expected_prefix, address):
@@ -140,9 +153,8 @@ def test_get_address_url(ecosystem, network, expected_prefix, address):
         ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
         ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
         ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
-        # TODO: Uncomment when Alchemy supports Optimism
-        # ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
-        # ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
+        ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
+        ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
     ],
 )
 def test_get_transaction_url(ecosystem, network, expected_prefix):
@@ -191,7 +203,7 @@ def test_get_contract_type(mocker, mock_abi_response, ecosystem, network, infura
     assert actual == expected
 
 
-def test_get_account_transactions(mocker, mock_account_transactions_response, address):
+def test_get_account_transactions(mocker, mock_account_transactions_response, address, explorer):
     expected_params = {
         "module": "account",
         "action": "txlist",
@@ -203,19 +215,12 @@ def test_get_account_transactions(mocker, mock_account_transactions_response, ad
         "sort": "asc",
     }
     setup_mock_get(mocker, mock_account_transactions_response, expected_params, "ethereum")
-
-    explorer = get_explorer("ethereum", "mainnet")
     actual = [r for r in explorer.get_account_transactions(address)]  # type: ignore
 
     # From `get_account_transactions.json` response.
     assert actual[0].txn_hash == "GENESIS_ddbd2b932c763ba5b1b7ae3b362eac3e8d40121a"
 
 
-def test_too_many_requests_error(mocker):
-    response = mocker.MagicMock()
-    key = os.environ.pop("ETHERSCAN_API_KEY", None)
-    error = EtherscanTooManyRequestsError(response, "ethereum")
-    assert "ETHERSCAN_API_KEY" in str(error)
-
-    if key:
-        os.environ["ETHERSCAN_API_KEY"] = key
+def test_too_many_requests_error(no_api_key):
+    actual = str(EtherscanTooManyRequestsError(None, "ethereum"))
+    assert "ETHERSCAN_API_KEY" in actual
