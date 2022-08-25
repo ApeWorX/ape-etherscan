@@ -1,6 +1,6 @@
 import time
+from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 from ape.contracts import ContractInstance
 from ape.logging import logger
@@ -11,6 +11,53 @@ from semantic_version import Version  # type: ignore
 
 from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 from ape_etherscan.exceptions import ContractVerificationError
+
+_SPX_ID_TO_LICENSE_MAP = {
+    "unlicense": 2,
+    "mit": 3,
+    "gpl-2.0": 4,
+    "gpl-3.0": 5,
+    "lgpl-2.1": 6,
+    "lgpl-3.0": 7,
+    "bsd-2-clause": 8,
+    "bsd-3-clause": 9,
+    "mpl-2.0": 10,
+    "osl-3.0": 11,
+    "apache 2.0": 12,
+    "agpl-3.0-only": 13,
+    "agpl-3.0-later": 13,
+    "busl-1.1": 14,
+}
+_SPDX_ID_KEY = "SPDX-License-Identifier: "
+
+
+class LicenseType(Enum):
+    NO_LICENSE = 1
+    UNLICENSED = 2
+    MIT = 3
+    GPL_2 = 4
+    GPL_3 = 5
+    LGLP_2_1 = 6
+    LGLP_3 = 7
+    BSD_2_CLAUSE = 8
+    BSD_3_CLAUSE = 9
+    MPL_2 = 10
+    OSL_3 = 11
+    APACHE = 2
+    AGLP_3 = 13
+    BUSL_1_1 = 14
+
+    @classmethod
+    def from_spx_id(cls, spx_id: str) -> "LicenseType":
+        if _SPDX_ID_KEY not in spx_id:
+            return cls.NO_LICENSE
+
+        license_id = spx_id.split(_SPDX_ID_KEY)[-1].strip().lower()
+        if license_id in _SPX_ID_TO_LICENSE_MAP:
+            return cls(_SPX_ID_TO_LICENSE_MAP[license_id])
+
+        logger.warning(f"Unsupported license type '{license_id}'.")
+        return cls.NO_LICENSE
 
 
 class SourceVerifier(ManagerAccessMixin):
@@ -76,38 +123,9 @@ class SourceVerifier(ManagerAccessMixin):
         return deploy_receipt["input"][start_index:]
 
     @cached_property
-    def license_code(self) -> Optional[int]:
-        spdx_key = "SPDX-License-Identifier: "
-        license_keyword_map = {
-            "unlicense": 2,
-            "mit": 3,
-            "gpl-2.0": 4,
-            "gpl-3.0": 5,
-            "lgpl-2.1": 6,
-            "lgpl-3.0": 7,
-            "bsd-2-clause": 8,
-            "bsd-3-clause": 9,
-            "mpl-2.0": 10,
-            "osl-3.0": 11,
-            "apache 2.0": 12,
-            "agpl-3.0-only": 13,
-            "agpl-3.0-later": 13,
-            "busl-1.1": 14,
-        }
-        license_type = 1
-
-        # Determine license type from SPDX-ID
-        first_line = self._source_path.read_text().split("\n")[0]
-        if spdx_key not in first_line:
-            return license_type
-
-        license_id = first_line.split(spdx_key)[-1].strip().lower()
-        license_type = license_keyword_map.get(license_id, 1)
-        if license_type:
-            return license_type
-
-        logger.warning(f"Unsupported license type '{license_id}'.")
-        return license_type
+    def license_code(self) -> int:
+        spdx_id = self._source_path.read_text().split("\n")[0]
+        return LicenseType.from_spx_id(spdx_id).value
 
     def attempt_verification(self):
         compiler = self.compiler_manager.registered_compilers[self._ext]
@@ -146,9 +164,7 @@ class SourceVerifier(ManagerAccessMixin):
         self._wait_for_verification(guid)
 
     def _wait_for_verification(self, guid: str):
-        iterations = 0
-        timeout = 100
-        while iterations < 25:
+        for iteration in range(100):
             verification_update = self.contract_client.check_verify_status(guid)
             fail_key = "Fail - "
             pass_key = "Pass - "
@@ -164,8 +180,7 @@ class SourceVerifier(ManagerAccessMixin):
 
             status_message = f"Contract verification status: {verification_update}"
             logger.info(status_message)
+            time.sleep(3)
 
-            time.sleep(2.5)
-            iterations += 1
-            if iterations == timeout:
-                raise ContractVerificationError("Timed out waiting for contract verification.")
+        else:
+            raise ContractVerificationError("Timed out waiting for contract verification.")
