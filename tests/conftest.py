@@ -121,13 +121,9 @@ class MockEtherscanBackend:
         self._handlers[method.lower()][module] = handler
         self._session.request.side_effect = self.handle_request
 
-    def handle_request(
-        self, method, base_uri, headers=None, params=None, json=None, data=None, *args, **kwargs
-    ):
+    def handle_request(self, method, base_uri, headers=None, params=None, data=None):
         if params and "apikey" in params:
             del params["apikey"]
-        if json and "apiKey" in json:
-            del json["apiKey"]
         if data and "apiKey" in data:
             del data["apiKey"]
 
@@ -135,8 +131,8 @@ class MockEtherscanBackend:
 
         module = params.get("module") or data.get("module")
         handler = self._handlers[method.lower()][module]
-        options = dict(headers=headers, params=params, json=json, data=data, **kwargs)
-        return handler(self, method, base_uri, *args, **options)
+        options = dict(headers=headers, params=params, json=json, data=data)
+        return handler(self, method, base_uri, **options)
 
     def setup_mock_get_contract_type_response(self, file_name: str):
         expected_address = CONTRACT_ADDRESS_MAP[file_name]
