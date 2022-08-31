@@ -5,8 +5,8 @@ import random
 from dataclasses import dataclass
 from typing import Dict, Iterator, List, Optional, Union
 
-import requests
 from ape.utils import USER_AGENT, cached_property
+from requests import Session
 
 from ape_etherscan.exceptions import (
     EtherscanResponseError,
@@ -124,6 +124,8 @@ class EtherscanResponse:
 class _APIClient:
     DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
 
+    session = Session()
+
     def __init__(self, ecosystem_name: str, network_name: str, module_name: str):
         self._ecosystem_name = ecosystem_name
         self._network_name = network_name
@@ -155,10 +157,15 @@ class _APIClient:
         return self._request("POST", data=data, headers=headers)
 
     def _request(
-        self, method: str, raise_on_exceptions: bool = True, *args, **kwargs
+        self,
+        method: str,
+        raise_on_exceptions: bool = True,
+        headers: Optional[Dict] = None,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
     ) -> EtherscanResponse:
-        headers = kwargs.pop("headers", {}) or self.DEFAULT_HEADERS
-        response = requests.request(method.upper(), self.base_uri, headers=headers, *args, **kwargs)
+        headers = headers or self.DEFAULT_HEADERS
+        response = self.session.request(method.upper(), self.base_uri, headers=headers)
 
         if raise_on_exceptions:
             response.raise_for_status()

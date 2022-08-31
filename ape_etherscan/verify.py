@@ -87,7 +87,7 @@ class SourceVerifier(ManagerAccessMixin):
 
     @property
     def _source_path(self) -> Path:
-        return self._base_path / self._contract_type.source_id
+        return self._base_path / (self._contract_type.source_id or "")
 
     @property
     def _ext(self) -> str:
@@ -95,16 +95,12 @@ class SourceVerifier(ManagerAccessMixin):
 
     @cached_property
     def constructor_arguments(self):
-        # The first receipt of a contract is its deploy
-        # TODO: Replace with chain.history.get_txn call
-        call = self.account_client.get_all_normal_transactions
-        contract_txns = [tx for tx in call()]
-
+        contract_txns = []
         timeout = 20
         checks_done = 0
         while checks_done <= timeout:
             # If was just deployed, it takes a few seconds to show up in API response
-            contract_txns = [tx for tx in call()]
+            contract_txns = [tx for tx in self.chain_manager.account_history[self.address]]
             if contract_txns:
                 break
 
@@ -130,9 +126,14 @@ class SourceVerifier(ManagerAccessMixin):
     def attempt_verification(self):
         compiler = self.compiler_manager.registered_compilers[self._ext]
         manifest = self.project_manager.extract_manifest()
-        compiler_used = [
+        compilers_used = [
             c for c in manifest.compilers if self._contract_type.name in c.contractTypes
-        ][0]
+        ]
+
+        if not compilers_used:
+            raise ContractVerificationError("Compiler data missing from project manifest.")
+
+        compiler_used = compilers_used[0]
         optimizer = compiler_used.settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", 200)
