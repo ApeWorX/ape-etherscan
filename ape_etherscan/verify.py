@@ -12,7 +12,7 @@ from semantic_version import Version  # type: ignore
 from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 from ape_etherscan.exceptions import ContractVerificationError
 
-_SPX_ID_TO_LICENSE_MAP = {
+_SPDX_ID_TO_API_CODE = {
     "unlicense": 2,
     "mit": 3,
     "gpl-2.0": 4,
@@ -32,29 +32,102 @@ _SPDX_ID_KEY = "SPDX-License-Identifier: "
 
 
 class LicenseType(Enum):
+    """
+    https://etherscan.io/contract-license-types
+    """
+
     NO_LICENSE = 1
+    """
+    Nobody else can copy, distribute, or modify your work without being at risk of
+    take-downs, shake-downs, or litigation.
+    """
+
     UNLICENSED = 2
+    """
+    A license with no conditions whatsoever which dedicates works to the public domain.
+    """
+
     MIT = 3
+    """
+    Licensed works, modifications, and larger works may be distributed under different
+    terms and without source code.
+    """
+
     GPL_2 = 4
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/gpl-2.0.txt
+    """
+
     GPL_3 = 5
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/gpl-3.0.txt
+    """
+
     LGLP_2_1 = 6
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/lgpl-3.0.txt
+    """
+
     LGLP_3 = 7
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/lgpl-3.0.txt
+    """
+
     BSD_2_CLAUSE = 8
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsd-2-clause.txt
+    """
+
     BSD_3_CLAUSE = 9
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsd-3-clause.txt
+    """
+
     MPL_2 = 10
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/mpl-2.0.txt
+    """
+
     OSL_3 = 11
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/osl-3.0.txt
+    """
+
     APACHE = 2
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/apache-2.0.txt
+    """
+
     AGLP_3 = 13
+    """
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/agpl-3.0.txt
+    """
+
     BUSL_1_1 = 14
+    """
+    The BSL is structured to allow free and open usage for many use cases, and only requires
+    a commercial license by those who make production use of the software, which is typically
+    indicative of an environment that is delivering significant value to a business.
+    """
 
     @classmethod
-    def from_spx_id(cls, spx_id: str) -> "LicenseType":
-        if _SPDX_ID_KEY not in spx_id:
+    def from_spdx_id(cls, spdx_id: str) -> "LicenseType":
+        """
+        Create an instance using the SPDX Identifier.
+
+        Args:
+            spdx_id (str): e.g. ``"// SPDX-License-Identifier: MIT"``
+
+        Returns:
+            ``LicenseType``
+        """
+
+        if _SPDX_ID_KEY not in spdx_id:
             return cls.NO_LICENSE
 
-        license_id = spx_id.split(_SPDX_ID_KEY)[-1].strip().lower()
-        if license_id in _SPX_ID_TO_LICENSE_MAP:
-            return cls(_SPX_ID_TO_LICENSE_MAP[license_id])
+        license_id = spdx_id.split(_SPDX_ID_KEY)[-1].strip().lower()
+        if license_id in _SPDX_ID_TO_API_CODE:
+            return cls(_SPDX_ID_TO_API_CODE[license_id])
 
         logger.warning(f"Unsupported license type '{license_id}'.")
         return cls.NO_LICENSE
@@ -66,11 +139,11 @@ class SourceVerifier(ManagerAccessMixin):
         self.client_factory = client_factory
 
     @cached_property
-    def account_client(self) -> AccountClient:
+    def _account_client(self) -> AccountClient:
         return self.client_factory.get_account_client(str(self.address))
 
     @cached_property
-    def contract_client(self) -> ContractClient:
+    def _contract_client(self) -> ContractClient:
         return self.client_factory.get_contract_client(str(self.address))
 
     @cached_property
@@ -94,7 +167,11 @@ class SourceVerifier(ManagerAccessMixin):
         return self._source_path.suffix
 
     @cached_property
-    def constructor_arguments(self):
+    def constructor_arguments(self) -> str:
+        """
+        The arguments used when deploying the contract.
+        """
+
         contract_txns = []
         timeout = 20
         checks_done = 0
@@ -119,11 +196,25 @@ class SourceVerifier(ManagerAccessMixin):
         return deploy_receipt.data[start_index:]
 
     @cached_property
-    def license_code(self) -> int:
+    def license_code(self) -> LicenseType:
+        """
+        The license type used in the code.
+        """
+
         spdx_id = self._source_path.read_text().split("\n")[0]
-        return LicenseType.from_spx_id(spdx_id).value
+        return LicenseType.from_spdx_id(spdx_id)
 
     def attempt_verification(self):
+        """
+        Attempt to verify the source code.
+        If the bytecode is already verified, Etherscan will use the existing bytecode
+        and this method will still succeed.
+
+        Raises:
+            :class:`~ape_etherscan.exceptions.ContractVerificationError`: - When fails
+              to validate the contract.
+        """
+
         compiler = self.compiler_manager.registered_compilers[self._ext]
         manifest = self.project_manager.extract_manifest()
         compilers_used = [
@@ -152,7 +243,7 @@ class SourceVerifier(ManagerAccessMixin):
         }
 
         evm_version = compiler_used.settings.get("evmVersion")
-        guid = self.contract_client.verify_source_code(
+        guid = self._contract_client.verify_source_code(
             source_code,
             compiler_used.version,
             contract_name=f"{self._contract_type.source_id}:{self._contract_type.name}",
@@ -160,13 +251,13 @@ class SourceVerifier(ManagerAccessMixin):
             optimization_runs=runs,
             constructor_arguments=self.constructor_arguments,
             evm_version=evm_version,
-            license_type=self.license_code,
+            license_type=self.license_code.value,
         )
         self._wait_for_verification(guid)
 
     def _wait_for_verification(self, guid: str):
         for iteration in range(100):
-            verification_update = self.contract_client.check_verify_status(guid)
+            verification_update = self._contract_client.check_verify_status(guid)
             fail_key = "Fail - "
             pass_key = "Pass - "
             if verification_update.startswith(fail_key):
