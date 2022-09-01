@@ -105,16 +105,46 @@ def test_too_many_requests_error(no_api_key):
 
 
 def test_publish_contract(
-    mock_account_transactions_response,
+    mock_backend,
     address,
     explorer,
-    mock_etherscan_backend,
+    caplog,
 ):
     contract_type = ape.project.get_contract("foo").contract_type
     ape.chain.contracts._local_contract_types[address] = contract_type
-
     guid = "123"
-    mock_etherscan_backend.add_handler("POST", "contract", {}, guid)
-    mock_etherscan_backend.add_handler("GET", "contract", {}, "YO")
+    mock_backend.setup_mock_account_transactions_response()
 
+    expected_verification_params = {
+        "action": "verifysourcecode",
+        "codeformat": "solidity-standard-json-input",
+        "constructorArguements": b"",
+        "contractaddress": "0xFe80e7afB7041c1592a2A5d8f617518c1591Aad4",
+        "contractname": "foo.sol:foo",
+        "evmversion": None,
+        "licenseType": 1,
+        "module": "contract",
+        "optimizationUsed": 1,
+        "runs": 200,
+    }
+    mock_backend.add_handler("POST", "contract", expected_verification_params, return_value=guid)
+
+    class VerificationTester:
+        counter = 0
+        threshold = 5
+
+        def sim(self):
+            # Simulate the contract type waiting in the queue until successful verification
+            if self.counter == self.threshold:
+                return "Pass - You made it!"
+
+            self.counter += 1
+            return "Pending in the queue"
+
+    verification_tester = VerificationTester()
+    mock_backend.add_handler("GET", "contract", {"guid": 123}, side_effect=verification_tester.sim)
     explorer.publish_contract(address)
+    assert caplog.records[-1].message == (
+        "Contract verification successful!\n"
+        "https://etherscan.io/address/0xFe80e7afB7041c1592a2A5d8f617518c1591Aad4#code"
+    )

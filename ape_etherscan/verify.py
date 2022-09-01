@@ -116,7 +116,7 @@ class SourceVerifier(ManagerAccessMixin):
         deploy_receipt = contract_txns[0]
         bytecode_len = len(self._contract_type.runtime_bytecode.bytecode)
         start_index = bytecode_len
-        return deploy_receipt["input"][start_index:]
+        return deploy_receipt.data[start_index:]
 
     @cached_property
     def license_code(self) -> int:

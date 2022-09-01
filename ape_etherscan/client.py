@@ -165,7 +165,9 @@ class _APIClient:
         data: Optional[Dict] = None,
     ) -> EtherscanResponse:
         headers = headers or self.DEFAULT_HEADERS
-        response = self.session.request(method.upper(), self.base_uri, headers=headers)
+        response = self.session.request(
+            method.upper(), self.base_uri, headers=headers, params=params, data=data
+        )
 
         if raise_on_exceptions:
             response.raise_for_status()

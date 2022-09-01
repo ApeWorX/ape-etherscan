@@ -2,7 +2,9 @@ import json
 import os
 from pathlib import Path
 from tempfile import mkdtemp
+from typing import IO, Dict, Union
 
+import _io
 import ape
 import pytest
 from ape.api import ExplorerAPI
@@ -109,14 +111,23 @@ class MockEtherscanBackend:
         self._expected_base_uri = expected_uri_map[ecosystem]
 
     def add_handler(self, method, module, expected_params, return_value=None, side_effect=None):
-        def handler(self, method, base_uri, params=None, *args, **kwargs):
-            assert params == expected_params
+        if isinstance(return_value, (str, dict)):
+            return_value = self.get_mock_response(return_value)
+
+        def handler(self, method, base_uri, params=None, data=None, headers=None):
+            actual_params = params if method.lower() == "get" else data
+            for key, val in expected_params.items():
+                if key not in expected_params:
+                    # Allow skipping certain assertions
+                    continue
+
+                assert actual_params[key] == val
 
             if return_value:
                 return return_value
 
             elif side_effect:
-                return side_effect()
+                return self.get_mock_response(side_effect())
 
         self._handlers[method.lower()][module] = handler
         self._session.request.side_effect = self.handle_request
@@ -129,10 +140,15 @@ class MockEtherscanBackend:
 
         assert base_uri == self._expected_base_uri
 
-        module = params.get("module") or data.get("module")
+        if params:
+            module = params.get("module")
+        elif data:
+            module = data.get("module")
+        else:
+            raise AssertionError("Expected either 'params' or 'data'.")
+
         handler = self._handlers[method.lower()][module]
-        options = dict(headers=headers, params=params, json=json, data=data)
-        return handler(self, method, base_uri, **options)
+        return handler(self, method, base_uri, headers=headers, params=params, data=data)
 
     def setup_mock_get_contract_type_response(self, file_name: str):
         expected_address = CONTRACT_ADDRESS_MAP[file_name]
@@ -144,7 +160,7 @@ class MockEtherscanBackend:
 
         test_data_path = MOCK_RESPONSES_PATH / f"{file_name}.json"
         with open(test_data_path) as response_data_file:
-            response = self.get_mock_response(file_name, response_data_file)
+            response = self.get_mock_response(response_data_file, file_name=file_name)
 
         self.add_handler("GET", "contract", expected_params, return_value=response)
         response.expected_address = expected_address
@@ -154,15 +170,23 @@ class MockEtherscanBackend:
         file_name = "get_account_transactions.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
         with open(test_data_path) as response_data_file:
-            response = self.get_mock_response(file_name, response_data_file)
+            response = self.get_mock_response(response_data_file, file_name=file_name)
             self.add_handler("GET", "account", EXPECTED_ACCOUNT_TXNS_PARAMS, return_value=response)
             self.set_ecosystem("ethereum")
             return response
 
-    def get_mock_response(self, file_name: str, response_data_file):
+    def get_mock_response(self, response_data: Union[IO, Dict, str], **kwargs):
+        if isinstance(response_data, str):
+            return self.get_mock_response({"result": response_data})
+
+        elif isinstance(response_data, _io.TextIOWrapper):
+            return self.get_mock_response(json.load(response_data), **kwargs)
+
         response = self._mocker.MagicMock(spec=Response)
-        mock_response_dict = json.load(response_data_file)
-        response.json.return_value = mock_response_dict
-        response.text = json.dumps(mock_response_dict)
-        response.file_name = file_name
+        response.json.return_value = response_data
+        response.text = json.dumps(response_data)
+
+        for key, val in kwargs.items():
+            setattr(response, key, val)
+
         return response
