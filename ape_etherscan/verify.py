@@ -172,28 +172,29 @@ class SourceVerifier(ManagerAccessMixin):
         The arguments used when deploying the contract.
         """
 
-        contract_txns = []
         timeout = 20
         checks_done = 0
+        deploy_receipt = None
         while checks_done <= timeout:
             # If was just deployed, it takes a few seconds to show up in API response
-            contract_txns = [tx for tx in self.chain_manager.account_history[self.address]]
-            if contract_txns:
-                break
+
+            try:
+                deploy_receipt = next(self._account_client.get_all_normal_transactions())
+            except StopIteration:
+                continue
 
             logger.debug("Waiting for deploy receipt in Etherscan...")
             checks_done += 1
             time.sleep(2.5)
 
-        if not contract_txns:
+        if not deploy_receipt:
             raise ContractVerificationError(
                 f"Failed to find to deploy receipt for '{self.address}'"
             )
 
-        deploy_receipt = contract_txns[0]
         bytecode_len = len(self._contract_type.runtime_bytecode.bytecode)
         start_index = bytecode_len
-        return deploy_receipt.data[start_index:]
+        return deploy_receipt["input"][start_index:]
 
     @cached_property
     def license_code(self) -> LicenseType:
