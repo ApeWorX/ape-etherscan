@@ -94,9 +94,9 @@ def test_get_contract_type_additional_types(mock_backend, file_name, explorer):
 
 def test_get_account_transactions(mock_backend, explorer, address):
     mock_backend.setup_mock_account_transactions_response()
-    actual = [r for r in explorer.get_account_transactions(address)]
-    expected_value_from_response = "GENESIS_ddbd2b932c763ba5b1b7ae3b362eac3e8d40121a"
-    assert actual[0].txn_hash == expected_value_from_response
+    actual = [r for r in explorer.get_account_transactions(address)][0].txn_hash
+    expected = "0x5780b43d819035ed1fa079171bdce7f0bbeaa6b01f201f8985d279a66cfc6844"
+    assert actual == expected
 
 
 def test_too_many_requests_error(no_api_key):

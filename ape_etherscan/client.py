@@ -84,9 +84,9 @@ class SourceCodeResponse:
 
 
 class EtherscanResponse:
-    def __init__(self, response, network, raise_on_exceptions: bool):
+    def __init__(self, response, ecosystem: str, raise_on_exceptions: bool):
         self.response = response
-        self.network = network
+        self.ecosystem = ecosystem
         self.raise_on_exceptions = raise_on_exceptions
 
     @cached_property
@@ -100,7 +100,7 @@ class EtherscanResponse:
         message = response_data.get("message", "")
         is_error = response_data.get("isError", 0) or message == "NOTOK"
         if is_error and self.raise_on_exceptions:
-            raise get_request_error(self.response, self.network)
+            raise get_request_error(self.response, self.ecosystem)
 
         result = response_data.get("result", message)
         if not result or not isinstance(result, str):
@@ -172,7 +172,7 @@ class _APIClient:
         if raise_on_exceptions:
             response.raise_for_status()
 
-        return EtherscanResponse(response, self._network_name, raise_on_exceptions)
+        return EtherscanResponse(response, self._ecosystem_name, raise_on_exceptions)
 
     def __authorize(self, params_or_data: Optional[Dict] = None) -> Optional[Dict]:
         env_var_key = API_KEY_ENV_KEY_MAP.get(self._ecosystem_name)
@@ -302,7 +302,7 @@ class AccountClient(_APIClient):
 
         if not isinstance(result, list):
             # For mypy
-            raise ValueError(f"Unexpected resullt '{result}'")
+            raise ValueError(f"Unexpected result '{result}'")
 
         return result
 

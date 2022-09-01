@@ -235,7 +235,7 @@ class SourceVerifier(ManagerAccessMixin):
         )
         settings = all_settings[Version(compiler_used.version)]
 
-        # TODO: Handle libraries, and metadata.
+        # TODO: Handle libraries
         source_code = {
             "language": compiler.name.capitalize(),
             "sources": sources,
