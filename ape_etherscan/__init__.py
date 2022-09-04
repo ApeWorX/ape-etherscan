@@ -22,6 +22,10 @@ NETWORKS = {
         "mainnet",
         "kovan",
     ],
+    "polygon": [
+        "mainnet",
+        "mumbai",
+    ],
 }
 
 
