@@ -42,6 +42,12 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             if network_name == "mainnet"
             else "https://kovan-optimistic.etherscan.io"
         )
+    elif ecosystem_name == "polygon":
+        return (
+            "https://polygonscan.com"
+            if network_name == "mainnet"
+            else "https://mumbai.polygonscan.com"
+        )
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -73,6 +79,13 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
             if network_name == "mainnet"
             else "https://api-kovan-optimistic.etherscan.io/api"
         )
+    elif ecosystem_name == "polygon":
+        return (
+            "https://api.polygonscan.com"
+            if network_name == "mainnet"
+            else "https://api-testnet.polygonscan.com"
+        )
+
     raise UnsupportedEcosystemError(ecosystem_name)
 
 

@@ -3,4 +3,5 @@ API_KEY_ENV_KEY_MAP = {
     "ethereum": "ETHERSCAN_API_KEY",
     "fantom": "FTMSCAN_API_KEY",
     "optimism": "OPTIMISTIC_ETHERSCAN_API_KEY",
+    "polygon": "POLYGONSCAN_API_KEY",
 }
