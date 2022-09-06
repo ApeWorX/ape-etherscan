@@ -131,7 +131,7 @@ def test_publish_contract(
 
     class VerificationTester:
         counter = 0
-        threshold = 5
+        threshold = 3
 
         def sim(self):
             # Simulate the contract type waiting in the queue until successful verification
