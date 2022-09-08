@@ -1,4 +1,4 @@
-# Ape Etherscan Plugin
+# Quick Start
 
 The following blockchain explorers are supported in this plugin:
 
@@ -9,7 +9,7 @@ The following blockchain explorers are supported in this plugin:
 
 ## Dependencies
 
-* [python3](https://www.python.org/downloads) version 3.7.2 or greater, python3-dev
+* [python3](https://www.python.org/downloads) version 3.8 or greater, python3-dev
 
 ## Installation
 
@@ -83,7 +83,3 @@ However, if the plugin detects that the contract type has a method named `symbol
 
 Please see the [contributing guide](CONTRIBUTING.md) to learn more how to contribute to this project.
 Comments, questions, criticisms and pull requests are welcomed.
-
-## License
-
-This project is licensed under the [Apache 2.0](LICENSE).
