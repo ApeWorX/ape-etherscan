@@ -119,7 +119,7 @@ def test_publish_contract(
         "action": "verifysourcecode",
         "codeformat": "solidity-standard-json-input",
         "constructorArguements": expected_ctor_args,
-        "contractaddress": "0xFe80e7afB7041c1592a2A5d8f617518c1591Aad4",
+        "contractaddress": address,
         "contractname": "foo.sol:foo",
         "evmversion": None,
         "licenseType": 1,
@@ -145,6 +145,5 @@ def test_publish_contract(
     mock_backend.add_handler("GET", "contract", {"guid": 123}, side_effect=verification_tester.sim)
     explorer.publish_contract(address)
     assert caplog.records[-1].message == (
-        "Contract verification successful!\n"
-        "https://etherscan.io/address/0xFe80e7afB7041c1592a2A5d8f617518c1591Aad4#code"
+        "Contract verification successful!\n" f"https://etherscan.io/address/{address}#code"
     )
