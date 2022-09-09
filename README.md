@@ -78,8 +78,3 @@ The return value from `Contract` is a `ContractInstance`, so it is connected to 
 
 **NOTE**: Vyper contracts from Etherscan always return the name `Vyper_contract`.
 However, if the plugin detects that the contract type has a method named `symbol`, it will use the return value from that call instead.
-
-## Development
-
-Please see the [contributing guide](CONTRIBUTING.md) to learn more how to contribute to this project.
-Comments, questions, criticisms and pull requests are welcomed.
