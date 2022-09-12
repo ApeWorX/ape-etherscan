@@ -99,8 +99,8 @@ def test_get_account_transactions(mock_backend, explorer, address):
     assert actual == expected
 
 
-def test_too_many_requests_error(no_api_key):
-    actual = str(EtherscanTooManyRequestsError(None, "ethereum"))
+def test_too_many_requests_error(no_api_key, response):
+    actual = str(EtherscanTooManyRequestsError(response, "ethereum"))
     assert "ETHERSCAN_API_KEY" in actual
 
 
@@ -142,7 +142,9 @@ def test_publish_contract(
             return "Pending in the queue"
 
     verification_tester = VerificationTester()
-    mock_backend.add_handler("GET", "contract", {"guid": 123}, side_effect=verification_tester.sim)
+    mock_backend.add_handler(
+        "GET", "contract", {"guid": "123"}, side_effect=verification_tester.sim
+    )
     explorer.publish_contract(address)
     assert caplog.records[-1].message == (
         "Contract verification successful!\n" f"https://etherscan.io/address/{address}#code"

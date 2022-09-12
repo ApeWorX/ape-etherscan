@@ -11,6 +11,7 @@ from ape.api import ExplorerAPI
 from requests import Response
 
 from ape_etherscan.client import _APIClient
+from ape_etherscan.types import EtherscanResponse
 
 ape.config.DATA_FOLDER = Path(mkdtemp()).resolve()
 ape.config.PROJECT_FOLDER = Path(mkdtemp()).resolve()
@@ -85,6 +86,12 @@ def get_explorer():
         return explorer
 
     return fn
+
+
+@pytest.fixture
+def response(mocker):
+    response = mocker.MagicMock(spec=Response)
+    return EtherscanResponse(response, "ethereum", raise_on_exceptions=False)
 
 
 @pytest.fixture
