@@ -8,6 +8,7 @@ from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
 
 from ape_etherscan.client import ClientFactory, get_etherscan_uri
+from ape_etherscan.verify import SourceVerifier
 
 
 class Etherscan(ExplorerAPI):
@@ -56,7 +57,7 @@ class Etherscan(ExplorerAPI):
             if "confirmations" in receipt_data:
                 receipt_data["required_confirmations"] = receipt_data.pop("confirmations")
             if "txreceipt_status" in receipt_data:
-                # NOTE: Ethrscan uses `""` for `0` in the receipt status.
+                # NOTE: Etherscan uses `""` for `0` in the receipt status.
                 status = receipt_data.pop("txreceipt_status") or 0
                 receipt_data["status"] = status
 
@@ -64,3 +65,7 @@ class Etherscan(ExplorerAPI):
                 receipt_data["nonce"] = None
 
             yield self.network.ecosystem.decode_receipt(receipt_data)
+
+    def publish_contract(self, address: AddressType):
+        verifier = SourceVerifier(address, self._client_factory)
+        return verifier.attempt_verification()

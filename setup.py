@@ -7,6 +7,7 @@ extras_require = {
         "ape-fantom",  # For testing Fantom integration
         "ape-optimism",  # Needed for Optimism integration
         "ape-infura",  # Needed for live network tests
+        "ape-solidity"  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
         "pytest-xdist",  # multi-process runner
         "pytest-cov",  # Coverage analyzer plugin

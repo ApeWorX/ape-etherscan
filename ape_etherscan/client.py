@@ -1,11 +1,12 @@
+import io
 import json
 import os
 import random
 from dataclasses import dataclass
 from typing import Dict, Iterator, List, Optional, Union
 
-import requests
-from ape.utils import USER_AGENT
+from ape.utils import USER_AGENT, cached_property
+from requests import Session
 
 from ape_etherscan.exceptions import (
     EtherscanResponseError,
@@ -82,8 +83,48 @@ class SourceCodeResponse:
     name: str = "unknown"
 
 
+class EtherscanResponse:
+    def __init__(self, response, ecosystem: str, raise_on_exceptions: bool):
+        self.response = response
+        self.ecosystem = ecosystem
+        self.raise_on_exceptions = raise_on_exceptions
+
+    @cached_property
+    def value(self) -> Union[List, Dict, str]:
+        try:
+            response_data = self.response.json()
+        except json.JSONDecodeError as err:
+            # Etherscan may resond with HTML content.
+            raise EtherscanResponseError(self.response, "Resource not found") from err
+
+        message = response_data.get("message", "")
+        is_error = response_data.get("isError", 0) or message == "NOTOK"
+        if is_error and self.raise_on_exceptions:
+            raise get_request_error(self.response, self.ecosystem)
+
+        result = response_data.get("result", message)
+        if not result or not isinstance(result, str):
+            return result
+
+        # Some errors come back as strings
+        if result.startswith("Error!"):
+            err_msg = result.split("Error!")[-1].strip()
+            if self.raise_on_exceptions:
+                raise EtherscanResponseError(self.response, err_msg)
+
+            return err_msg
+
+        try:
+            # Sometimes, the response is a stringified JSON object or list
+            return json.loads(result)
+        except json.JSONDecodeError:
+            return result
+
+
 class _APIClient:
     DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
+
+    session = Session()
 
     def __init__(self, ecosystem_name: str, network_name: str, module_name: str):
         self._ecosystem_name = ecosystem_name
@@ -98,33 +139,40 @@ class _APIClient:
     def base_params(self) -> Dict:
         return {"module": self._module_name}
 
-    def _get(self, params: Optional[Dict] = None) -> Union[List, Dict]:
+    def _get(
+        self,
+        params: Optional[Dict] = None,
+        headers: Optional[Dict[str, str]] = None,
+        raise_on_exceptions: bool = True,
+    ) -> EtherscanResponse:
         params = self.__authorize(params)
-        return self._request("GET", params=params, headers=self.DEFAULT_HEADERS)
+        return self._request(
+            "GET", params=params, headers=headers, raise_on_exceptions=raise_on_exceptions
+        )
 
-    def _post(self, json_dict: Optional[Dict] = None) -> Dict:
-        json_dict = self.__authorize(json_dict)
-        return self._request("POST", json=json_dict, headers=self.DEFAULT_HEADERS)  # type: ignore
+    def _post(
+        self, json_dict: Optional[Dict] = None, headers: Optional[Dict[str, str]] = None
+    ) -> EtherscanResponse:
+        data = self.__authorize(json_dict)
+        return self._request("POST", data=data, headers=headers)
 
-    def _request(self, method: str, *args, **kwargs) -> Union[List, Dict]:
-        response = requests.request(method.upper(), self.base_uri, *args, **kwargs)
-        response.raise_for_status()
+    def _request(
+        self,
+        method: str,
+        raise_on_exceptions: bool = True,
+        headers: Optional[Dict] = None,
+        params: Optional[Dict] = None,
+        data: Optional[Dict] = None,
+    ) -> EtherscanResponse:
+        headers = headers or self.DEFAULT_HEADERS
+        response = self.session.request(
+            method.upper(), self.base_uri, headers=headers, params=params, data=data
+        )
 
-        try:
-            response_data = response.json()
-        except json.JSONDecodeError as err:
-            # Etherscan may resond with HTML content.
-            raise EtherscanResponseError(response, "Resource not found") from err
+        if raise_on_exceptions:
+            response.raise_for_status()
 
-        if response_data.get("isError", 0) or response_data.get("message", "") == "NOTOK":
-            raise get_request_error(response, self._network_name)
-
-        result = response_data.get("result")
-        if result and isinstance(result, str):
-            # Sometimes, the response is a stringified JSON object or list
-            result = json.loads(result)
-
-        return result
+        return EtherscanResponse(response, self._ecosystem_name, raise_on_exceptions)
 
     def __authorize(self, params_or_data: Optional[Dict] = None) -> Optional[Dict]:
         env_var_key = API_KEY_ENV_KEY_MAP.get(self._ecosystem_name)
@@ -147,7 +195,8 @@ class ContractClient(_APIClient):
 
     def get_source_code(self) -> SourceCodeResponse:
         params = {**self.base_params, "action": "getsourcecode", "address": self._address}
-        result = self._get(params=params) or []
+        response = self._get(params=params)
+        result = response.value or []
 
         if len(result) != 1:
             return SourceCodeResponse()
@@ -156,6 +205,54 @@ class ContractClient(_APIClient):
         abi = data.get("ABI") or ""
         name = data.get("ContractName") or "unknown"
         return SourceCodeResponse(abi, name)
+
+    def verify_source_code(
+        self,
+        standard_json_output: Dict,
+        compiler_version: str,
+        contract_name: Optional[str] = None,
+        optimization_used: bool = False,
+        optimization_runs: Optional[int] = 200,
+        constructor_arguments: Optional[str] = None,
+        evm_version: Optional[str] = None,
+        license_type: Optional[int] = None,
+        libraries: Optional[Dict[str, str]] = None,
+    ) -> str:
+        libraries = libraries or {}
+        if len(libraries) > 10:
+            raise ValueError(f"Can only have up to 10 libraries (received {len(libraries)}).")
+
+        if not compiler_version.startswith("v"):
+            compiler_version = f"v{compiler_version}"
+
+        json_dict = {
+            **self.base_params,
+            "action": "verifysourcecode",
+            "codeformat": "solidity-standard-json-input",
+            "compilerversion": compiler_version,
+            "constructorArguements": constructor_arguments,
+            "contractaddress": self._address,
+            "contractname": contract_name,
+            "evmversion": evm_version,
+            "licenseType": license_type,
+            "optimizationUsed": int(optimization_used),
+            "runs": optimization_runs,
+            "sourceCode": io.StringIO(json.dumps(standard_json_output)),
+        }
+
+        iterator = 1
+        for lib_address, lib_name in libraries.items():
+            json_dict[f"libraryname{iterator}"] = lib_name
+            json_dict[f"libraryaddress{iterator}"] = lib_address
+            iterator += 1
+
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        return self._post(json_dict=json_dict, headers=headers).value
+
+    def check_verify_status(self, guid: str) -> str:
+        json_dict = {**self.base_params, "action": "checkverifystatus", "guid": guid}
+        response = self._get(params=json_dict, raise_on_exceptions=False)
+        return str(response.value)
 
 
 class AccountClient(_APIClient):
@@ -201,8 +298,13 @@ class AccountClient(_APIClient):
             "offset": offset,
             "sort": sort,
         }
-        result = self._get(params=params)
-        return result  # type: ignore
+        result = self._get(params=params).value
+
+        if not isinstance(result, list):
+            # For mypy
+            raise ValueError(f"Unexpected result '{result}'")
+
+        return result
 
 
 class ClientFactory:

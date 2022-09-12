@@ -36,16 +36,22 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
     Raised after being rate-limited by Etherscan.
     """
 
-    def __init__(self, response: Response, network: str):
+    def __init__(self, response: Response, ecosystem: str):
         message = "Etherscan API server rate limit exceeded."
-        api_key_name = API_KEY_ENV_KEY_MAP[network]
+        api_key_name = API_KEY_ENV_KEY_MAP[ecosystem]
         if not os.environ.get(api_key_name):
             message = f"{message}. Try setting {api_key_name}'."
 
         super().__init__(response, message)
 
 
-def get_request_error(response: Response, network: str) -> EtherscanResponseError:
+class ContractVerificationError(ApeEtherscanException):
+    """
+    An error that occurs when unable to verify or publish a contract.
+    """
+
+
+def get_request_error(response: Response, ecosystem: str) -> EtherscanResponseError:
     response_data = response.json()
     if "result" in response_data and response_data["result"]:
         message = response_data["result"]
@@ -55,6 +61,6 @@ def get_request_error(response: Response, network: str) -> EtherscanResponseErro
         message = response.text
 
     if "max rate limit reached" in response.text.lower():
-        return EtherscanTooManyRequestsError(response, network)
+        return EtherscanTooManyRequestsError(response, ecosystem)
 
     return EtherscanResponseError(response, message)
