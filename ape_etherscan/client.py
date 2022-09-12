@@ -8,7 +8,7 @@ from ape.utils import USER_AGENT
 from requests import Session
 
 from ape_etherscan.exceptions import UnhandledResultError, UnsupportedEcosystemError
-from ape_etherscan.types import EtherscanResponse, EtherscanResponseError, SourceCodeResponse
+from ape_etherscan.types import EtherscanResponse, SourceCodeResponse
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 
@@ -157,7 +157,7 @@ class ContractClient(_APIClient):
 
         data = result_list[0]
         if not isinstance(data, dict):
-            raise EtherscanResponseError(result.response, f"Unhandled response format: {data}")
+            raise UnhandledResultError(result, data)
 
         abi = data.get("ABI") or ""
         name = data.get("ContractName") or "unknown"
@@ -258,7 +258,7 @@ class AccountClient(_APIClient):
         result = self._get(params=params)
 
         if not isinstance(result.value, list):
-            raise EtherscanResponseError(result.response, f"Unexpected result '{result}'")
+            raise UnhandledResultError(result, result.value)
 
         return result.value
 
