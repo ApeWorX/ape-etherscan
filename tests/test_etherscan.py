@@ -10,6 +10,7 @@ EXPECTED_CONTRACT_NAME_MAP = {
     "get_proxy_contract_response": "MIM-UST-f",
     "get_vyper_contract_response": "yvDAI",
 }
+TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 ecosystems_and_networks = pytest.mark.parametrize(
     "ecosystem,network",
     [
@@ -19,7 +20,6 @@ ecosystems_and_networks = pytest.mark.parametrize(
         ("optimism", "mainnet"),
     ],
 )
-TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 
 
 @pytest.mark.parametrize(

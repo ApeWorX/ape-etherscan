@@ -1,9 +1,13 @@
 import os
+from typing import TYPE_CHECKING, Union
 
 from ape.exceptions import ApeException
 from requests import Response
 
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
+
+if TYPE_CHECKING:
+    from ape_etherscan.types import EtherscanResponse, ResponseValue
 
 
 class ApeEtherscanException(ApeException):
@@ -26,9 +30,23 @@ class EtherscanResponseError(ApeEtherscanException):
     Raised when the response is not correct.
     """
 
-    def __init__(self, response: Response, message: str):
+    def __init__(self, response: Union[Response, "EtherscanResponse"], message: str):
+        if not isinstance(response, Response):
+            response = response.response
+
         self.response = response
         super().__init__(f"Response indicated failure: {message}")
+
+
+class UnhandledResultError(EtherscanResponseError):
+    """
+    Raised in specific client module where the result from Etherscan
+    has an unhandled form.
+    """
+
+    def __init__(self, response: Union[Response, "EtherscanResponse"], value: "ResponseValue"):
+        message = f"Unhandled response format: {value}"
+        super().__init__(response, message)
 
 
 class EtherscanTooManyRequestsError(EtherscanResponseError):
@@ -36,7 +54,7 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
     Raised after being rate-limited by Etherscan.
     """
 
-    def __init__(self, response: Response, ecosystem: str):
+    def __init__(self, response: Union[Response, "EtherscanResponse"], ecosystem: str):
         message = "Etherscan API server rate limit exceeded."
         api_key_name = API_KEY_ENV_KEY_MAP[ecosystem]
         if not os.environ.get(api_key_name):

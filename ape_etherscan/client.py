@@ -2,17 +2,13 @@ import io
 import json
 import os
 import random
-from dataclasses import dataclass
-from typing import Dict, Iterator, List, Optional, Union
+from typing import Dict, Iterator, List, Optional
 
-from ape.utils import USER_AGENT, cached_property
+from ape.utils import USER_AGENT
 from requests import Session
 
-from ape_etherscan.exceptions import (
-    EtherscanResponseError,
-    UnsupportedEcosystemError,
-    get_request_error,
-)
+from ape_etherscan.exceptions import UnhandledResultError, UnsupportedEcosystemError
+from ape_etherscan.types import EtherscanResponse, EtherscanResponseError, SourceCodeResponse
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 
@@ -77,53 +73,8 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
-@dataclass
-class SourceCodeResponse:
-    abi: str = ""
-    name: str = "unknown"
-
-
-class EtherscanResponse:
-    def __init__(self, response, ecosystem: str, raise_on_exceptions: bool):
-        self.response = response
-        self.ecosystem = ecosystem
-        self.raise_on_exceptions = raise_on_exceptions
-
-    @cached_property
-    def value(self) -> Union[List, Dict, str]:
-        try:
-            response_data = self.response.json()
-        except json.JSONDecodeError as err:
-            # Etherscan may resond with HTML content.
-            raise EtherscanResponseError(self.response, "Resource not found") from err
-
-        message = response_data.get("message", "")
-        is_error = response_data.get("isError", 0) or message == "NOTOK"
-        if is_error and self.raise_on_exceptions:
-            raise get_request_error(self.response, self.ecosystem)
-
-        result = response_data.get("result", message)
-        if not result or not isinstance(result, str):
-            return result
-
-        # Some errors come back as strings
-        if result.startswith("Error!"):
-            err_msg = result.split("Error!")[-1].strip()
-            if self.raise_on_exceptions:
-                raise EtherscanResponseError(self.response, err_msg)
-
-            return err_msg
-
-        try:
-            # Sometimes, the response is a stringified JSON object or list
-            return json.loads(result)
-        except json.JSONDecodeError:
-            return result
-
-
 class _APIClient:
     DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
-
     session = Session()
 
     def __init__(self, ecosystem_name: str, network_name: str, module_name: str):
@@ -195,15 +146,18 @@ class ContractClient(_APIClient):
 
     def get_source_code(self) -> SourceCodeResponse:
         params = {**self.base_params, "action": "getsourcecode", "address": self._address}
-        response = self._get(params=params)
-        result = response.value or []
+        result = self._get(params=params)
+        result_list = result.value or []
 
-        if len(result) != 1:
-            raise EtherscanResponseError(response.response, f"Unhandled response format: {result}")
+        if not result_list:
+            return SourceCodeResponse()
 
-        data = result[0]
+        elif len(result_list) > 1:
+            raise UnhandledResultError(result, result_list)
+
+        data = result_list[0]
         if not isinstance(data, dict):
-            raise EtherscanResponseError(response.response, f"Unhandled response format: {data}")
+            raise EtherscanResponseError(result.response, f"Unhandled response format: {data}")
 
         abi = data.get("ABI") or ""
         name = data.get("ContractName") or "unknown"
@@ -301,13 +255,12 @@ class AccountClient(_APIClient):
             "offset": offset,
             "sort": sort,
         }
-        result = self._get(params=params).value
+        result = self._get(params=params)
 
-        if not isinstance(result, list):
-            # For mypy
-            raise ValueError(f"Unexpected result '{result}'")
+        if not isinstance(result.value, list):
+            raise EtherscanResponseError(result.response, f"Unexpected result '{result}'")
 
-        return result
+        return result.value
 
 
 class ClientFactory:
