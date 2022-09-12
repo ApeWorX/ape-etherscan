@@ -4,7 +4,7 @@ from typing import Iterator, Optional
 
 from ape.api import ExplorerAPI, ReceiptAPI
 from ape.contracts import ContractInstance
-from ape.exceptions import ProviderNotConnectedError
+from ape.exceptions import APINotImplementedError, ProviderNotConnectedError
 from ape.types import AddressType, ContractType
 
 from ape_etherscan.client import ClientFactory, get_etherscan_uri
@@ -60,4 +60,10 @@ class Etherscan(ExplorerAPI):
                 status = receipt_data.pop("txreceipt_status") or 0
                 receipt_data["status"] = status
 
+            if receipt_data.get("nonce") == "":
+                receipt_data["nonce"] = None
+
             yield self.network.ecosystem.decode_receipt(receipt_data)
+
+    def publish_contract(self, address: AddressType):
+        raise APINotImplementedError("Publishing not yet implemeted")

@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from ape import networks
 from ape.api.explorers import ExplorerAPI
+from ape.api.networks import LOCAL_NETWORK_NAME
 from requests import Response
 
 from ape_etherscan import NETWORKS
@@ -79,7 +80,7 @@ def infura_connection():
 
 def get_explorer(
     ecosystem_name: str = "ethereum",
-    network_name: str = "development",
+    network_name: str = LOCAL_NETWORK_NAME,
 ) -> ExplorerAPI:
     ecosystem = networks.get_ecosystem(ecosystem_name)
     explorer = ecosystem.get_network(network_name).explorer
