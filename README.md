@@ -1,4 +1,4 @@
-# Ape Etherscan Plugin
+# Quick Start
 
 The following blockchain explorers are supported in this plugin:
 
@@ -9,7 +9,7 @@ The following blockchain explorers are supported in this plugin:
 
 ## Dependencies
 
-* [python3](https://www.python.org/downloads) version 3.7.2 or greater, python3-dev
+* [python3](https://www.python.org/downloads) version 3.8 or greater, python3-dev
 
 ## Installation
 
@@ -104,12 +104,3 @@ etherscan.publish_contract("0x55a8a39bc9694714e2874c1ce77aa1e599461e18")
 ```
 
 **NOTE**: You must set the Etherscan API key environment variable to use the publishing feature.
-
-## Development
-
-Please see the [contributing guide](CONTRIBUTING.md) to learn more how to contribute to this project.
-Comments, questions, criticisms and pull requests are welcomed.
-
-## License
-
-This project is licensed under the [Apache 2.0](LICENSE).

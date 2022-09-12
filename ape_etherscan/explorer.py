@@ -40,7 +40,7 @@ class Etherscan(ExplorerAPI):
         except JSONDecodeError:
             return None
 
-        contract_type = ContractType.parse_obj({"abi": abi, "contractName": source_code.name})
+        contract_type = ContractType(abi=abi, contractName=source_code.name)
         if source_code.name == "Vyper_contract" and "symbol" in contract_type.view_methods:
             try:
                 checksummed_address = self.provider.network.ecosystem.decode_address(address)
@@ -60,6 +60,9 @@ class Etherscan(ExplorerAPI):
                 # NOTE: Etherscan uses `""` for `0` in the receipt status.
                 status = receipt_data.pop("txreceipt_status") or 0
                 receipt_data["status"] = status
+
+            if receipt_data.get("nonce") == "":
+                receipt_data["nonce"] = None
 
             yield self.network.ecosystem.decode_receipt(receipt_data)
 
