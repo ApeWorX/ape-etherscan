@@ -39,7 +39,7 @@ class Etherscan(ExplorerAPI):
         except JSONDecodeError:
             return None
 
-        contract_type = ContractType.parse_obj({"abi": abi, "contractName": source_code.name})
+        contract_type = ContractType.parse_obj(abi=abi, contractName=source_code.name)
         if source_code.name == "Vyper_contract" and "symbol" in contract_type.view_methods:
             try:
                 checksummed_address = self.provider.network.ecosystem.decode_address(address)

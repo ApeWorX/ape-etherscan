@@ -40,7 +40,7 @@ extras_require = {
     ],
 }
 
-# NOTE: `pip install -e .[dev]` to install package
+# NOTE: `pip install -e .'[dev]'` to install package
 extras_require["dev"] = (
     extras_require["test"]
     + extras_require["lint"]
@@ -68,7 +68,7 @@ setup(
         "eth-ape>=0.5.0,<0.6.0",
         "requests",  # Use same version as eth-ape
     ],
-    python_requires=">=3.8,<4",
+    python_requires=">=3.8,<3.11",
     extras_require=extras_require,
     py_modules=["ape_etherscan"],
     license="Apache-2.0",
