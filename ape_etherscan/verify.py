@@ -192,7 +192,11 @@ class SourceVerifier(ManagerAccessMixin):
                 f"Failed to find to deploy receipt for '{self.address}'"
             )
 
-        bytecode_len = len(self._contract_type.runtime_bytecode.bytecode)
+        runtime_bytecode = self._contract_type.runtime_bytecode
+        bytecode_len = 0
+        if runtime_bytecode:
+            bytecode_len = len(runtime_bytecode.bytecode or "")
+
         start_index = bytecode_len
         return deploy_receipt["input"][start_index:]
 
@@ -257,6 +261,12 @@ class SourceVerifier(ManagerAccessMixin):
         self._wait_for_verification(guid)
 
     def _wait_for_verification(self, guid: str):
+        explorer = self.provider.network.explorer
+        if not explorer:
+            raise ContractVerificationError(
+                f"Etherscan plugin missing for network {self.provider.network.name}"
+            )
+
         for iteration in range(100):
             verification_update = self._contract_client.check_verify_status(guid)
             fail_key = "Fail - "
@@ -267,7 +277,7 @@ class SourceVerifier(ManagerAccessMixin):
             elif verification_update == "Already Verified" or verification_update.startswith(
                 pass_key
             ):
-                uri = self.provider.network.explorer.get_address_url(self.address)
+                uri = explorer.get_address_url(self.address)
                 logger.success(f"Contract verification successful!\n{uri}#code")
                 break
 

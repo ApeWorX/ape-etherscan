@@ -199,9 +199,12 @@ class ContractClient(_APIClient):
         result = response.value or []
 
         if len(result) != 1:
-            return SourceCodeResponse()
+            raise EtherscanResponseError(response.response, f"Unhandled response format: {result}")
 
         data = result[0]
+        if not isinstance(data, dict):
+            raise EtherscanResponseError(response.response, f"Unhandled response format: {data}")
+
         abi = data.get("ABI") or ""
         name = data.get("ContractName") or "unknown"
         return SourceCodeResponse(abi, name)
@@ -247,7 +250,7 @@ class ContractClient(_APIClient):
             iterator += 1
 
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        return self._post(json_dict=json_dict, headers=headers).value
+        return str(self._post(json_dict=json_dict, headers=headers).value)
 
     def check_verify_status(self, guid: str) -> str:
         json_dict = {**self.base_params, "action": "checkverifystatus", "guid": guid}

@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import mkdtemp
 from typing import IO, Dict, Union
 
-import _io
+import _io  # type: ignore
 import ape
 import pytest
 from ape.api import ExplorerAPI
