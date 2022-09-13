@@ -1,4 +1,4 @@
-# Ape Etherscan Plugin
+# Quick Start
 
 The following blockchain explorers are supported in this plugin:
 
@@ -9,7 +9,7 @@ The following blockchain explorers are supported in this plugin:
 
 ## Dependencies
 
-* [python3](https://www.python.org/downloads) version 3.7.2 or greater, python3-dev
+* [python3](https://www.python.org/downloads) version 3.8 or greater, python3-dev
 
 ## Installation
 
@@ -41,7 +41,7 @@ or use a tool like [direnv](https://direnv.net/) and store them locally in `.env
 You can also specify multiple comma-separated keys, a random key will be chosen for each request.
 This could be useful if you hit API rate limits.
 
-You can obtain an API key by registering with Etherscan and visitng [this page](https://etherscan.io/myapikey).
+You can obtain an API key by registering with Etherscan and visiting [this page](https://etherscan.io/myapikey).
 
 ```bash
 export ETHERSCAN_API_KEY=SAMPLE_KEY
@@ -79,11 +79,28 @@ The return value from `Contract` is a `ContractInstance`, so it is connected to 
 **NOTE**: Vyper contracts from Etherscan always return the name `Vyper_contract`.
 However, if the plugin detects that the contract type has a method named `symbol`, it will use the return value from that call instead.
 
-## Development
+## Contract Verification
 
-Please see the [contributing guide](CONTRIBUTING.md) to learn more how to contribute to this project.
-Comments, questions, criticisms and pull requests are welcomed.
+Use the `ape-etherscan` plugin to publish and verify your contracts.
+Contract verification associates a contract type from Ape with an Ethereum address on Etherscan.
+Learn more about Etherscan verification [here](https://info.etherscan.com/types-of-contract-verification/).
 
-## License
+To verify contract in Ape, you can set the `publish` key to `True` when deploying:
 
-This project is licensed under the [Apache 2.0](LICENSE).
+```python
+from ape import accounts, project
+
+account = accounts.load("testnetacct")
+account.deploy(project.MyContract, publish=True)
+```
+
+You can also use the explorer class directly to publish at a later time:
+
+```python
+from ape import networks
+
+etherscan = networks.provider.network.explorer
+etherscan.publish_contract("0x55a8a39bc9694714e2874c1ce77aa1e599461e18")
+```
+
+**NOTE**: You must set the Etherscan API key environment variable to use the publishing feature.
