@@ -1,9 +1,13 @@
 import os
+from typing import TYPE_CHECKING, Union
 
 from ape.exceptions import ApeException
 from requests import Response
 
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
+
+if TYPE_CHECKING:
+    from ape_etherscan.types import EtherscanResponse, ResponseValue
 
 
 class ApeEtherscanException(ApeException):
@@ -26,9 +30,23 @@ class EtherscanResponseError(ApeEtherscanException):
     Raised when the response is not correct.
     """
 
-    def __init__(self, response: Response, message: str):
+    def __init__(self, response: Union[Response, "EtherscanResponse"], message: str):
+        if not isinstance(response, Response):
+            response = response.response
+
         self.response = response
         super().__init__(f"Response indicated failure: {message}")
+
+
+class UnhandledResultError(EtherscanResponseError):
+    """
+    Raised in specific client module where the result from Etherscan
+    has an unhandled form.
+    """
+
+    def __init__(self, response: Union[Response, "EtherscanResponse"], value: "ResponseValue"):
+        message = f"Unhandled response format: {value}"
+        super().__init__(response, message)
 
 
 class EtherscanTooManyRequestsError(EtherscanResponseError):
@@ -36,16 +54,22 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
     Raised after being rate-limited by Etherscan.
     """
 
-    def __init__(self, response: Response, network: str):
+    def __init__(self, response: Union[Response, "EtherscanResponse"], ecosystem: str):
         message = "Etherscan API server rate limit exceeded."
-        api_key_name = API_KEY_ENV_KEY_MAP[network]
+        api_key_name = API_KEY_ENV_KEY_MAP[ecosystem]
         if not os.environ.get(api_key_name):
             message = f"{message}. Try setting {api_key_name}'."
 
         super().__init__(response, message)
 
 
-def get_request_error(response: Response, network: str) -> EtherscanResponseError:
+class ContractVerificationError(ApeEtherscanException):
+    """
+    An error that occurs when unable to verify or publish a contract.
+    """
+
+
+def get_request_error(response: Response, ecosystem: str) -> EtherscanResponseError:
     response_data = response.json()
     if "result" in response_data and response_data["result"]:
         message = response_data["result"]
@@ -55,6 +79,6 @@ def get_request_error(response: Response, network: str) -> EtherscanResponseErro
         message = response.text
 
     if "max rate limit reached" in response.text.lower():
-        return EtherscanTooManyRequestsError(response, network)
+        return EtherscanTooManyRequestsError(response, ecosystem)
 
     return EtherscanResponseError(response, message)

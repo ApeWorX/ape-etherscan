@@ -7,6 +7,7 @@ extras_require = {
         "ape-fantom",  # For testing Fantom integration
         "ape-optimism",  # Needed for Optimism integration
         "ape-infura",  # Needed for live network tests
+        "ape-solidity",  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
         "pytest-xdist",  # multi-process runner
         "pytest-cov",  # Coverage analyzer plugin
@@ -40,7 +41,7 @@ extras_require = {
     ],
 }
 
-# NOTE: `pip install -e .[dev]` to install package
+# NOTE: `pip install -e .'[dev]'` to install package
 extras_require["dev"] = (
     extras_require["test"]
     + extras_require["lint"]
@@ -65,11 +66,10 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.4.0,<0.5.0",
-        "importlib-metadata ; python_version<'3.8'",
-        "requests>=2.28.1,<3.0.0",
+        "eth-ape>=0.5.0,<0.6.0",
+        "requests",  # Use same version as eth-ape
     ],
-    python_requires=">=3.7.2,<4",
+    python_requires=">=3.8,<3.11",
     extras_require=extras_require,
     py_modules=["ape_etherscan"],
     license="Apache-2.0",
@@ -85,7 +85,6 @@ setup(
         "Operating System :: MacOS",
         "Operating System :: POSIX",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
