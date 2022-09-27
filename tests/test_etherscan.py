@@ -18,6 +18,7 @@ ecosystems_and_networks = pytest.mark.parametrize(
         ("ethereum", "mainnet-fork"),
         ("fantom", "opera"),
         ("optimism", "mainnet"),
+        ("polygon", "mainnet"),
     ],
 )
 
@@ -32,6 +33,8 @@ ecosystems_and_networks = pytest.mark.parametrize(
         ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
         ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
         ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
+        ("polygon", NETWORKS["polygon"][0], "polygonscan.com"),
+        ("polygon", NETWORKS["polygon"][1], "mumbai.polygonscan.com"),
     ],
 )
 def test_get_address_url(ecosystem, network, expected_prefix, address, get_explorer):
@@ -51,6 +54,8 @@ def test_get_address_url(ecosystem, network, expected_prefix, address, get_explo
         ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
         ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
         ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
+        ("polygon", NETWORKS["polygon"][0], "polygonscan.com"),
+        ("polygon", NETWORKS["polygon"][1], "mumbai.polygonscan.com"),
     ],
 )
 def test_get_transaction_url(ecosystem, network, expected_prefix, get_explorer):

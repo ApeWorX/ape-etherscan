@@ -114,6 +114,7 @@ class MockEtherscanBackend:
             "ethereum": "https://api.etherscan.io/api",
             "fantom": "https://api.ftmscan.com/api",
             "optimism": "https://api-optimistic.etherscan.io/api",
+            "polygon": "https://api.polygonscan.com/api",
         }
         self._expected_base_uri = expected_uri_map[ecosystem]
 
