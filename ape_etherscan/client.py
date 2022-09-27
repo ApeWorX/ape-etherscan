@@ -78,9 +78,9 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
         )
     elif ecosystem_name == "polygon":
         return (
-            "https://api.polygonscan.com"
+            "https://api.polygonscan.com/api"
             if network_name == "mainnet"
-            else "https://api-testnet.polygonscan.com"
+            else "https://api-testnet.polygonscan.com/api"
         )
 
     raise UnsupportedEcosystemError(ecosystem_name)
