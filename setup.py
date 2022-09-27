@@ -6,6 +6,7 @@ extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
         "ape-fantom",  # For testing Fantom integration
         "ape-optimism",  # Needed for Optimism integration
+        "ape-polygon",  # Needed for Polygon integration
         "ape-infura",  # Needed for live network tests
         "ape-solidity",  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
