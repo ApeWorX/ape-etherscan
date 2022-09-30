@@ -45,6 +45,10 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             if network_name == "mainnet"
             else "https://mumbai.polygonscan.com"
         )
+    elif ecosystem_name == "avalanche":
+        return (
+            "https://snowtrace.io"
+        )
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -81,6 +85,12 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
             "https://api.polygonscan.com/api"
             if network_name == "mainnet"
             else "https://api-testnet.polygonscan.com/api"
+        )
+    elif ecosystem_name == "avalanche":
+        return (
+            "https://api-{network_name}.snowtrace.io/api"
+            if network_name != "mainnet"
+            else "https://api.snowtrace.io/api"
         )
 
     raise UnsupportedEcosystemError(ecosystem_name)

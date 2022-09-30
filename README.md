@@ -7,6 +7,7 @@ The following blockchain explorers are supported in this plugin:
 * [Arbiscan]("https://arbiscan.io") for Arbitrum networks.
 * [Optimistic Etherscan]("https://optimistic.etherscan.io") for Optimism networks.
 * [Polygonscan]("https://polygonscan.com") for Polygon networks.
+* [Snowtrace]("https://snowtrace.io") for Avalanche networks.
 
 ## Dependencies
 
