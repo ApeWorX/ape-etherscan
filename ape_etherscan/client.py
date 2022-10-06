@@ -88,9 +88,7 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
         )
     elif ecosystem_name == "avalanche":
         return (
-            "https://api-{network_name}.snowtrace.io/api"
-            if network_name != "mainnet"
-            else "https://api.snowtrace.io/api"
+            "https://api.snowtrace.io/api"
         )
 
     raise UnsupportedEcosystemError(ecosystem_name)
