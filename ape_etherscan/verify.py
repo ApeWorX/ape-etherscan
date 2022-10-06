@@ -10,7 +10,7 @@ from ethpm_types import ContractType
 from semantic_version import Version  # type: ignore
 
 from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
-from ape_etherscan.exceptions import ContractVerificationError
+from ape_etherscan.exceptions import ContractVerificationError, EtherscanResponseError
 
 _SPDX_ID_TO_API_CODE = {
     "unlicense": 2,
@@ -269,10 +269,21 @@ class SourceVerifier(ManagerAccessMixin):
                 f"Etherscan plugin missing for network {self.provider.network.name}"
             )
 
+        guid_did_exist = False
+        fail_key = "Fail - "
+        pass_key = "Pass - "
+
         for iteration in range(100):
-            verification_update = self._contract_client.check_verify_status(guid)
-            fail_key = "Fail - "
-            pass_key = "Pass - "
+            try:
+                verification_update = self._contract_client.check_verify_status(guid)
+                guid_did_exist = True
+            except EtherscanResponseError as err:
+                if "Resource not found" in str(err) and guid_did_exist:
+                    # Sometimes, the GUID resource is gone before receiving a passing verification
+                    verification_update = f"{pass_key}Complete"
+                else:
+                    raise  # Original error
+
             if verification_update.startswith(fail_key):
                 err_msg = verification_update.split(fail_key)[-1].strip()
                 raise ContractVerificationError(err_msg)
