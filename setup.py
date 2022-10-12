@@ -67,7 +67,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.5.1,<0.6",
+        "eth-ape>=0.5.2,<0.6",
         "requests",  # Use same version as eth-ape
     ],
     python_requires=">=3.8,<3.11",
