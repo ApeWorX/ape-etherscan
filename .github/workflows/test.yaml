@@ -70,6 +70,8 @@ jobs:
 
         - name: Run Tests
           run: pytest -m "not fuzzing" -n 0 -s --cov
+          env:
+            WEB3_INFURA_PROJECT_ID: ${{ secrets.WEB3_INFURA_PROJECT_ID }}
 
 # NOTE: uncomment this block after you've marked tests with @pytest.mark.fuzzing
 #    fuzzing:
