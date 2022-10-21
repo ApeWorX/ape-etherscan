@@ -16,6 +16,7 @@ include = '\.pyi?$'
 
 [tool.pytest.ini_options]
 addopts = """
+    -n auto
     -p no:ape_test
     --cov-branch
     --cov-report term
