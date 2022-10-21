@@ -7,13 +7,13 @@ NETWORKS = {
         "mainnet",
         "goerli",
     ],
-    "fantom": [
-        "opera",
-        "testnet",
-    ],
     "arbitrum": [
         "mainnet",
         "goerli",
+    ],
+    "fantom": [
+        "opera",
+        "testnet",
     ],
     "optimism": [
         "mainnet",

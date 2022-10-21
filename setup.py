@@ -4,6 +4,7 @@ from setuptools import find_packages, setup  # type: ignore
 
 extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
+        "ape-arbitrum",  # Needed for Arbitrum integration
         "ape-fantom",  # For testing Fantom integration
         "ape-optimism",  # Needed for Optimism integration
         "ape-polygon",  # Needed for Polygon integration
