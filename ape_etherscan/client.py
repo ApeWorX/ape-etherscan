@@ -37,7 +37,7 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
         return (
             "https://optimistic.etherscan.io"
             if network_name == "mainnet"
-            else "https://kovan-optimistic.etherscan.io"
+            else "https://goerli-optimistic.etherscan.io"
         )
     elif ecosystem_name == "polygon":
         return (
@@ -59,7 +59,7 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
 
     elif ecosystem_name == "fantom":
         return (
-            f"https://api-{network_name}.ftmscan.com"
+            f"https://api-{network_name}.ftmscan.com/api"
             if network_name != "opera"
             else "https://api.ftmscan.com/api"
         )
@@ -74,7 +74,7 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
         return (
             "https://api-optimistic.etherscan.io/api"
             if network_name == "mainnet"
-            else "https://api-kovan-optimistic.etherscan.io/api"
+            else "https://api-goerli-optimistic.etherscan.io/api"
         )
     elif ecosystem_name == "polygon":
         return (
