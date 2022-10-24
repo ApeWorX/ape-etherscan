@@ -14,14 +14,38 @@ EXPECTED_CONTRACT_NAME_MAP = {
 }
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 PUBLISH_GUID = "123"
-ecosystems_and_networks = pytest.mark.parametrize(
-    "ecosystem,network",
+
+# Every supported ecosystem / network combo as `[("ecosystem", "network") ... ]`
+ecosystems_and_networks = [
+    p
+    for plist in [
+        [(e, n) for n in nets] + [(e, f"{n}-fork") for n in nets] for e, nets in NETWORKS.items()
+    ]
+    for p in plist
+]
+base_url_test = pytest.mark.parametrize(
+    "ecosystem,network,url",
     [
-        ("ethereum", "mainnet"),
-        ("ethereum", "mainnet-fork"),
-        ("fantom", "opera"),
-        ("optimism", "mainnet"),
-        ("polygon", "mainnet"),
+        ("ethereum", "mainnet", "etherscan.io"),
+        ("ethereum", "mainnet-fork", "etherscan.io"),
+        ("ethereum", "goerli", "goerli.etherscan.io"),
+        ("ethereum", "goerli-fork", "goerli.etherscan.io"),
+        ("fantom", "opera", "ftmscan.com"),
+        ("fantom", "opera-fork", "ftmscan.com"),
+        ("fantom", "testnet", "testnet.ftmscan.com"),
+        ("fantom", "testnet-fork", "testnet.ftmscan.com"),
+        ("arbitrum", "mainnet", "arbiscan.io"),
+        ("arbitrum", "mainnet-fork", "arbiscan.io"),
+        ("arbitrum", "goerli", "goerli.arbiscan.io"),
+        ("arbitrum", "goerli-fork", "goerli.arbiscan.io"),
+        ("optimism", "mainnet", "optimistic.etherscan.io"),
+        ("optimism", "mainnet-fork", "optimistic.etherscan.io"),
+        ("optimism", "goerli", "goerli-optimistic.etherscan.io"),
+        ("optimism", "goerli-fork", "goerli-optimistic.etherscan.io"),
+        ("polygon", "mainnet", "polygonscan.com"),
+        ("polygon", "mainnet-fork", "polygonscan.com"),
+        ("polygon", "mumbai", "mumbai.polygonscan.com"),
+        ("polygon", "mumbai-fork", "mumbai.polygonscan.com"),
     ],
 )
 
@@ -92,49 +116,23 @@ def expected_verification_log(address_to_verify):
     )
 
 
-@pytest.mark.parametrize(
-    "ecosystem,network,expected_prefix",
-    [
-        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io"),
-        ("ethereum", f"{NETWORKS['ethereum'][0]}-fork", "etherscan.io"),
-        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
-        ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
-        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
-        ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
-        ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
-        ("polygon", NETWORKS["polygon"][0], "polygonscan.com"),
-        ("polygon", NETWORKS["polygon"][1], "mumbai.polygonscan.com"),
-    ],
-)
-def test_get_address_url(ecosystem, network, expected_prefix, address, get_explorer):
-    expected = f"https://{expected_prefix}/address/{address}"
+@base_url_test
+def test_get_address_url(ecosystem, network, url, address, get_explorer):
+    expected = f"https://{url}/address/{address}"
     explorer = get_explorer(ecosystem, network)
     actual = explorer.get_address_url(address)
     assert actual == expected
 
 
-@pytest.mark.parametrize(
-    "ecosystem,network,expected_prefix",
-    [
-        ("ethereum", NETWORKS["ethereum"][0], "etherscan.io"),
-        ("ethereum", f"{NETWORKS['ethereum'][0]}-fork", "etherscan.io"),
-        ("ethereum", NETWORKS["ethereum"][1], "ropsten.etherscan.io"),
-        ("fantom", NETWORKS["fantom"][0], "ftmscan.com"),
-        ("fantom", NETWORKS["fantom"][1], "testnet.ftmscan.com"),
-        ("optimism", NETWORKS["optimism"][0], "optimistic.etherscan.io"),
-        ("optimism", NETWORKS["optimism"][1], "kovan-optimistic.etherscan.io"),
-        ("polygon", NETWORKS["polygon"][0], "polygonscan.com"),
-        ("polygon", NETWORKS["polygon"][1], "mumbai.polygonscan.com"),
-    ],
-)
-def test_get_transaction_url(ecosystem, network, expected_prefix, get_explorer):
-    expected = f"https://{expected_prefix}/tx/{TRANSACTION}"
+@base_url_test
+def test_get_transaction_url(ecosystem, network, url, get_explorer):
+    expected = f"https://{url}/tx/{TRANSACTION}"
     explorer = get_explorer(ecosystem, network)
     actual = explorer.get_transaction_url(TRANSACTION)
     assert actual == expected
 
 
-@ecosystems_and_networks
+@pytest.mark.parametrize("ecosystem,network", ecosystems_and_networks)
 def test_get_contract_type_ecosystems_and_networks(
     mock_backend,
     ecosystem,
@@ -142,7 +140,7 @@ def test_get_contract_type_ecosystems_and_networks(
     get_explorer,
 ):
     # This test parametrizes getting contract types across ecosystem / network combos
-    mock_backend.set_ecosystem(ecosystem)
+    mock_backend.set_network(ecosystem, network)
     response = mock_backend.setup_mock_get_contract_type_response("get_contract_response")
     explorer = get_explorer(ecosystem, network)
     actual = explorer.get_contract_type(response.expected_address)
