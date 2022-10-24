@@ -17,11 +17,11 @@ extras_require = {
         "pytest-mock",  # Test mocker
     ],
     "lint": [
-        "black>=22.6",  # auto-formatter and linter
-        "mypy>=0.971,<1",  # Static type analyzer
+        "black>=22.10.0",  # auto-formatter and linter
+        "mypy>=0.982",  # Static type analyzer
         "types-requests>=2.28.7",  # NOTE: Needed due to mypy typeshed
-        "flake8>=4.0.1,<5",  # Style linter
-        "isort>=5.10.1,<6",  # Import sorting linter
+        "flake8>=5.0.4",  # Style linter
+        "isort>=5.10.1",  # Import sorting linter
     ],
     "doc": [
         "Sphinx>=3.4.3,<4",  # Documentation generator

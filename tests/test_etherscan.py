@@ -1,8 +1,10 @@
+from typing import Callable
+
 import ape
 import pytest
 
 from ape_etherscan import NETWORKS
-from ape_etherscan.exceptions import EtherscanTooManyRequestsError
+from ape_etherscan.exceptions import EtherscanResponseError, EtherscanTooManyRequestsError
 
 # A map of each mock response to its contract name for testing `get_contract_type()`.
 EXPECTED_CONTRACT_NAME_MAP = {
@@ -11,6 +13,7 @@ EXPECTED_CONTRACT_NAME_MAP = {
     "get_vyper_contract_response": "yvDAI",
 }
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
+PUBLISH_GUID = "123"
 
 # Every supported ecosystem / network combo as `[("ecosystem", "network") ... ]`
 ecosystems_and_networks = [
@@ -45,6 +48,72 @@ base_url_test = pytest.mark.parametrize(
         ("polygon", "mumbai-fork", "mumbai.polygonscan.com"),
     ],
 )
+
+
+@pytest.fixture
+def verification_params(address):
+    ctor_args = "0000000000000005000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002a73333362346563316232316330313364393230366536333836653231383935356635616630656533636200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002833623465633162323163303133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
+    return {
+        "action": "verifysourcecode",
+        "codeformat": "solidity-standard-json-input",
+        "constructorArguements": ctor_args,
+        "contractaddress": address,
+        "contractname": "foo.sol:foo",
+        "evmversion": None,
+        "licenseType": 1,
+        "module": "contract",
+        "optimizationUsed": 1,
+        "runs": 200,
+    }
+
+
+@pytest.fixture
+def address_to_verify(address):
+    contract_type = ape.project.get_contract("foo").contract_type
+    ape.chain.contracts._local_contract_types[address] = contract_type
+    return address
+
+
+@pytest.fixture
+def verification_tester_cls():
+    class VerificationTester:
+        counter = 0
+
+        def __init__(self, action_when_found: Callable, threshold: int = 2):
+            self.action_when_found = action_when_found
+            self.threshold = threshold
+
+        def sim(self):
+            # Simulate the contract type waiting in the queue until successful verification
+            if self.counter == self.threshold:
+                return self.action_when_found()
+
+            self.counter += 1
+            return "Pending in the queue"
+
+    return VerificationTester
+
+
+@pytest.fixture
+def setup_verification_test(mock_backend, verification_params, verification_tester_cls):
+    def setup(found_handler: Callable, threshold: int = 2):
+        mock_backend.setup_mock_account_transactions_response()
+        mock_backend.add_handler("POST", "contract", verification_params, return_value=PUBLISH_GUID)
+        verification_tester = verification_tester_cls(found_handler, threshold=threshold)
+        mock_backend.add_handler(
+            "GET", "contract", {"guid": PUBLISH_GUID}, side_effect=verification_tester.sim
+        )
+        return verification_tester
+
+    return setup
+
+
+@pytest.fixture
+def expected_verification_log(address_to_verify):
+    return (
+        "Contract verification successful!\n"
+        f"https://etherscan.io/address/{address_to_verify}#code"
+    )
 
 
 @base_url_test
@@ -108,47 +177,28 @@ def test_too_many_requests_error(no_api_key, response):
 
 
 def test_publish_contract(
-    mock_backend,
-    address,
     explorer,
+    address_to_verify,
+    setup_verification_test,
+    expected_verification_log,
     caplog,
 ):
-    contract_type = ape.project.get_contract("foo").contract_type
-    ape.chain.contracts._local_contract_types[address] = contract_type
-    guid = "123"
-    mock_backend.setup_mock_account_transactions_response()
-    expected_ctor_args = "0000000000000005000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002a73333362346563316232316330313364393230366536333836653231383935356635616630656533636200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002833623465633162323163303133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
-    expected_verification_params = {
-        "action": "verifysourcecode",
-        "codeformat": "solidity-standard-json-input",
-        "constructorArguements": expected_ctor_args,
-        "contractaddress": address,
-        "contractname": "foo.sol:foo",
-        "evmversion": None,
-        "licenseType": 1,
-        "module": "contract",
-        "optimizationUsed": 1,
-        "runs": 200,
-    }
-    mock_backend.add_handler("POST", "contract", expected_verification_params, return_value=guid)
+    setup_verification_test(lambda: "Pass - You made it!")
+    explorer.publish_contract(address_to_verify)
+    assert caplog.records[-1].message == expected_verification_log
 
-    class VerificationTester:
-        counter = 0
-        threshold = 3
 
-        def sim(self):
-            # Simulate the contract type waiting in the queue until successful verification
-            if self.counter == self.threshold:
-                return "Pass - You made it!"
+def test_publish_contract_when_guid_not_found_at_end(
+    mocker,
+    explorer,
+    address_to_verify,
+    setup_verification_test,
+    expected_verification_log,
+    caplog,
+):
+    def raise_err():
+        raise EtherscanResponseError(mocker.MagicMock(), "Resource not found")
 
-            self.counter += 1
-            return "Pending in the queue"
-
-    verification_tester = VerificationTester()
-    mock_backend.add_handler(
-        "GET", "contract", {"guid": "123"}, side_effect=verification_tester.sim
-    )
-    explorer.publish_contract(address)
-    assert caplog.records[-1].message == (
-        f"Contract verification successful!\nhttps://etherscan.io/address/{address}#code"
-    )
+    setup_verification_test(raise_err, threshold=1)
+    explorer.publish_contract(address_to_verify)
+    assert caplog.records[-1].message == expected_verification_log
