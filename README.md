@@ -105,4 +105,4 @@ etherscan = networks.provider.network.explorer
 etherscan.publish_contract("0x55a8a39bc9694714e2874c1ce77aa1e599461e18")
 ```
 
-**NOTE**: You must set the Etherscan API key environment variable to use the publishing feature.
+**NOTE**: You must set an Etherscan API key environment variable to use the publishing feature.

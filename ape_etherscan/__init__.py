@@ -5,22 +5,19 @@ from .explorer import Etherscan
 NETWORKS = {
     "ethereum": [
         "mainnet",
-        "ropsten",
-        "rinkeby",
-        "kovan",
+        "goerli",
+    ],
+    "arbitrum": [
+        "mainnet",
         "goerli",
     ],
     "fantom": [
         "opera",
         "testnet",
     ],
-    "arbitrum": [
-        "mainnet",
-        "testnet",
-    ],
     "optimism": [
         "mainnet",
-        "kovan",
+        "goerli",
     ],
     "polygon": [
         "mainnet",

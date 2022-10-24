@@ -8,6 +8,7 @@ import _io  # type: ignore
 import ape
 import pytest
 from ape.api import ExplorerAPI
+from ape.utils import cached_property
 from requests import Response
 
 from ape_etherscan.client import _APIClient
@@ -109,14 +110,38 @@ class MockEtherscanBackend:
         self._expected_base_uri = "https://api.etherscan.io/api"  # Default
         self._handlers = {"get": {}, "post": {}}
 
-    def set_ecosystem(self, ecosystem):
-        expected_uri_map = {
-            "ethereum": "https://api.etherscan.io/api",
-            "fantom": "https://api.ftmscan.com/api",
-            "optimism": "https://api-optimistic.etherscan.io/api",
-            "polygon": "https://api.polygonscan.com/api",
+    @cached_property
+    def expected_uri_map(
+        self,
+    ) -> Dict[str, Dict[str, str]]:
+        def get_url_f(testnet: bool = False, tld: str = "io"):
+            f_str = f"https://api-{{}}.{{}}.{tld}/api" if testnet else f"https://api.{{}}.{tld}/api"
+            return f_str.format
+
+        url = get_url_f()
+        testnet_url = get_url_f(testnet=True)
+        com_url = get_url_f(tld="com")
+        com_testnet_url = get_url_f(testnet=True, tld="com")
+
+        return {
+            "ethereum": {"mainnet": url("etherscan"), "goerli": testnet_url("goerli", "etherscan")},
+            "arbitrum": {"mainnet": url("arbiscan"), "goerli": testnet_url("goerli", "arbiscan")},
+            "fantom": {
+                "opera": com_url("ftmscan"),
+                "testnet": com_testnet_url("testnet", "ftmscan"),
+            },
+            "optimism": {
+                "mainnet": testnet_url("optimistic", "etherscan"),
+                "goerli": testnet_url("goerli-optimistic", "etherscan"),
+            },
+            "polygon": {
+                "mainnet": com_url("polygonscan"),
+                "mumbai": com_testnet_url("testnet", "polygonscan"),
+            },
         }
-        self._expected_base_uri = expected_uri_map[ecosystem]
+
+    def set_network(self, ecosystem: str, network: str):
+        self._expected_base_uri = self.expected_uri_map[ecosystem][network.replace("-fork", "")]
 
     def add_handler(self, method, module, expected_params, return_value=None, side_effect=None):
         if isinstance(return_value, (str, dict)):
@@ -180,7 +205,7 @@ class MockEtherscanBackend:
         with open(test_data_path) as response_data_file:
             response = self.get_mock_response(response_data_file, file_name=file_name)
             self.add_handler("GET", "account", EXPECTED_ACCOUNT_TXNS_PARAMS, return_value=response)
-            self.set_ecosystem("ethereum")
+            self.set_network("ethereum", "mainnet")
             return response
 
     def get_mock_response(self, response_data: Union[IO, Dict, str], **kwargs):
