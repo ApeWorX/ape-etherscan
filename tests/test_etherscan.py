@@ -43,6 +43,7 @@ base_url_test = pytest.mark.parametrize(
         ("polygon", "mainnet-fork", "polygonscan.com"),
         ("polygon", "mumbai", "mumbai.polygonscan.com"),
         ("polygon", "mumbai-fork", "mumbai.polygonscan.com"),
+        ("avalanche", "mainnet", "snowtrace.io"),
     ],
 )
 
