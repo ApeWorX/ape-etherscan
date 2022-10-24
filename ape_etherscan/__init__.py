@@ -25,7 +25,7 @@ NETWORKS = {
     ],
     "avalanche": [
         "mainnet",
-    ]
+    ],
 }
 
 
