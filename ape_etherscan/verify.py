@@ -249,7 +249,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         evm_version = compiler_used.settings.get("evmVersion")
         license_code = self.license_code
-        license_code_value = None if not license_code else license_code.value
+        license_code_value = license_code.value if license_code else None
         guid = self._contract_client.verify_source_code(
             source_code,
             compiler_used.version,
