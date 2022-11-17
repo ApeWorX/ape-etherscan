@@ -37,10 +37,30 @@ EXPECTED_ACCOUNT_TXNS_PARAMS = {
     "page": 1,
     "sort": "asc",
 }
-SOURCE_CODE = """
-pragma solidity =0.8.16;
+FOO_SOURCE_CODE = """
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.2;
+
+import "@bar/bar.sol";
+
 contract foo {
 }
+"""
+BAR_SOURCE_CODE = """
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.2;
+
+contract bar {
+}
+"""
+APE_CONFIG_FILE = """
+dependencies:
+  - name: bar
+    local: ./bar
+
+solidity:
+  import_remapping:
+    - "@bar=bar"
 """
 
 
@@ -50,14 +70,27 @@ def connection():
         yield provider
 
 
+def make_source(base_dir: Path, name: str, content: str):
+    source_file = base_dir / f"{name}.sol"
+    source_file.touch()
+    source_file.write_text(content)
+
+
 @pytest.fixture(autouse=True)
 def with_source_file():
-    contracts_dir = ape.config.PROJECT_FOLDER / "contracts"
+    base_dir = ape.config.PROJECT_FOLDER
+    contracts_dir = base_dir / "contracts"
+    dependency_contracts_dir = base_dir / "bar" / "contracts"
     ape.config.contracts_folder = contracts_dir
-    contracts_dir.mkdir(exist_ok=True)
-    source_file = contracts_dir / "foo.sol"
-    source_file.touch()
-    source_file.write_text(SOURCE_CODE)
+    contracts_dir.mkdir(exist_ok=True, parents=True)
+    dependency_contracts_dir.mkdir(exist_ok=True, parents=True)
+
+    make_source(contracts_dir, "foo", FOO_SOURCE_CODE)
+    make_source(dependency_contracts_dir, "bar", BAR_SOURCE_CODE)
+
+    config_file = base_dir / "ape-config.yaml"
+    config_file.unlink(missing_ok=True)
+    config_file.write_text(APE_CONFIG_FILE)
 
 
 @pytest.fixture
