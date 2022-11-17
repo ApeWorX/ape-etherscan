@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from setuptools import find_packages, setup  # type: ignore
+from setuptools import find_packages, setup
 
 extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
@@ -18,8 +18,9 @@ extras_require = {
     ],
     "lint": [
         "black>=22.10.0",  # auto-formatter and linter
-        "mypy>=0.982",  # Static type analyzer
-        "types-requests>=2.28.7",  # NOTE: Needed due to mypy typeshed
+        "mypy==0.982",  # Static type analyzer
+        "types-requests>=2.28.7",  # Needed due to mypy typeshed
+        "types-setuptools",  # Needed due to mypy typeshed
         "flake8>=5.0.4",  # Style linter
         "isort>=5.10.1",  # Import sorting linter
     ],
@@ -68,7 +69,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.5.2,<0.6",
+        "eth-ape>=0.5.4,<0.6",
         "requests",  # Use same version as eth-ape
     ],
     python_requires=">=3.8,<3.11",

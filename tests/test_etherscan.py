@@ -145,7 +145,11 @@ def test_get_contract_type_ecosystems_and_networks(
     response = mock_backend.setup_mock_get_contract_type_response("get_contract_response")
     explorer = get_explorer(ecosystem, network)
     actual = explorer.get_contract_type(response.expected_address)
+    contract_type_from_lowered_address = explorer.get_contract_type(
+        response.expected_address.lower()
+    )
     assert actual is not None
+    assert actual == contract_type_from_lowered_address
 
     actual = actual.name
     expected = EXPECTED_CONTRACT_NAME_MAP[response.file_name]

@@ -28,7 +28,11 @@ class Etherscan(ExplorerAPI):
     def _client_factory(self) -> ClientFactory:
         return ClientFactory(self.network.ecosystem.name, self.network.name.replace("-fork", ""))
 
-    def get_contract_type(self, address: str) -> Optional[ContractType]:
+    def get_contract_type(self, address: AddressType) -> Optional[ContractType]:
+        if not self.conversion_manager.is_type(address, AddressType):
+            # Handle non-checksummed addresses
+            address = self.conversion_manager.convert(str(address), AddressType)
+
         client = self._client_factory.get_contract_client(address)
         source_code = client.get_source_code()
         abi_string = source_code.abi
