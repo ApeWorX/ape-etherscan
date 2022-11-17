@@ -8,9 +8,12 @@ import _io  # type: ignore
 import ape
 import pytest
 from ape.api import ExplorerAPI
+from ape.exceptions import NetworkError
+from ape.logging import logger
 from ape.utils import cached_property
 from requests import Response
 
+from ape_etherscan import Etherscan
 from ape_etherscan.client import _APIClient
 from ape_etherscan.types import EtherscanResponse
 
@@ -76,14 +79,32 @@ def explorer(get_explorer):
 
 
 @pytest.fixture
-def get_explorer():
+def get_explorer(mocker):
     def fn(
         ecosystem_name: str = "ethereum",
         network_name: str = "development",
     ) -> ExplorerAPI:
-        ecosystem = ape.networks.get_ecosystem(ecosystem_name)
-        explorer = ecosystem.get_network(network_name).explorer
-        assert explorer is not None
+        try:
+            ecosystem = ape.networks.get_ecosystem(ecosystem_name)
+        except NetworkError:
+            # Use mock
+            logger.warning(
+                f"Ecosystem 'ape-{ecosystem_name}' not installed; resorting to a mock ecosystem."
+            )
+            ecosystem = mocker.MagicMock()
+            ecosystem.name = ecosystem_name
+            network = mocker.MagicMock()
+            network.name = network_name
+            network.ecosystem = ecosystem
+            etherscan = ape.networks.get_ecosystem("ethereum").get_network("mainnet")
+            explorer = Etherscan.construct(name=etherscan.name, network=network)
+            network.explorer = explorer
+            explorer.network = network
+        else:
+            network = ecosystem.get_network(network_name)
+            explorer = network.explorer
+            assert explorer is not None
+
         return explorer
 
     return fn
@@ -138,6 +159,7 @@ class MockEtherscanBackend:
                 "mainnet": com_url("polygonscan"),
                 "mumbai": com_testnet_url("testnet", "polygonscan"),
             },
+            "avalanche": {"mainnet": url("snowtrace")},
         }
 
     def set_network(self, ecosystem: str, network: str):

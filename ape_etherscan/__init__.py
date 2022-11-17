@@ -23,6 +23,9 @@ NETWORKS = {
         "mainnet",
         "mumbai",
     ],
+    "avalanche": [
+        "mainnet",
+    ],
 }
 
 

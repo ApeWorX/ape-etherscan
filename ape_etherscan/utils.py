@@ -4,4 +4,5 @@ API_KEY_ENV_KEY_MAP = {
     "fantom": "FTMSCAN_API_KEY",
     "optimism": "OPTIMISTIC_ETHERSCAN_API_KEY",
     "polygon": "POLYGONSCAN_API_KEY",
+    "avalanche": "SNOWTRACE_API_KEY",
 }
