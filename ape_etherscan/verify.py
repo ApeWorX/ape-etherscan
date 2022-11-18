@@ -24,8 +24,8 @@ _SPDX_ID_TO_API_CODE = {
     "mpl-2.0": 10,
     "osl-3.0": 11,
     "apache 2.0": 12,
+    "agpl-3.0": 13,
     "agpl-3.0-only": 13,
-    "agpl-3.0-later": 13,
     "busl-1.1": 14,
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "

@@ -38,7 +38,7 @@ EXPECTED_ACCOUNT_TXNS_PARAMS = {
     "sort": "asc",
 }
 FOO_SOURCE_CODE = """
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.2;
 
 import "@bar/bar.sol";
@@ -47,7 +47,7 @@ contract foo {
 }
 """
 BAR_SOURCE_CODE = """
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.2;
 
 contract bar {
