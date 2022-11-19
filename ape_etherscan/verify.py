@@ -1,9 +1,11 @@
+import json
 import time
 from enum import Enum
 from pathlib import Path
+from typing import Dict, Optional
 
 from ape.contracts import ContractInstance
-from ape.logging import logger
+from ape.logging import LogLevel, logger
 from ape.types import AddressType
 from ape.utils import ManagerAccessMixin, cached_property
 from ethpm_types import ContractType
@@ -26,6 +28,7 @@ _SPDX_ID_TO_API_CODE = {
     "apache 2.0": 12,
     "agpl-3.0": 13,
     "agpl-3.0-only": 13,
+    "agpl-3.0-later": 13,
     "busl-1.1": 14,
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
@@ -220,7 +223,6 @@ class SourceVerifier(ManagerAccessMixin):
               to validate the contract.
         """
 
-        compiler = self.compiler_manager.registered_compilers[self._ext]
         manifest = self.project_manager.extract_manifest()
         compilers_used = [
             c for c in manifest.compilers if self._contract_type.name in c.contractTypes
@@ -229,31 +231,32 @@ class SourceVerifier(ManagerAccessMixin):
         if not compilers_used:
             raise ContractVerificationError("Compiler data missing from project manifest.")
 
-        compiler_used = compilers_used[0]
-        optimizer = compiler_used.settings.get("optimizer", {})
-        optimized = optimizer.get("enabled", False)
-        runs = optimizer.get("runs", 200)
-        source_name = self._contract_type.source_id
-        sources = {source_name: {"content": manifest.sources[source_name].content}}
-        all_settings = compiler.get_compiler_settings(
+        version = max([Version(c.version) for c in compilers_used])
+        compiler_plugin = self.compiler_manager.registered_compilers[self._ext]
+        all_settings = compiler_plugin.get_compiler_settings(
             [self._source_path], base_path=self._base_path
         )
-        settings = all_settings[Version(compiler_used.version)]
+        settings = all_settings[version]
+        optimizer = settings.get("optimizer", {})
+        optimized = optimizer.get("enabled", False)
+        runs = optimizer.get("runs", 200)
+        source_id = self._contract_type.source_id
+        base_folder = self.project_manager.contracts_folder
+        standard_input_json = self._get_standard_input_json(source_id, base_folder, **settings)
 
-        # TODO: Handle libraries
-        source_code = {
-            "language": compiler.name.capitalize(),
-            "sources": sources,
-            "settings": settings,
-        }
-
-        evm_version = compiler_used.settings.get("evmVersion")
+        evm_version = settings.get("evmVersion")
         license_code = self.license_code
         license_code_value = license_code.value if license_code else None
+
+        if logger.level == LogLevel.DEBUG:
+            logger.debug("Dumping standard JSON output:\n")
+            standard_json = json.dumps(standard_input_json, indent=2)
+            logger.debug(f"{standard_json}\n")
+
         guid = self._contract_client.verify_source_code(
-            source_code,
-            compiler_used.version,
-            contract_name=f"{self._contract_type.source_id}:{self._contract_type.name}",
+            standard_input_json,
+            str(version),
+            contract_name=f"{source_id}:{self._contract_type.name}",
             optimization_used=optimized,
             optimization_runs=runs,
             constructor_arguments=self.constructor_arguments,
@@ -261,6 +264,32 @@ class SourceVerifier(ManagerAccessMixin):
             license_type=license_code_value,
         )
         self._wait_for_verification(guid)
+
+    def _get_standard_input_json(
+        self, source_id: str, base_folder: Optional[Path] = None, **settings
+    ) -> Dict:
+        base_dir = base_folder or self.project_manager.contracts_folder
+        source_path = base_dir / source_id
+        compiler = self.compiler_manager.registered_compilers[source_path.suffix]
+        sources = {self._source_path.name: {"content": source_path.read_text()}}
+
+        def build_map(_source_id: str):
+            _source_path = base_dir / _source_id
+            source_imports = compiler.get_imports([_source_path]).get(_source_id, [])
+            for imported_source_id in source_imports:
+                sources[imported_source_id] = {
+                    "content": (base_dir / imported_source_id).read_text()
+                }
+                build_map(imported_source_id)
+
+        build_map(source_id)
+
+        # TODO: Handle linked-libraries
+        return {
+            "language": compiler.name.capitalize(),
+            "sources": sources,
+            "settings": settings,
+        }
 
     def _wait_for_verification(self, guid: str):
         explorer = self.provider.network.explorer

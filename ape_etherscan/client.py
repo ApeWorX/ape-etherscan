@@ -1,9 +1,10 @@
-import io
 import json
 import os
 import random
+from io import StringIO
 from typing import Dict, Iterator, List, Optional
 
+from ape.logging import logger
 from ape.utils import USER_AGENT
 from requests import Session
 
@@ -139,6 +140,8 @@ class _APIClient:
 
         if raise_on_exceptions:
             response.raise_for_status()
+        elif not 200 <= response.status_code < 300:
+            logger.error(response.text)
 
         return EtherscanResponse(response, self._ecosystem_name, raise_on_exceptions)
 
@@ -211,7 +214,7 @@ class ContractClient(_APIClient):
             "licenseType": license_type,
             "optimizationUsed": int(optimization_used),
             "runs": optimization_runs,
-            "sourceCode": io.StringIO(json.dumps(standard_json_output)),
+            "sourceCode": StringIO(json.dumps(standard_json_output)),
         }
 
         iterator = 1

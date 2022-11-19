@@ -1,8 +1,9 @@
 import json
 import os
+from io import StringIO
 from pathlib import Path
 from tempfile import mkdtemp
-from typing import IO, Dict, Union
+from typing import IO, Any, Callable, Dict, Optional, Union
 
 import _io  # type: ignore
 import ape
@@ -46,14 +47,14 @@ import "@bar/bar.sol";
 contract foo {
 }
 """
-BAR_SOURCE_CODE = """
+BAR_SOURCE_CODE = r"""
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.2;
 
 contract bar {
 }
 """
-APE_CONFIG_FILE = """
+APE_CONFIG_FILE = r"""
 dependencies:
   - name: bar
     local: ./bar
@@ -62,6 +63,21 @@ solidity:
   import_remapping:
     - "@bar=bar"
 """
+STANDARD_INPUT_JSON = {
+    "language": "Solidity",
+    "sources": {
+        "foo.sol": {"content": FOO_SOURCE_CODE},
+        ".cache/bar/local/bar.sol": {"content": BAR_SOURCE_CODE},
+    },
+    "settings": {
+        "optimizer": {"enabled": True, "runs": 200},
+        "outputSelection": {
+            "foo.sol": {"foo": ["abi", "bin", "bin-runtime", "devdoc", "userdoc"]},
+            "bar.sol": {"bar": ["abi", "bin", "bin-runtime", "devdoc", "userdoc"]},
+        },
+        "remappings": ["@bar=.cache/bar/local"],
+    },
+}
 
 
 @pytest.fixture(autouse=True)
@@ -198,7 +214,14 @@ class MockEtherscanBackend:
     def set_network(self, ecosystem: str, network: str):
         self._expected_base_uri = self.expected_uri_map[ecosystem][network.replace("-fork", "")]
 
-    def add_handler(self, method, module, expected_params, return_value=None, side_effect=None):
+    def add_handler(
+        self,
+        method: str,
+        module: str,
+        expected_params: Dict,
+        return_value: Optional[Any] = None,
+        side_effect: Optional[Callable] = None,
+    ):
         if isinstance(return_value, (str, dict)):
             return_value = self.get_mock_response(return_value)
 
@@ -209,7 +232,15 @@ class MockEtherscanBackend:
                     # Allow skipping certain assertions
                     continue
 
-                assert actual_params[key] == val, key
+                # Handler StringIO objects
+                if isinstance(val, StringIO):
+                    assert isinstance(actual_params[key], StringIO)
+                    actual_json = json.loads(actual_params[key].read())
+                    expected_json = json.loads(val.read())
+                    assert actual_json == expected_json
+
+                else:
+                    assert actual_params[key] == val, key
 
             if return_value:
                 return return_value
@@ -273,8 +304,28 @@ class MockEtherscanBackend:
         response = self._mocker.MagicMock(spec=Response)
         response.json.return_value = response_data
         response.text = json.dumps(response_data)
+        response.status_code = 200
 
         for key, val in kwargs.items():
             setattr(response, key, val)
 
         return response
+
+
+@pytest.fixture
+def verification_params(address):
+    ctor_args = "0000000000000005000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002a73333362346563316232316330313364393230366536333836653231383935356635616630656533636200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002833623465633162323163303133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
+
+    return {
+        "action": "verifysourcecode",
+        "codeformat": "solidity-standard-json-input",
+        "constructorArguements": ctor_args,
+        "contractaddress": address,
+        "contractname": "foo.sol:foo",
+        "evmversion": None,
+        "licenseType": 1,
+        "module": "contract",
+        "optimizationUsed": 1,
+        "runs": 200,
+        "sourceCode": StringIO(json.dumps(STANDARD_INPUT_JSON)),
+    }
