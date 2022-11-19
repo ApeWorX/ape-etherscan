@@ -231,7 +231,19 @@ class SourceVerifier(ManagerAccessMixin):
         if not compilers_used:
             raise ContractVerificationError("Compiler data missing from project manifest.")
 
-        version = max([Version(c.version) for c in compilers_used])
+        versions = [Version(c.version) for c in compilers_used]
+        if not versions:
+            # Might be impossible to get here.
+            raise ContractVerificationError("Unable to find compiler version used.")
+
+        elif len(versions) > 1:
+            # Might be impossible to get here.
+            logger.warning("Source was compiled by multiple versions. Using max.")
+            version = max(versions)
+
+        else:
+            version = versions[0]
+
         compiler_plugin = self.compiler_manager.registered_compilers[self._ext]
         all_settings = compiler_plugin.get_compiler_settings(
             [self._source_path], base_path=self._base_path
