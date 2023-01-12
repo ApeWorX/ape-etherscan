@@ -48,7 +48,14 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
         )
     elif ecosystem_name == "avalanche":
         return "https://snowtrace.io"
-
+    elif ecosystem_name == 'bsc':
+        return (
+            f"https://{network_name}.bscscan.com"
+            if network_name != "mainnet"
+            else "https://bscscan.com"
+        )
+    
+    
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
@@ -87,6 +94,12 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
         )
     elif ecosystem_name == "avalanche":
         return "https://api.snowtrace.io/api"
+    elif ecosystem_name == "bsc":
+        return (
+            f"https://api-{network_name}.bscscan.com/api"
+            if network_name != "mainnet"
+            else "https://api.bscscan.com/api"
+        )
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
