@@ -55,7 +55,6 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             else "https://bscscan.com"
         )
     
-    
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
