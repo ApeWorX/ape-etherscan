@@ -82,7 +82,7 @@ STANDARD_INPUT_JSON = {
 
 @pytest.fixture(autouse=True)
 def connection():
-    with ape.networks.parse_network_choice("ethereum:mainnet:infura") as provider:
+    with ape.networks.ethereum.mainnet.use_provider("infura") as provider:
         yield provider
 
 
@@ -92,12 +92,11 @@ def make_source(base_dir: Path, name: str, content: str):
     source_file.write_text(content)
 
 
-@pytest.fixture(autouse=True)
-def with_source_file():
+@pytest.fixture
+def project():
     base_dir = ape.config.PROJECT_FOLDER
     contracts_dir = base_dir / "contracts"
     dependency_contracts_dir = base_dir / "bar" / "contracts"
-    ape.config.contracts_folder = contracts_dir
     contracts_dir.mkdir(exist_ok=True, parents=True)
     dependency_contracts_dir.mkdir(exist_ok=True, parents=True)
 
@@ -107,6 +106,9 @@ def with_source_file():
     config_file = base_dir / "ape-config.yaml"
     config_file.unlink(missing_ok=True)
     config_file.write_text(APE_CONFIG_FILE)
+
+    with ape.config.using_project(base_dir) as project:
+        yield project
 
 
 @pytest.fixture
@@ -194,8 +196,14 @@ class MockEtherscanBackend:
         com_testnet_url = get_url_f(testnet=True, tld="com")
 
         return {
-            "ethereum": {"mainnet": url("etherscan"), "goerli": testnet_url("goerli", "etherscan")},
-            "arbitrum": {"mainnet": url("arbiscan"), "goerli": testnet_url("goerli", "arbiscan")},
+            "ethereum": {
+                "mainnet": url("etherscan"),
+                "goerli": testnet_url("goerli", "etherscan"),
+            },
+            "arbitrum": {
+                "mainnet": url("arbiscan"),
+                "goerli": testnet_url("goerli", "arbiscan"),
+            },
             "fantom": {
                 "opera": com_url("ftmscan"),
                 "testnet": com_testnet_url("testnet", "ftmscan"),

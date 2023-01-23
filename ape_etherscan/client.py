@@ -116,7 +116,10 @@ class _APIClient:
     ) -> EtherscanResponse:
         params = self.__authorize(params)
         return self._request(
-            "GET", params=params, headers=headers, raise_on_exceptions=raise_on_exceptions
+            "GET",
+            params=params,
+            headers=headers,
+            raise_on_exceptions=raise_on_exceptions,
         )
 
     def _post(
@@ -165,7 +168,11 @@ class ContractClient(_APIClient):
         super().__init__(ecosystem_name, network_name, "contract")
 
     def get_source_code(self) -> SourceCodeResponse:
-        params = {**self.base_params, "action": "getsourcecode", "address": self._address}
+        params = {
+            **self.base_params,
+            "action": "getsourcecode",
+            "address": self._address,
+        }
         result = self._get(params=params)
         result_list = result.value or []
 

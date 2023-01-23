@@ -52,8 +52,8 @@ base_url_test = pytest.mark.parametrize(
 
 
 @pytest.fixture
-def address_to_verify(address):
-    contract_type = ape.project.get_contract("foo").contract_type
+def address_to_verify(address, project):
+    contract_type = project.get_contract("foo").contract_type
     ape.chain.contracts._local_contract_types[address] = contract_type
     return address
 
@@ -85,7 +85,10 @@ def setup_verification_test(mock_backend, verification_params, verification_test
         mock_backend.add_handler("POST", "contract", verification_params, return_value=PUBLISH_GUID)
         verification_tester = verification_tester_cls(found_handler, threshold=threshold)
         mock_backend.add_handler(
-            "GET", "contract", {"guid": PUBLISH_GUID}, side_effect=verification_tester.sim
+            "GET",
+            "contract",
+            {"guid": PUBLISH_GUID},
+            side_effect=verification_tester.sim,
         )
         return verification_tester
 
