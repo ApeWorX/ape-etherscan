@@ -118,3 +118,7 @@ dmypy.json
 
 # setuptools-scm
 version.py
+
+**/.DS_Store
+*.swp
+*.swo
