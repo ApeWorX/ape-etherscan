@@ -26,6 +26,10 @@ NETWORKS = {
     "avalanche": [
         "mainnet",
     ],
+    "bsc": [
+        "mainnet",
+        "testnet",
+    ],
 }
 
 

@@ -217,6 +217,10 @@ class MockEtherscanBackend:
                 "mumbai": com_testnet_url("testnet", "polygonscan"),
             },
             "avalanche": {"mainnet": url("snowtrace")},
+            "bsc": {
+                "mainnet": com_url("bscscan"),
+                "testnet": com_testnet_url("testnet", "bscscan"),
+            },
         }
 
     def set_network(self, ecosystem: str, network: str):
