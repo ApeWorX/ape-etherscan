@@ -1,6 +1,5 @@
 from typing import Callable
 
-import ape
 import pytest
 
 from ape_etherscan import NETWORKS
@@ -52,13 +51,6 @@ base_url_test = pytest.mark.parametrize(
 
 
 @pytest.fixture
-def address_to_verify(address, project):
-    contract_type = project.get_contract("foo").contract_type
-    ape.chain.contracts._local_contract_types[address] = contract_type
-    return address
-
-
-@pytest.fixture
 def verification_tester_cls():
     class VerificationTester:
         counter = 0
@@ -93,14 +85,6 @@ def setup_verification_test(mock_backend, verification_params, verification_test
         return verification_tester
 
     return setup
-
-
-@pytest.fixture
-def expected_verification_log(address_to_verify):
-    return (
-        "Contract verification successful!\n"
-        f"https://etherscan.io/address/{address_to_verify}#code"
-    )
 
 
 @base_url_test

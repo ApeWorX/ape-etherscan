@@ -92,7 +92,7 @@ def make_source(base_dir: Path, name: str, content: str):
     source_file.write_text(content)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session", autouse=True)
 def project():
     base_dir = ape.config.PROJECT_FOLDER
     contracts_dir = base_dir / "contracts"
@@ -111,7 +111,7 @@ def project():
         yield project
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def address():
     return CONTRACT_ADDRESS
 
@@ -337,3 +337,18 @@ def verification_params(address):
         "runs": 200,
         "sourceCode": StringIO(json.dumps(STANDARD_INPUT_JSON)),
     }
+
+
+@pytest.fixture(scope="session")
+def address_to_verify(address, project):
+    contract_type = project.get_contract("foo").contract_type
+    ape.chain.contracts._local_contract_types[address] = contract_type
+    return address
+
+
+@pytest.fixture(scope="session")
+def expected_verification_log(address_to_verify):
+    return (
+        "Contract verification successful!\n"
+        f"https://etherscan.io/address/{address_to_verify}#code"
+    )
