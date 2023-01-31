@@ -8,6 +8,7 @@ The following blockchain explorers are supported in this plugin:
 * [Optimistic Etherscan](https://optimistic.etherscan.io) for Optimism networks.
 * [Polygonscan](https://polygonscan.com) for Polygon networks.
 * [Snowtrace](https://snowtrace.io) for Avalanche networks.
+* [Bscscan](https://bscscan.com) for Binance-Smart-Chain networks.
 
 ## Dependencies
 
