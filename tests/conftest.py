@@ -76,12 +76,8 @@ solidity:
 STANDARD_INPUT_JSON = {
     "language": "Solidity",
     "sources": {
-        "foo.sol": {
-            "content": '\n// SPDX-License-Identifier: AGPL-3.0\npragma solidity ^0.8.2;\n\nimport "@bar/bar.sol";\n\nlibrary MyLib {\n    function insert(uint value) public returns (bool) {\n        return true;\n    }\n}\n\ncontract foo {\n    function register(uint value) public {\n        require(MyLib.insert(value));\n    }\n}\n'  # noqa: E501
-        },
-        ".cache/bar/local/bar.sol": {
-            "content": "\n// SPDX-License-Identifier: AGPL-3.0\npragma solidity ^0.8.2;\n\ncontract bar {\n}\n"  # noqa: E501
-        },
+        "foo.sol": {"content": FOO_SOURCE_CODE},
+        ".cache/bar/local/bar.sol": {"content": BAR_SOURCE_CODE},
     },
     "settings": {
         "optimizer": {"enabled": True, "runs": 200},
@@ -99,8 +95,6 @@ STANDARD_INPUT_JSON = {
 @pytest.fixture(autouse=True)
 def connection(explorer):
     with ape.networks.ethereum.mainnet.use_provider("infura") as provider:
-        provider.network.name = "mainnet"
-        provider.network.explorer = explorer
         yield provider
 
 
@@ -137,6 +131,12 @@ def address():
 @pytest.fixture(scope="session")
 def account():
     return ape.accounts.test_accounts[0]
+
+
+@pytest.fixture(scope="session")
+def fake_connection():
+    with ape.networks.ethereum.local.use_provider("test"):
+        yield
 
 
 @pytest.fixture
@@ -379,7 +379,7 @@ def verification_params(address_to_verify):
 
 
 @pytest.fixture(scope="session")
-def address_to_verify(connection, project, account):
+def address_to_verify(fake_connection, project, account):
     # Deploy the library first.
     library = account.deploy(project.MyLib)
     ape.chain.contracts._local_contract_types[library.address] = library.contract_type
