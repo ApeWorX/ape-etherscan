@@ -296,12 +296,27 @@ class SourceVerifier(ManagerAccessMixin):
 
         build_map(source_id)
 
-        # TODO: Handle linked-libraries
-        return {
+        data = {
             "language": compiler.name.capitalize(),
             "sources": sources,
             "settings": settings,
         }
+        if hasattr(compiler, "libraries") and compiler.libraries:
+            libraries = compiler.libraries
+            index = 1
+            max_libraries = 10
+            for _, library in libraries.items():
+                for name, address in library.items():
+                    if index > max_libraries:
+                        raise ContractVerificationError(
+                            f"Can only include up to {max_libraries} libraries."
+                        )
+
+                    data[f"libraryname{index}"] = name
+                    data[f"libraryaddress{index}"] = address
+                    index += 1
+
+        return data
 
     def _wait_for_verification(self, guid: str):
         explorer = self.provider.network.explorer
