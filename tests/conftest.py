@@ -11,6 +11,7 @@ import pytest
 from ape.api import ExplorerAPI
 from ape.exceptions import NetworkError
 from ape.logging import logger
+from ape.types import AddressType
 from ape.utils import cached_property
 from requests import Response
 
@@ -44,7 +45,16 @@ pragma solidity ^0.8.2;
 
 import "@bar/bar.sol";
 
+library MyLib {
+    function insert(uint value) public returns (bool) {
+        return true;
+    }
+}
+
 contract foo {
+    function register(uint value) public {
+        require(MyLib.insert(value));
+    }
 }
 """
 BAR_SOURCE_CODE = r"""
@@ -66,23 +76,31 @@ solidity:
 STANDARD_INPUT_JSON = {
     "language": "Solidity",
     "sources": {
-        "foo.sol": {"content": FOO_SOURCE_CODE},
-        ".cache/bar/local/bar.sol": {"content": BAR_SOURCE_CODE},
+        "foo.sol": {
+            "content": '\n// SPDX-License-Identifier: AGPL-3.0\npragma solidity ^0.8.2;\n\nimport "@bar/bar.sol";\n\nlibrary MyLib {\n    function insert(uint value) public returns (bool) {\n        return true;\n    }\n}\n\ncontract foo {\n    function register(uint value) public {\n        require(MyLib.insert(value));\n    }\n}\n'  # noqa: E501
+        },
+        ".cache/bar/local/bar.sol": {
+            "content": "\n// SPDX-License-Identifier: AGPL-3.0\npragma solidity ^0.8.2;\n\ncontract bar {\n}\n"  # noqa: E501
+        },
     },
     "settings": {
         "optimizer": {"enabled": True, "runs": 200},
         "outputSelection": {
-            "foo.sol": {"foo": ["abi", "bin", "bin-runtime", "devdoc", "userdoc"]},
-            "bar.sol": {"bar": ["abi", "bin", "bin-runtime", "devdoc", "userdoc"]},
+            "foo.sol": {"foo": ["abi", "bin", "bin-runtime", "devdoc", "userdoc", "srcmap"]},
+            "bar.sol": {"bar": ["abi", "bin", "bin-runtime", "devdoc", "userdoc", "srcmap"]},
         },
         "remappings": ["@bar=.cache/bar/local"],
     },
+    "libraryname1": "MyLib",
+    "libraryaddress1": "0x274b028b03A250cA03644E6c578D81f019eE1323",
 }
 
 
 @pytest.fixture(autouse=True)
-def connection():
+def connection(explorer):
     with ape.networks.ethereum.mainnet.use_provider("infura") as provider:
+        provider.network.name = "mainnet"
+        provider.network.explorer = explorer
         yield provider
 
 
@@ -114,6 +132,11 @@ def project():
 @pytest.fixture(scope="session")
 def address():
     return CONTRACT_ADDRESS
+
+
+@pytest.fixture(scope="session")
+def account():
+    return ape.accounts.test_accounts[0]
 
 
 @pytest.fixture
@@ -252,7 +275,12 @@ class MockEtherscanBackend:
                     assert actual_json == expected_json
 
                 else:
-                    assert actual_params[key] == val, key
+
+                    msg = f"expected={key}"
+                    if params:
+                        msg = f"{msg} module={params['module']} action={params['action']}"
+
+                    assert actual_params[key] == val, msg
 
             if return_value:
                 return return_value
@@ -297,12 +325,19 @@ class MockEtherscanBackend:
         response.expected_address = expected_address
         return response
 
-    def setup_mock_account_transactions_response(self):
+    def setup_mock_account_transactions_response(self, address: Optional[AddressType] = None):
         file_name = "get_account_transactions.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
+
+        if address:
+            params = EXPECTED_ACCOUNT_TXNS_PARAMS.copy()
+            params["address"] = address
+        else:
+            params = EXPECTED_ACCOUNT_TXNS_PARAMS
+
         with open(test_data_path) as response_data_file:
             response = self.get_mock_response(response_data_file, file_name=file_name)
-            self.add_handler("GET", "account", EXPECTED_ACCOUNT_TXNS_PARAMS, return_value=response)
+            self.add_handler("GET", "account", params, return_value=response)
             self.set_network("ethereum", "mainnet")
             return response
 
@@ -325,14 +360,14 @@ class MockEtherscanBackend:
 
 
 @pytest.fixture
-def verification_params(address):
-    ctor_args = "0000000000000005000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000002a73333362346563316232316330313364393230366536333836653231383935356635616630656533636200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002833623465633162323163303133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
+def verification_params(address_to_verify):
+    ctor_args = "3133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
 
     return {
         "action": "verifysourcecode",
         "codeformat": "solidity-standard-json-input",
         "constructorArguements": ctor_args,
-        "contractaddress": address,
+        "contractaddress": address_to_verify,
         "contractname": "foo.sol:foo",
         "evmversion": None,
         "licenseType": 1,
@@ -344,10 +379,19 @@ def verification_params(address):
 
 
 @pytest.fixture(scope="session")
-def address_to_verify(address, project):
-    contract_type = project.get_contract("foo").contract_type
-    ape.chain.contracts._local_contract_types[address] = contract_type
-    return address
+def address_to_verify(connection, project, account):
+    # Deploy the library first.
+    library = account.deploy(project.MyLib)
+    ape.chain.contracts._local_contract_types[library.address] = library.contract_type
+
+    # Add the library to recompile contract `foo`.
+    solidity = project.compiler_manager.solidity
+    solidity.add_library(library)
+
+    # Use foo address for verification.
+    foo = project.foo.deploy(sender=account)
+    ape.chain.contracts._local_contract_types[address] = foo.contract_type
+    return foo.address
 
 
 @pytest.fixture(scope="session")
