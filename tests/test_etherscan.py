@@ -164,6 +164,7 @@ def test_publish_contract(
     setup_verification_test,
     expected_verification_log,
     caplog,
+    fake_connection,
 ):
     setup_verification_test(lambda: "Pass - You made it!")
     explorer.publish_contract(address_to_verify)
