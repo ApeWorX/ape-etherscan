@@ -55,21 +55,6 @@ class Etherscan(ExplorerAPI):
 
         return contract_type
 
-    def get_account_transactions(self, address: AddressType) -> Iterator[ReceiptAPI]:
-        client = self._client_factory.get_account_client(address)
-        for receipt_data in client.get_all_normal_transactions():
-            if "confirmations" in receipt_data:
-                receipt_data["required_confirmations"] = receipt_data.pop("confirmations")
-            if "txreceipt_status" in receipt_data:
-                # NOTE: Etherscan uses `""` for `0` in the receipt status.
-                status = receipt_data.pop("txreceipt_status") or 0
-                receipt_data["status"] = status
-
-            if receipt_data.get("nonce") == "":
-                receipt_data["nonce"] = None
-
-            yield self.network.ecosystem.decode_receipt(receipt_data)
-
     def publish_contract(self, address: AddressType):
         verifier = SourceVerifier(address, self._client_factory)
         return verifier.attempt_verification()
