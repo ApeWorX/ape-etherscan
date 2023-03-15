@@ -26,6 +26,7 @@ NETWORKS = {
     ],
     "avalanche": [
         "mainnet",
+        "fuji",
     ],
     "bsc": [
         "mainnet",
