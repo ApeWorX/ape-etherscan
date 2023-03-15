@@ -46,6 +46,7 @@ base_url_test = pytest.mark.parametrize(
         ("polygon", "mumbai", "mumbai.polygonscan.com"),
         ("polygon", "mumbai-fork", "mumbai.polygonscan.com"),
         ("avalanche", "mainnet", "snowtrace.io"),
+        ("avalanche", "fuji", "testnet.snowtrace.io"),
         ("bsc", "mainnet", "bscscan.com"),
         ("bsc", "mainnet-fork", "bscscan.com"),
         ("bsc", "testnet", "testnet.bscscan.com"),

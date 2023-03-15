@@ -96,7 +96,11 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
             else "https://api-testnet.polygonscan.com/api"
         )
     elif ecosystem_name == "avalanche":
-        return "https://api.snowtrace.io/api"
+        return (
+            "https://api.snowtrace.io/api"
+            if network_name == "mainnet"
+            else "https://api-testnet.snowtrace.io/api"
+        )
     elif ecosystem_name == "bsc":
         return (
             f"https://api-{network_name}.bscscan.com/api"
