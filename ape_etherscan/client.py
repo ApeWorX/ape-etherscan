@@ -48,9 +48,7 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
         )
     elif ecosystem_name == "avalanche":
         return (
-            "https://snowtrace.io"
-            if network_name == "mainnet"
-            else "https://testnet.snowtrace.io"
+            "https://snowtrace.io" if network_name == "mainnet" else "https://testnet.snowtrace.io"
         )
     elif ecosystem_name == "bsc":
         return (
