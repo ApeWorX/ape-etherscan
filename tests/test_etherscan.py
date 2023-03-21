@@ -76,9 +76,11 @@ def verification_tester_cls():
 
 
 @pytest.fixture
-def setup_verification_test(mock_backend, verification_params, verification_tester_cls):
+def setup_verification_test(
+    mock_backend, verification_params, verification_tester_cls, address_to_verify
+):
     def setup(found_handler: Callable, threshold: int = 2):
-        mock_backend.setup_mock_account_transactions_response()
+        mock_backend.setup_mock_account_transactions_response(address=address_to_verify)
         mock_backend.add_handler("POST", "contract", verification_params, return_value=PUBLISH_GUID)
         verification_tester = verification_tester_cls(found_handler, threshold=threshold)
         mock_backend.add_handler(
@@ -162,6 +164,7 @@ def test_publish_contract(
     setup_verification_test,
     expected_verification_log,
     caplog,
+    fake_connection,
 ):
     setup_verification_test(lambda: "Pass - You made it!")
     explorer.publish_contract(address_to_verify)
