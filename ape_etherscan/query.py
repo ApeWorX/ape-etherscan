@@ -60,7 +60,7 @@ class EtherscanQueryEngine(QueryAPI):
                 self.chain_manager.history.append(receipt)
 
             elif (
-                receipt.transaction.nonce
+                receipt.transaction.nonce is not None  # Just for mypy
                 # TODO: Take advantage of nonces somehow to remove this if statement
                 and query.start_nonce <= receipt.transaction.nonce <= query.stop_nonce
             ):
