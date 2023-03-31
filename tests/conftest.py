@@ -109,10 +109,11 @@ def project():
     base_dir = ape.config.PROJECT_FOLDER
     contracts_dir = base_dir / "contracts"
     dependency_contracts_dir = base_dir / "bar" / "contracts"
-    contracts_dir.mkdir(exist_ok=True, parents=True)
+    sub_contracts_dir = contracts_dir / "subcontracts"
+    sub_contracts_dir.mkdir(exist_ok=True, parents=True)
     dependency_contracts_dir.mkdir(exist_ok=True, parents=True)
 
-    make_source(contracts_dir, "foo", FOO_SOURCE_CODE)
+    make_source(sub_contracts_dir, "foo", FOO_SOURCE_CODE)
     make_source(dependency_contracts_dir, "bar", BAR_SOURCE_CODE)
 
     config_file = base_dir / "ape-config.yaml"
@@ -275,7 +276,6 @@ class MockEtherscanBackend:
                     assert actual_json == expected_json
 
                 else:
-
                     msg = f"expected={key}"
                     if params:
                         msg = f"{msg} module={params['module']} action={params['action']}"
