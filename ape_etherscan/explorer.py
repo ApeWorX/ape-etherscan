@@ -1,8 +1,8 @@
 import json
 from json.decoder import JSONDecodeError
-from typing import Iterator, Optional
+from typing import Optional
 
-from ape.api import ExplorerAPI, ReceiptAPI
+from ape.api import ExplorerAPI
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
@@ -54,21 +54,6 @@ class Etherscan(ExplorerAPI):
                 pass
 
         return contract_type
-
-    def get_account_transactions(self, address: AddressType) -> Iterator[ReceiptAPI]:
-        client = self._client_factory.get_account_client(address)
-        for receipt_data in client.get_all_normal_transactions():
-            if "confirmations" in receipt_data:
-                receipt_data["required_confirmations"] = receipt_data.pop("confirmations")
-            if "txreceipt_status" in receipt_data:
-                # NOTE: Etherscan uses `""` for `0` in the receipt status.
-                status = receipt_data.pop("txreceipt_status") or 0
-                receipt_data["status"] = status
-
-            if receipt_data.get("nonce") == "":
-                receipt_data["nonce"] = None
-
-            yield self.network.ecosystem.decode_receipt(receipt_data)
 
     def publish_contract(self, address: AddressType):
         verifier = SourceVerifier(address, self._client_factory)

@@ -1,6 +1,7 @@
 from typing import Callable
 
 import pytest
+from ape.api.query import AccountTransactionQuery
 
 from ape_etherscan import NETWORKS
 from ape_etherscan.exceptions import EtherscanResponseError, EtherscanTooManyRequestsError
@@ -146,9 +147,12 @@ def test_get_contract_type_additional_types(mock_backend, file_name, explorer):
     assert actual == expected
 
 
-def test_get_account_transactions(mock_backend, explorer, address):
-    mock_backend.setup_mock_account_transactions_response()
-    actual = [r for r in explorer.get_account_transactions(address)][0].txn_hash
+def test_get_account_transactions(mock_backend, account):
+    mock_backend.setup_mock_account_transactions_response(account.address)
+    query = AccountTransactionQuery(
+        start_nonce=0, stop_nonce=0, columns=["txn_hash"], account=account.address
+    )
+    actual = next(account.query_manager.engines["etherscan"].perform_query(query)).txn_hash
     expected = "0x5780b43d819035ed1fa079171bdce7f0bbeaa6b01f201f8985d279a66cfc6844"
     assert actual == expected
 

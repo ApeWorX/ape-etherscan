@@ -32,7 +32,7 @@ CONTRACT_ADDRESS_MAP = {
 EXPECTED_ACCOUNT_TXNS_PARAMS = {
     "module": "account",
     "action": "txlist",
-    "address": CONTRACT_ADDRESS,
+    "address": "0x1e59ce931B4CFea3fe4B875411e280e173cB7A9C",
     "endblock": None,
     "startblock": None,
     "offset": 100,
