@@ -265,10 +265,12 @@ class SourceVerifier(ManagerAccessMixin):
             standard_json = json.dumps(standard_input_json, indent=2)
             logger.debug(f"{standard_json}\n")
 
+        # if there is a folder structure for source_id like xx/yy/zzz.sol
+        request_source_id = source_id.split("/")[-1]
         guid = self._contract_client.verify_source_code(
             standard_input_json,
             str(version),
-            contract_name=f"{source_id}:{self._contract_type.name}",
+            contract_name=f"{request_source_id}:{self._contract_type.name}",
             optimization_used=optimized,
             optimization_runs=runs,
             constructor_arguments=self.constructor_arguments,

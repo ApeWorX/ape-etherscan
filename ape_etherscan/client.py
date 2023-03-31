@@ -38,7 +38,7 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
         return (
             "https://optimistic.etherscan.io"
             if network_name == "mainnet"
-            else "https://goerli-optimistic.etherscan.io"
+            else "https://goerli-optimism.etherscan.io"
         )
     elif ecosystem_name == "polygon":
         return (
