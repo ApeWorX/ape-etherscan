@@ -1,8 +1,8 @@
 import json
 from json.decoder import JSONDecodeError
-from typing import Iterator, Optional
+from typing import Optional
 
-from ape.api import ExplorerAPI, ReceiptAPI
+from ape.api import ExplorerAPI
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
