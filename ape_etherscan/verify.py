@@ -265,8 +265,9 @@ class SourceVerifier(ManagerAccessMixin):
             standard_json = json.dumps(standard_input_json, indent=2)
             logger.debug(f"{standard_json}\n")
 
-        # if there is a folder structure for source_id like xx/yy/zzz.sol
-        request_source_id = source_id.split("/")[-1]
+        # NOTE: Etherscan does not allow directory prefixes on the source ID.
+        request_source_id = Path(source_id).name
+
         guid = self._contract_client.verify_source_code(
             standard_input_json,
             str(version),
