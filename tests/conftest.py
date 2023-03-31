@@ -276,7 +276,6 @@ class MockEtherscanBackend:
                     assert actual_json == expected_json
 
                 else:
-
                     msg = f"expected={key}"
                     if params:
                         msg = f"{msg} module={params['module']} action={params['action']}"
