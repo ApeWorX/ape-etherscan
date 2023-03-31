@@ -1,5 +1,6 @@
 from ape import plugins
 
+from .config import EtherscanConfig
 from .explorer import Etherscan
 from .query import EtherscanQueryEngine
 
@@ -33,6 +34,11 @@ NETWORKS = {
         "testnet",
     ],
 }
+
+
+@plugins.register(plugins.Config)
+def config_class():
+    return EtherscanConfig
 
 
 @plugins.register(plugins.ExplorerPlugin)

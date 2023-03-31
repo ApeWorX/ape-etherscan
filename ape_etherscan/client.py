@@ -1,11 +1,12 @@
 import json
 import os
 import random
+import time
 from io import StringIO
 from typing import Dict, Iterator, List, Optional
 
 from ape.logging import logger
-from ape.utils import USER_AGENT
+from ape.utils import USER_AGENT, ManagerAccessMixin
 from requests import Session
 
 from ape_etherscan.exceptions import UnhandledResultError, UnsupportedEcosystemError
@@ -109,7 +110,7 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
-class _APIClient:
+class _APIClient(ManagerAccessMixin):
     DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
     session = Session()
 
@@ -117,6 +118,7 @@ class _APIClient:
         self._ecosystem_name = ecosystem_name
         self._network_name = network_name
         self._module_name = module_name
+        self._last_call = 0.0
 
     @property
     def base_uri(self) -> str:
@@ -126,6 +128,15 @@ class _APIClient:
     def base_params(self) -> Dict:
         return {"module": self._module_name}
 
+    @property
+    def _rate_limit(self) -> int:
+        config = self.config_manager.get_config("etherscan")
+        return getattr(config, self.network_manager.ecosystem.name).rate_limit
+
+    @property
+    def _min_time_between_calls(self) -> float:
+        return 1 / self._rate_limit  # seconds / calls per second
+
     def _get(
         self,
         params: Optional[Dict] = None,
@@ -133,6 +144,16 @@ class _APIClient:
         raise_on_exceptions: bool = True,
     ) -> EtherscanResponse:
         params = self.__authorize(params)
+
+        # Rate limit
+        if time.time() - self._last_call < self._min_time_between_calls:
+            time_to_sleep = self._min_time_between_calls - (time.time() - self._last_call)
+            logger.debug(f"Sleeping {time_to_sleep} seconds to avoid rate limit")
+            # NOTE: Sleep time is in seconds (float for subseconds)
+            time.sleep(time_to_sleep)
+
+        self._last_call = time.time()
+
         return self._request(
             "GET",
             params=params,
