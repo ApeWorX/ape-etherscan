@@ -7,6 +7,7 @@ NETWORKS = {
     "ethereum": [
         "mainnet",
         "goerli",
+        "sepolia",
     ],
     "arbitrum": [
         "mainnet",

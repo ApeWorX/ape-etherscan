@@ -223,6 +223,7 @@ class MockEtherscanBackend:
             "ethereum": {
                 "mainnet": url("etherscan"),
                 "goerli": testnet_url("goerli", "etherscan"),
+                "sepolia": testnet_url("sepolia", "etherscan"),
             },
             "arbitrum": {
                 "mainnet": url("arbiscan"),
