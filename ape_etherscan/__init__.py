@@ -2,38 +2,7 @@ from ape import plugins
 
 from .explorer import Etherscan
 from .query import EtherscanQueryEngine
-
-NETWORKS = {
-    "ethereum": [
-        "mainnet",
-        "goerli",
-        "sepolia",
-    ],
-    "arbitrum": [
-        "mainnet",
-        "goerli",
-    ],
-    "fantom": [
-        "opera",
-        "testnet",
-    ],
-    "optimism": [
-        "mainnet",
-        "goerli",
-    ],
-    "polygon": [
-        "mainnet",
-        "mumbai",
-    ],
-    "avalanche": [
-        "mainnet",
-        "fuji",
-    ],
-    "bsc": [
-        "mainnet",
-        "testnet",
-    ],
-}
+from .utils import NETWORKS
 
 
 @plugins.register(plugins.ExplorerPlugin)

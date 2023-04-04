@@ -1,12 +1,12 @@
 from typing import Iterator, Optional
 
 from ape.api import QueryAPI, QueryType, ReceiptAPI
-from ape.api.networks import LOCAL_NETWORK_NAME
 from ape.api.query import AccountTransactionQuery
 from ape.exceptions import QueryEngineError
 from ape.utils import singledispatchmethod
 
 from ape_etherscan.client import ClientFactory
+from ape_etherscan.utils import NETWORKS
 
 
 class EtherscanQueryEngine(QueryAPI):
@@ -23,11 +23,12 @@ class EtherscanQueryEngine(QueryAPI):
 
     @estimate_query.register
     def estimate_account_transaction_query(self, query: AccountTransactionQuery) -> Optional[int]:
-        if (
-            self.network_manager.active_provider
-            and self.network_manager.provider.network.name == LOCAL_NETWORK_NAME
-        ):
-            return None
+        if self.network_manager.active_provider:
+            # Ignore unsupported networks.
+            ecosystem = self.network_manager.provider.network.ecosystem.name
+            network = self.network_manager.provider.network.name
+            if network not in NETWORKS.get(ecosystem, {}):
+                return None
 
         # About 15 ms per page of 100 transactions
         return 1500 * (1 + query.stop_nonce - query.start_nonce) // 100
