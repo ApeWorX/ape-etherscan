@@ -7,3 +7,34 @@ API_KEY_ENV_KEY_MAP = {
     "avalanche": "SNOWTRACE_API_KEY",
     "bsc": "BSCSCAN_API_KEY",
 }
+NETWORKS = {
+    "ethereum": [
+        "mainnet",
+        "goerli",
+        "sepolia",
+    ],
+    "arbitrum": [
+        "mainnet",
+        "goerli",
+    ],
+    "fantom": [
+        "opera",
+        "testnet",
+    ],
+    "optimism": [
+        "mainnet",
+        "goerli",
+    ],
+    "polygon": [
+        "mainnet",
+        "mumbai",
+    ],
+    "avalanche": [
+        "mainnet",
+        "fuji",
+    ],
+    "bsc": [
+        "mainnet",
+        "testnet",
+    ],
+}
