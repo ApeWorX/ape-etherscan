@@ -21,6 +21,11 @@ class EtherscanQueryEngine(QueryAPI):
     def estimate_query(self, query: QueryType) -> Optional[int]:  # type: ignore[override]
         return None
 
+    @property
+    def rate_limit(self) -> int:
+        config = self.config_manager.get_config("etherscan")
+        return getattr(config, self.network_manager.ecosystem.name).rate_limit
+
     @estimate_query.register
     def estimate_account_transaction_query(self, query: AccountTransactionQuery) -> Optional[int]:
         if self.network_manager.active_provider:
@@ -30,8 +35,11 @@ class EtherscanQueryEngine(QueryAPI):
             if network not in NETWORKS.get(ecosystem, {}):
                 return None
 
-        # About 15 ms per page of 100 transactions
-        return 1500 * (1 + query.stop_nonce - query.start_nonce) // 100
+        # About 15 ms per page of 100 transactions, with rate limit applied
+        if query.stop_nonce - query.stop_nonce <= 100:
+            return 15
+
+        return (10000 // self.rate_limit) * (1 + query.stop_nonce - query.start_nonce) // 100
 
     @singledispatchmethod
     def perform_query(self, query: QueryType) -> Iterator:  # type: ignore[override]
