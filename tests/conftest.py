@@ -1,6 +1,7 @@
 import json
 import os
 from io import StringIO
+from json import JSONDecodeError
 from pathlib import Path
 from tempfile import mkdtemp
 from typing import IO, Any, Callable, Dict, Optional, Union
@@ -272,8 +273,19 @@ class MockEtherscanBackend:
                 # Handler StringIO objects
                 if isinstance(val, StringIO):
                     assert isinstance(actual_params[key], StringIO)
-                    actual_json = json.loads(actual_params[key].read())
-                    expected_json = json.loads(val.read())
+                    text = actual_params[key].read()
+                    if text:
+                        try:
+                            actual_json = json.loads(text)
+                        except JSONDecodeError:
+                            pytest.fail(f"Response text is not JSON: '{text}'.")
+                            return
+                    else:
+                        # Empty.
+                        actual_json = {}
+
+                    val = val.read()
+                    expected_json = json.loads(val) if val else {}
                     assert actual_json == expected_json
 
                 else:
