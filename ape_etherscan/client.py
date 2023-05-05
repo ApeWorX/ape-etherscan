@@ -191,6 +191,8 @@ class _APIClient(ManagerAccessMixin):
                 response.raise_for_status()
             elif not 200 <= response.status_code < 300:
                 logger.error(response.text)
+            else:
+                break
 
         return EtherscanResponse(response, self._ecosystem_name, raise_on_exceptions)
 
