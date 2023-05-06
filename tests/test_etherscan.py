@@ -148,6 +148,22 @@ def test_get_contract_type_additional_types(mock_backend, file_name, explorer):
     assert actual == expected
 
 
+def test_get_contract_type_with_rate_limiting(mock_backend, explorer):
+    """
+    This test ensures the rate limiting logic in the Etherscan client works.
+    """
+
+    file_name = "get_vyper_contract_response"
+    setter_upper = mock_backend.setup_mock_get_contract_type_response_with_throttling
+    throttler, response = setter_upper(file_name)
+
+    # We still eventually get the response.
+    actual = explorer.get_contract_type(response.expected_address).name
+    expected = EXPECTED_CONTRACT_NAME_MAP[response.file_name]
+    assert actual == expected
+    assert throttler.counter == 2  # Prove that it actually throttled.
+
+
 def test_get_account_transactions(mock_backend, account):
     mock_backend.setup_mock_account_transactions_response(account.address)
     query = AccountTransactionQuery(

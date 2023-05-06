@@ -1,9 +1,11 @@
 import json
 import os
 from io import StringIO
+from json import JSONDecodeError
 from pathlib import Path
 from tempfile import mkdtemp
 from typing import IO, Any, Callable, Dict, Optional, Union
+from unittest.mock import MagicMock
 
 import _io  # type: ignore
 import ape
@@ -272,8 +274,19 @@ class MockEtherscanBackend:
                 # Handler StringIO objects
                 if isinstance(val, StringIO):
                     assert isinstance(actual_params[key], StringIO)
-                    actual_json = json.loads(actual_params[key].read())
-                    expected_json = json.loads(val.read())
+                    text = actual_params[key].read()
+                    if text:
+                        try:
+                            actual_json = json.loads(text)
+                        except JSONDecodeError:
+                            pytest.fail(f"Response text is not JSON: '{text}'.")
+                            return
+                    else:
+                        # Empty.
+                        actual_json = {}
+
+                    val = val.read()
+                    expected_json = json.loads(val) if val else {}
                     assert actual_json == expected_json
 
                 else:
@@ -287,7 +300,8 @@ class MockEtherscanBackend:
                 return return_value
 
             elif side_effect:
-                return self.get_mock_response(side_effect())
+                result = side_effect()
+                return result if isinstance(result, Response) else self.get_mock_response(result)
 
         self._handlers[method.lower()][module] = handler
         self._session.request.side_effect = self.handle_request
@@ -311,20 +325,44 @@ class MockEtherscanBackend:
         return handler(self, method, base_uri, headers=headers, params=params, data=data)
 
     def setup_mock_get_contract_type_response(self, file_name: str):
-        expected_address = CONTRACT_ADDRESS_MAP[file_name]
-        expected_params = {
-            "module": "contract",
-            "action": "getsourcecode",
-            "address": expected_address,
-        }
+        response = self._get_contract_type_response(file_name)
+        address = CONTRACT_ADDRESS_MAP[file_name]
+        expected_params = self._expected_get_ct_params(address)
+        self.add_handler("GET", "contract", expected_params, return_value=response)
+        response.expected_address = address
+        return response
 
+    def setup_mock_get_contract_type_response_with_throttling(
+        self, file_name: str, retries: int = 2
+    ):
+        response = self._get_contract_type_response(file_name)
+        address = CONTRACT_ADDRESS_MAP[file_name]
+        expected_params = self._expected_get_ct_params(address)
+        throttled = self._mocker.MagicMock(spec=Response)
+        throttled.status_code = 429
+
+        class ThrottleMock:
+            counter = 0
+
+            def side_effect(self):
+                if self.counter < retries:
+                    self.counter += 1
+                    return throttled
+
+                return response
+
+        throttler = ThrottleMock()
+        self.add_handler("GET", "contract", expected_params, side_effect=throttler.side_effect)
+        response.expected_address = address
+        return throttler, response
+
+    def _get_contract_type_response(self, file_name: str) -> Any:
         test_data_path = MOCK_RESPONSES_PATH / f"{file_name}.json"
         with open(test_data_path) as response_data_file:
-            response = self.get_mock_response(response_data_file, file_name=file_name)
+            return self.get_mock_response(response_data_file, file_name=file_name)
 
-        self.add_handler("GET", "contract", expected_params, return_value=response)
-        response.expected_address = expected_address
-        return response
+    def _expected_get_ct_params(self, address: str) -> Dict:
+        return {"module": "contract", "action": "getsourcecode", "address": address}
 
     def setup_mock_account_transactions_response(self, address: Optional[AddressType] = None):
         file_name = "get_account_transactions.json"
@@ -342,16 +380,23 @@ class MockEtherscanBackend:
             self.set_network("ethereum", "mainnet")
             return response
 
-    def get_mock_response(self, response_data: Union[IO, Dict, str], **kwargs):
+    def get_mock_response(
+        self, response_data: Optional[Union[IO, Dict, str, MagicMock]] = None, **kwargs
+    ):
         if isinstance(response_data, str):
             return self.get_mock_response({"result": response_data})
 
         elif isinstance(response_data, _io.TextIOWrapper):
             return self.get_mock_response(json.load(response_data), **kwargs)
 
+        elif isinstance(response_data, MagicMock):
+            # Mock wasn't set.
+            response_data = {}
+
         response = self._mocker.MagicMock(spec=Response)
         response.json.return_value = response_data
-        response.text = json.dumps(response_data)
+        response.text = json.dumps(response_data or {})
+
         response.status_code = 200
 
         for key, val in kwargs.items():
