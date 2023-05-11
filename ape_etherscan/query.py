@@ -24,7 +24,7 @@ class EtherscanQueryEngine(QueryAPI):
     @property
     def rate_limit(self) -> int:
         config = self.config_manager.get_config("etherscan")
-        return getattr(config, self.network_manager.ecosystem.name).rate_limit
+        return getattr(config, self.network_manager.ecosystem.name.lower()).rate_limit
 
     @estimate_query.register
     def estimate_account_transaction_query(self, query: AccountTransactionQuery) -> Optional[int]:
