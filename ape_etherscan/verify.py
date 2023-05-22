@@ -275,16 +275,25 @@ class SourceVerifier(ManagerAccessMixin):
         # NOTE: Etherscan does not allow directory prefixes on the source ID.
         request_source_id = Path(source_id).name
 
-        guid = self._contract_client.verify_source_code(
-            standard_input_json,
-            str(version),
-            contract_name=f"{request_source_id}:{self._contract_type.name}",
-            optimization_used=optimized,
-            optimization_runs=runs,
-            constructor_arguments=self.constructor_arguments,
-            evm_version=evm_version,
-            license_type=license_code_value,
-        )
+        try:
+            guid = self._contract_client.verify_source_code(
+                standard_input_json,
+                str(version),
+                contract_name=f"{request_source_id}:{self._contract_type.name}",
+                optimization_used=optimized,
+                optimization_runs=runs,
+                constructor_arguments=self.constructor_arguments,
+                evm_version=evm_version,
+                license_type=license_code_value,
+            )
+        except EtherscanResponseError as err:
+            if "source code already verified" in str(err):
+                logger.warning(str(err))
+                return
+
+            else:
+                raise  # this error
+
         self._wait_for_verification(guid)
 
     def _get_standard_input_json(
@@ -347,6 +356,11 @@ class SourceVerifier(ManagerAccessMixin):
                 if "Resource not found" in str(err) and guid_did_exist:
                     # Sometimes, the GUID resource is gone before receiving a passing verification
                     verification_update = f"{pass_key}Complete"
+
+                elif "source code already verified" in str(err):
+                    # Consider this a pass.
+                    verification_update = "Already Verified"
+
                 else:
                     raise  # Original error
 
