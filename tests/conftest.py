@@ -98,7 +98,8 @@ STANDARD_INPUT_JSON = {
 @pytest.fixture(autouse=True, scope="session")
 def authorized():
     """
-    Prevent annoying issues where API key is missing even though it isn't.
+    Prevent annoying issues where API key is missing even though it isn't
+    needed.
     """
     # needed in the tests.
     for eco, key in API_KEY_ENV_KEY_MAP.items():
