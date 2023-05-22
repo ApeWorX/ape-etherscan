@@ -112,8 +112,16 @@ def authorized():
 
 @pytest.fixture(autouse=True)
 def connection(explorer):
+    # A project ID is needed for the Infura plugin to connect.
+    # However, no requests are actually made, so it is okay to be fake.
+    key = "WEB3_INFURA_PROJECT_ID"
+    proj_id = os.environ.get(key)
+    os.environ[key] = "__TEST_INFURA_PROJECT_ID__"
     with ape.networks.ethereum.mainnet.use_provider("infura") as provider:
         yield provider
+
+    if proj_id:
+        os.environ[key] = proj_id
 
 
 def make_source(base_dir: Path, name: str, content: str):
