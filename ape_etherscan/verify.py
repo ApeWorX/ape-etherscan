@@ -249,6 +249,13 @@ class SourceVerifier(ManagerAccessMixin):
             [self._source_path], base_path=self._base_path
         )
         settings = all_settings[version]
+
+        # NOTE: Etherscan verification is picky about outputSelection fields.
+        # If you put `srcmap` related fields, it complains with missing sources.
+        for src_id, output_data in settings["outputSelection"].items():
+            for contract_id, selection in output_data.items():
+                output_data[contract_id] = [x for x in selection if x not in ("srcmap",)]
+
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", 200)
