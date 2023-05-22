@@ -183,7 +183,12 @@ class _APIClient(ManagerAccessMixin):
         headers = headers or self.DEFAULT_HEADERS
         for i in range(self._retries):
             response = self.session.request(
-                method.upper(), self.base_uri, headers=headers, params=params, data=data
+                method.upper(),
+                self.base_uri,
+                headers=headers,
+                params=params,
+                data=data,
+                timeout=1064,
             )
             if response.status_code == 429:
                 time.sleep(2**i)
