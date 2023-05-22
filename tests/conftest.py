@@ -306,7 +306,7 @@ class MockEtherscanBackend:
         self._handlers[method.lower()][module] = handler
         self._session.request.side_effect = self.handle_request
 
-    def handle_request(self, method, base_uri, headers=None, params=None, data=None):
+    def handle_request(self, method, base_uri, timeout, headers=None, params=None, data=None):
         if params and "apikey" in params:
             del params["apikey"]
         if data and "apiKey" in data:
