@@ -43,7 +43,7 @@ EXPECTED_ACCOUNT_TXNS_PARAMS = {
 }
 FOO_SOURCE_CODE = """
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.20;
 
 import "@bar/bar.sol";
 
@@ -61,7 +61,7 @@ contract foo {
 """
 BAR_SOURCE_CODE = r"""
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.20;
 
 contract bar {
 }
@@ -306,7 +306,7 @@ class MockEtherscanBackend:
         self._handlers[method.lower()][module] = handler
         self._session.request.side_effect = self.handle_request
 
-    def handle_request(self, method, base_uri, headers=None, params=None, data=None):
+    def handle_request(self, method, base_uri, timeout, headers=None, params=None, data=None):
         if params and "apikey" in params:
             del params["apikey"]
         if data and "apiKey" in data:
@@ -407,7 +407,7 @@ class MockEtherscanBackend:
 
 @pytest.fixture
 def verification_params(address_to_verify):
-    ctor_args = "3133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
+    ctor_args = "00002833623465633162323163303133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
 
     return {
         "action": "verifysourcecode",
