@@ -188,7 +188,7 @@ class _APIClient(ManagerAccessMixin):
                 headers=headers,
                 params=params,
                 data=data,
-                timeout=1064,
+                timeout=1024,
             )
             if response.status_code == 429:
                 time.sleep(2**i)
