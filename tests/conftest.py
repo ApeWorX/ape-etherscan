@@ -43,7 +43,7 @@ EXPECTED_ACCOUNT_TXNS_PARAMS = {
 }
 FOO_SOURCE_CODE = """
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.20;
 
 import "@bar/bar.sol";
 
@@ -61,7 +61,7 @@ contract foo {
 """
 BAR_SOURCE_CODE = r"""
 // SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.2;
+pragma solidity ^0.8.20;
 
 contract bar {
 }
