@@ -20,6 +20,7 @@ from requests import Response
 from ape_etherscan import Etherscan
 from ape_etherscan.client import _APIClient
 from ape_etherscan.types import EtherscanResponse
+from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 ape.config.DATA_FOLDER = Path(mkdtemp()).resolve()
 ape.config.PROJECT_FOLDER = Path(mkdtemp()).resolve()
@@ -92,6 +93,20 @@ STANDARD_INPUT_JSON = {
     "libraryname1": "MyLib",
     "libraryaddress1": "0x274b028b03A250cA03644E6c578D81f019eE1323",
 }
+
+
+@pytest.fixture(autouse=True, scope="session")
+def authorized():
+    """
+    Prevent annoying issues where API key is missing even though it isn't.
+    """
+    # needed in the tests.
+    for eco, key in API_KEY_ENV_KEY_MAP.items():
+        if key in os.environ:
+            continue
+
+        # Ensure a fake key is at least set.
+        os.environ[key] = f"__{eco.upper()}_TEST_KEY__"
 
 
 @pytest.fixture(autouse=True)
@@ -306,7 +321,7 @@ class MockEtherscanBackend:
         self._handlers[method.lower()][module] = handler
         self._session.request.side_effect = self.handle_request
 
-    def handle_request(self, method, base_uri, headers=None, params=None, data=None):
+    def handle_request(self, method, base_uri, timeout, headers=None, params=None, data=None):
         if params and "apikey" in params:
             del params["apikey"]
         if data and "apiKey" in data:
