@@ -50,6 +50,8 @@ You can obtain an API key by registering with Etherscan and visiting [this page]
 export ETHERSCAN_API_KEY=SAMPLE_KEY
 export FTMSCAN_API_KEY=SAMPLE_KEY
 export ARBISCAN_API_KEY=SAMPLE_KEY
+export POLYGON_ZKEVM_ETHERSCAN_API_KEY=SAMPLE_KEY
+export BASESCAN_API_KEY=SAMPLE_KEY
 ```
 
 ## Transaction URLs
