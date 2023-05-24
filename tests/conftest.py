@@ -243,6 +243,11 @@ class MockEtherscanBackend:
                 "mainnet": com_url("polygonscan"),
                 "mumbai": com_testnet_url("testnet", "polygonscan"),
             },
+            "base": {"goerli": com_testnet_url("goerli", "basescan")},
+            "polygon-zkevm": {
+                "mainnet": com_testnet_url("zkevm", "polygonscan"),
+                "goerli": com_testnet_url("testnet-zkevm", "polygonscan"),
+            },
             "avalanche": {"mainnet": url("snowtrace"), "fuji": testnet_url("testnet", "snowtrace")},
             "bsc": {
                 "mainnet": com_url("bscscan"),
