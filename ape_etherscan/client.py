@@ -205,16 +205,24 @@ class _APIClient(ManagerAccessMixin):
         headers = headers or self.DEFAULT_HEADERS
         for i in range(self._retries):
             response = self.session.request(
-                method.upper(), self.base_uri, headers=headers, params=params, data=data
+                method.upper(),
+                self.base_uri,
+                headers=headers,
+                params=params,
+                data=data,
+                timeout=1024,
             )
             if response.status_code == 429:
                 time.sleep(2**i)
-            elif raise_on_exceptions:
+                continue
+
+            # Recieved a real response unrelated to rate limiting.
+            if raise_on_exceptions:
                 response.raise_for_status()
             elif not 200 <= response.status_code < 300:
                 logger.error(response.text)
-            else:
-                break
+
+            break
 
         return EtherscanResponse(response, self._ecosystem_name, raise_on_exceptions)
 
@@ -293,7 +301,6 @@ class ContractClient(_APIClient):
             "runs": optimization_runs,
             "sourceCode": StringIO(json.dumps(standard_json_output)),
         }
-
         iterator = 1
         for lib_address, lib_name in libraries.items():
             json_dict[f"libraryname{iterator}"] = lib_name
