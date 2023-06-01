@@ -3,6 +3,8 @@ API_KEY_ENV_KEY_MAP = {
     "ethereum": "ETHERSCAN_API_KEY",
     "fantom": "FTMSCAN_API_KEY",
     "optimism": "OPTIMISTIC_ETHERSCAN_API_KEY",
+    "polygon-zkevm": "POLYGON_ZKEVM_ETHERSCAN_API_KEY",
+    "base": "BASESCAN_API_KEY",
     "polygon": "POLYGONSCAN_API_KEY",
     "avalanche": "SNOWTRACE_API_KEY",
     "bsc": "BSCSCAN_API_KEY",
@@ -22,6 +24,14 @@ NETWORKS = {
         "testnet",
     ],
     "optimism": [
+        "mainnet",
+        "goerli",
+    ],
+    "base": [
+        "mainnet",
+        "goerli",
+    ],
+    "polygon-zkevm": [
         "mainnet",
         "goerli",
     ],

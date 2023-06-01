@@ -41,6 +41,16 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             if network_name == "mainnet"
             else "https://goerli-optimism.etherscan.io"
         )
+    elif ecosystem_name == "polygon-zkevm":
+        return (
+            "https://zkevm.polygonscan.com"
+            if network_name == "mainnet"
+            else "https://testnet-zkevm.polygonscan.com"
+        )
+    elif ecosystem_name == "base":
+        return (
+            "https://basescan.org" if network_name == "mainnet" else "https://goerli.basescan.org"
+        )
     elif ecosystem_name == "polygon":
         return (
             "https://polygonscan.com"
@@ -88,6 +98,18 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
             if network_name == "mainnet"
             else "https://api-goerli-optimistic.etherscan.io/api"
         )
+    elif ecosystem_name == "polygon-zkevm":
+        return (
+            "https://api-zkevm.polygonscan.com/api"
+            if network_name == "mainnet"
+            else "https://api-testnet-zkevm.polygonscan.com/api"
+        )
+    elif ecosystem_name == "base":
+        return (
+            "https://api.basescan.org/api"
+            if network_name == "mainnet"
+            else "https://api-goerli.basescan.org/api"
+        )
     elif ecosystem_name == "polygon":
         return (
             "https://api.polygonscan.com/api"
@@ -131,12 +153,12 @@ class _APIClient(ManagerAccessMixin):
     @property
     def _rate_limit(self) -> int:
         config = self.config_manager.get_config("etherscan")
-        return getattr(config, self.network_manager.ecosystem.name).rate_limit
+        return getattr(config, self.network_manager.ecosystem.name.lower()).rate_limit
 
     @property
     def _retries(self) -> int:
         config = self.config_manager.get_config("etherscan")
-        return getattr(config, self.network_manager.ecosystem.name).retries
+        return getattr(config, self.network_manager.ecosystem.name.lower()).retries
 
     @property
     def _min_time_between_calls(self) -> float:

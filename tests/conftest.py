@@ -219,7 +219,9 @@ class MockEtherscanBackend:
         url = get_url_f()
         testnet_url = get_url_f(testnet=True)
         com_url = get_url_f(tld="com")
+        org_url = get_url_f(tld="org")
         com_testnet_url = get_url_f(testnet=True, tld="com")
+        org_testnet_url = get_url_f(testnet=True, tld="org")
 
         return {
             "ethereum": {
@@ -242,6 +244,14 @@ class MockEtherscanBackend:
             "polygon": {
                 "mainnet": com_url("polygonscan"),
                 "mumbai": com_testnet_url("testnet", "polygonscan"),
+            },
+            "base": {
+                "goerli": org_testnet_url("goerli", "basescan"),
+                "mainnet": org_url("basescan"),
+            },
+            "polygon-zkevm": {
+                "mainnet": com_testnet_url("zkevm", "polygonscan"),
+                "goerli": com_testnet_url("testnet-zkevm", "polygonscan"),
             },
             "avalanche": {"mainnet": url("snowtrace"), "fuji": testnet_url("testnet", "snowtrace")},
             "bsc": {

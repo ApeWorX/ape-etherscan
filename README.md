@@ -7,7 +7,9 @@ The following blockchain explorers are supported in this plugin:
 - [Arbiscan](https://arbiscan.io) for Arbitrum networks.
 - [Optimistic Etherscan](https://optimistic.etherscan.io) for Optimism networks.
 - [Polygonscan](https://polygonscan.com) for Polygon networks.
+- [Polygonscan ZkEVM](https://zkevm.polygonscan.com) for Polygon ZkEVM networks.
 - [Snowtrace](https://snowtrace.io) for Avalanche networks.
+- [Basescan](https://basescan.org) for Base networks.
 - [Bscscan](https://bscscan.com) for Binance-Smart-Chain networks.
 
 ## Dependencies
@@ -50,6 +52,8 @@ You can obtain an API key by registering with Etherscan and visiting [this page]
 export ETHERSCAN_API_KEY=SAMPLE_KEY
 export FTMSCAN_API_KEY=SAMPLE_KEY
 export ARBISCAN_API_KEY=SAMPLE_KEY
+export POLYGON_ZKEVM_ETHERSCAN_API_KEY=SAMPLE_KEY
+export BASESCAN_API_KEY=SAMPLE_KEY
 ```
 
 ## Transaction URLs
