@@ -28,6 +28,7 @@ NETWORKS = {
         "goerli",
     ],
     "base": [
+        "mainnet",
         "goerli",
     ],
     "polygon-zkevm": [

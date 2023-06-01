@@ -5,10 +5,12 @@ from setuptools import find_packages, setup
 extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
         "ape-arbitrum",  # Needed for Arbitrum integration
+        "ape-base",  # Needed for Base networks integration
         "ape-bsc",  # For testing BSC integration
         "ape-fantom",  # For testing Fantom integration
         "ape-optimism",  # Needed for Optimism integration
         "ape-polygon",  # Needed for Polygon integration
+        "ape-polygon",  # Needed for Polygon ZkEVM integration
         "ape-infura",  # Needed for live network tests
         "ape-solidity",  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
@@ -76,7 +78,7 @@ setup(
         "eth-ape>=0.6.7,<0.7",
         "requests",  # Use same version as eth-ape
     ],
-    python_requires=">=3.8,<3.11",
+    python_requires=">=3.8,<4",
     extras_require=extras_require,
     py_modules=["ape_etherscan"],
     license="Apache-2.0",
@@ -95,5 +97,6 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
 )

@@ -49,7 +49,7 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
         )
     elif ecosystem_name == "base":
         return (
-            "https://basescan.org/" if network_name == "mainnet" else "https://goerli.basescan.org/"
+            "https://basescan.org" if network_name == "mainnet" else "https://goerli.basescan.org"
         )
     elif ecosystem_name == "polygon":
         return (
