@@ -23,6 +23,15 @@ class UnsupportedEcosystemError(ApeEtherscanException):
 
     def __init__(self, ecosystem: str):
         super().__init__(f"Unsupported Ecosystem: {ecosystem}")
+        
+
+class UnsupportedNetworkError(ApeEtherscanException):
+    """
+    Raised when there is no Etherscan buildout for ecosystem.
+    """
+
+    def __init__(self, network: str):
+        super().__init__(f"Unsupported Network: {network}")
 
 
 class EtherscanResponseError(ApeEtherscanException):
