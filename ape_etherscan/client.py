@@ -67,12 +67,8 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             if network_name != "mainnet"
             else "https://bscscan.com"
         )
-    elif ecosystem_name == "gnosis":
-        return (
-            f"https://gnosisscan.io"
-            if network_name == "mainnet"
-            else ""
-        )
+    elif ecosystem_name == "gnosis" and network_name=="mainnet":
+        return "https://gnosisscan.io"
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -134,12 +130,8 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
             if network_name != "mainnet"
             else "https://api.bscscan.com/api"
         )
-    elif ecosystem_name == "gnosis":
-        return (
-            f"https://api.gnosisscan.io/api"
-            if network_name == "mainnet"
-            else ""
-        )
+    elif ecosystem_name == "gnosis" and network_name == "mainnet":
+        return "https://api.gnosisscan.io/api"
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
