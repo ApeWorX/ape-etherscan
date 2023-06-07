@@ -8,6 +8,7 @@ API_KEY_ENV_KEY_MAP = {
     "polygon": "POLYGONSCAN_API_KEY",
     "avalanche": "SNOWTRACE_API_KEY",
     "bsc": "BSCSCAN_API_KEY",
+    "gnosis": "GNOSISSCAN_API_KEY"
 }
 NETWORKS = {
     "ethereum": [
@@ -47,4 +48,7 @@ NETWORKS = {
         "mainnet",
         "testnet",
     ],
+    "gnosis": [
+        "mainnet"
+    ]
 }
