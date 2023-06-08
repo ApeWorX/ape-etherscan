@@ -23,7 +23,7 @@ class UnsupportedEcosystemError(ApeEtherscanException):
 
     def __init__(self, ecosystem: str):
         super().__init__(f"Unsupported Ecosystem: {ecosystem}")
-        
+
 
 class UnsupportedNetworkError(ApeEtherscanException):
     """

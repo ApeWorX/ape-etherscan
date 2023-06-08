@@ -10,7 +10,9 @@ from ape.utils import USER_AGENT, ManagerAccessMixin
 from requests import Session
 
 from ape_etherscan.exceptions import (
-    UnhandledResultError, UnsupportedEcosystemError, UnsupportedNetworkError
+    UnhandledResultError,
+    UnsupportedEcosystemError,
+    UnsupportedNetworkError,
 )
 from ape_etherscan.types import EtherscanResponse, SourceCodeResponse
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
@@ -70,7 +72,7 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             else "https://bscscan.com"
         )
     elif ecosystem_name == "gnosis":
-        if network_name=="mainnet":
+        if network_name == "mainnet":
             return "https://gnosisscan.io"
         raise UnsupportedNetworkError
 
