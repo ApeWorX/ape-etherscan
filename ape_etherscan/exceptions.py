@@ -30,8 +30,8 @@ class UnsupportedNetworkError(ApeEtherscanException):
     Raised when there is no Etherscan buildout for ecosystem.
     """
 
-    def __init__(self, network: str):
-        super().__init__(f"Unsupported Network: {network}")
+    def __init__(self, ecosystem_name: str, network_name: str):
+        super().__init__(f"Unsupported Network for Ecosystem '{ecosystem-name}': {network_name}")
 
 
 class EtherscanResponseError(ApeEtherscanException):
