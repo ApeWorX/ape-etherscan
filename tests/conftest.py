@@ -259,7 +259,7 @@ class MockEtherscanBackend:
                 "testnet": com_testnet_url("testnet", "bscscan"),
             },
             "gnosis": {
-                "mainnet": com_url("gnosisscan"),
+                "mainnet": url("gnosisscan"),
             },
         }
 
