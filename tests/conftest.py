@@ -258,6 +258,9 @@ class MockEtherscanBackend:
                 "mainnet": com_url("bscscan"),
                 "testnet": com_testnet_url("testnet", "bscscan"),
             },
+            "gnosis": {
+                "mainnet": url("gnosisscan"),
+            },
         }
 
     def set_network(self, ecosystem: str, network: str):
