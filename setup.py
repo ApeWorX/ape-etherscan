@@ -10,7 +10,7 @@ extras_require = {
         "ape-fantom",  # For testing Fantom integration
         "ape-optimism",  # Needed for Optimism integration
         "ape-polygon",  # Needed for Polygon integration
-        "ape-polygon",  # Needed for Polygon ZkEVM integration
+        "ape-polygon-zkevm",  # Needed for Polygon ZkEVM integration
         "ape-infura",  # Needed for live network tests
         "ape-solidity",  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
