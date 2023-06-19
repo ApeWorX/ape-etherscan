@@ -85,8 +85,8 @@ STANDARD_INPUT_JSON = {
     "settings": {
         "optimizer": {"enabled": True, "runs": 200},
         "outputSelection": {
-            "subcontracts/foo.sol": {"*": OUTPUT_SELECTION},
-            ".cache/bar/local/bar.sol": {"*": OUTPUT_SELECTION},
+            "subcontracts/foo.sol": {"*": OUTPUT_SELECTION, "": ["ast"]},
+            ".cache/bar/local/bar.sol": {"*": OUTPUT_SELECTION, "": ["ast"]},
         },
         "remappings": ["@bar=.cache/bar/local"],
     },
