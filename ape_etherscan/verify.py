@@ -308,6 +308,11 @@ class SourceVerifier(ManagerAccessMixin):
 
         build_map(source_id)
 
+        # "libraries" field not allows in `settings` dict.
+        if "libraries" in settings:
+            # libraries are handled below.
+            settings.pop("libraries")
+
         data = {
             "language": compiler.name.capitalize(),
             "sources": sources,
