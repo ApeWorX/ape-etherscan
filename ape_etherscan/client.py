@@ -287,10 +287,17 @@ class ContractClient(_APIClient):
         if not compiler_version.startswith("v"):
             compiler_version = f"v{compiler_version}"
 
+        if "sourceCode" in standard_json_output:
+            source_code = standard_json_output["sourceCode"]
+            code_format = "solidity-single-file"
+        else:
+            source_code = StringIO(json.dumps(standard_json_output))
+            code_format = "solidity-standard-json-input"
+
         json_dict = {
             **self.base_params,
             "action": "verifysourcecode",
-            "codeformat": "solidity-standard-json-input",
+            "codeformat": code_format,
             "compilerversion": compiler_version,
             "constructorArguements": constructor_arguments,
             "contractaddress": self._address,
@@ -299,7 +306,7 @@ class ContractClient(_APIClient):
             "licenseType": license_type,
             "optimizationUsed": int(optimization_used),
             "runs": optimization_runs,
-            "sourceCode": StringIO(json.dumps(standard_json_output)),
+            "sourceCode": source_code,
         }
         iterator = 1
         for lib_address, lib_name in libraries.items():

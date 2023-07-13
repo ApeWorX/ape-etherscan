@@ -196,12 +196,12 @@ class SourceVerifier(ManagerAccessMixin):
             )
 
         runtime_bytecode = self._contract_type.runtime_bytecode
-        bytecode_len = 0
         if runtime_bytecode:
-            bytecode_len = len(runtime_bytecode.bytecode or "")
-
-        start_index = bytecode_len
-        return deploy_receipt["input"][start_index:]
+            return extract_constructor_arguments(
+                deploy_receipt["input"], runtime_bytecode.bytecode or ""
+            )
+        else:
+            raise ContractVerificationError("Failed to find runtime bytecode.")
 
     @cached_property
     def license_code(self) -> LicenseType:
@@ -266,13 +266,19 @@ class SourceVerifier(ManagerAccessMixin):
             logger.debug(f"{standard_json}\n")
 
         # NOTE: Etherscan does not allow directory prefixes on the source ID.
-        request_source_id = Path(source_id).name
+        if self.provider.network.ecosystem.name == "ethereum":
+            request_source_id = Path(source_id).name
+            contract_name = f"{request_source_id}:{self._contract_type.name}"
+        else:
+            # When we have a flattened contract, we don't need to specify the file name
+            # only the contract name
+            contract_name = f"{self._contract_type.name}"
 
         try:
             guid = self._contract_client.verify_source_code(
                 standard_input_json,
                 str(version),
-                contract_name=f"{request_source_id}:{self._contract_type.name}",
+                contract_name=contract_name,
                 optimization_used=optimized,
                 optimization_runs=runs,
                 constructor_arguments=self.constructor_arguments,
@@ -306,13 +312,26 @@ class SourceVerifier(ManagerAccessMixin):
                 }
                 build_map(imported_source_id)
 
+        def flatten_source(_source_id: str):
+            _source_path = base_dir / _source_id
+            flattened_source = str(compiler.flatten_contract(_source_path))
+            return flattened_source
+
         build_map(source_id)
 
-        data = {
-            "language": compiler.name.capitalize(),
-            "sources": sources,
-            "settings": settings,
-        }
+        if self.provider.network.ecosystem.name == "ethereum":
+            data = {
+                "language": compiler.name.capitalize(),
+                "sources": sources,
+                "settings": settings,
+            }
+        else:
+            data = {
+                "language": compiler.name.capitalize(),
+                "sourceCode": flatten_source(source_id),
+                "settings": settings,
+            }
+
         if hasattr(compiler, "libraries") and compiler.libraries:
             libraries = compiler.libraries
             index = 1
@@ -373,3 +392,30 @@ class SourceVerifier(ManagerAccessMixin):
 
         else:
             raise ContractVerificationError("Timed out waiting for contract verification.")
+
+
+def extract_constructor_arguments(deployment_bytecode, runtime_bytecode):
+    # Ensure the bytecodes are stripped of the "0x" prefix
+    deployment_bytecode = deployment_bytecode[2:]
+    runtime_bytecode = runtime_bytecode[2:]
+
+    if deployment_bytecode.endswith(runtime_bytecode):
+        # If the runtime bytecode is at the end of the deployment bytecode,
+        # there are no constructor arguments
+        return ""
+
+    # Find the start of the runtime bytecode within the deployment bytecode
+    start_index = deployment_bytecode.find(runtime_bytecode)
+
+    # If the runtime bytecode is not found within the deployment bytecode,
+    # return an error message
+    if start_index == -1:
+        return "Runtime bytecode not found in deployment bytecode"
+
+    # Cut the deployment bytecode at the start of the runtime bytecode
+    # The remaining part is the constructor arguments
+    constructor_start_index = start_index + len(runtime_bytecode)
+    constructor_arguments = deployment_bytecode[constructor_start_index:]
+
+    # Prepend the constructor arguments with "0x"
+    return constructor_arguments
