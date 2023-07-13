@@ -15,6 +15,7 @@ from ape.exceptions import NetworkError
 from ape.logging import logger
 from ape.types import AddressType
 from ape.utils import cached_property
+from ape_solidity._utils import OUTPUT_SELECTION
 from requests import Response
 
 from ape_etherscan import Etherscan
@@ -84,8 +85,8 @@ STANDARD_INPUT_JSON = {
     "settings": {
         "optimizer": {"enabled": True, "runs": 200},
         "outputSelection": {
-            "foo.sol": {"foo": ["abi", "bin", "bin-runtime", "devdoc", "userdoc", "srcmap"]},
-            "bar.sol": {"bar": ["abi", "bin", "bin-runtime", "devdoc", "userdoc", "srcmap"]},
+            "subcontracts/foo.sol": {"*": OUTPUT_SELECTION, "": ["ast"]},
+            ".cache/bar/local/bar.sol": {"*": OUTPUT_SELECTION, "": ["ast"]},
         },
         "remappings": ["@bar=.cache/bar/local"],
     },
@@ -258,6 +259,9 @@ class MockEtherscanBackend:
                 "mainnet": com_url("bscscan"),
                 "testnet": com_testnet_url("testnet", "bscscan"),
             },
+            "gnosis": {
+                "mainnet": url("gnosisscan"),
+            },
         }
 
     def set_network(self, ecosystem: str, network: str):
@@ -417,7 +421,7 @@ class MockEtherscanBackend:
 
 @pytest.fixture
 def verification_params(address_to_verify):
-    ctor_args = "00002833623465633162323163303133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
+    ctor_args = "000000000000000000000000000000000000000000000000000000000000002833623465633162323163303133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
 
     return {
         "action": "verifysourcecode",

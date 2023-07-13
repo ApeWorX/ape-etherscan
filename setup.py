@@ -10,7 +10,7 @@ extras_require = {
         "ape-fantom",  # For testing Fantom integration
         "ape-optimism",  # Needed for Optimism integration
         "ape-polygon",  # Needed for Polygon integration
-        "ape-polygon",  # Needed for Polygon ZkEVM integration
+        "ape-polygon-zkevm",  # Needed for Polygon ZkEVM integration
         "ape-infura",  # Needed for live network tests
         "ape-solidity",  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
@@ -20,12 +20,12 @@ extras_require = {
         "pytest-mock",  # Test mocker
     ],
     "lint": [
-        "black>=23.3.0",  # auto-formatter and linter
+        "black>=23.3.0,<24",  # auto-formatter and linter
         "mypy>=0.991,<1",  # Static type analyzer
         "types-requests>=2.28.7",  # Needed due to mypy typeshed
         "types-setuptools",  # Needed due to mypy typeshed
-        "flake8>=5.0.4",  # Style linter
-        "isort>=5.10.1",  # Import sorting linter
+        "flake8>=6.0.0,<7",  # Style linter
+        "isort>=5.10.1,<6",  # Import sorting linter
         "mdformat>=0.7.16",  # Auto-formatter for markdown
         "mdformat-gfm>=0.3.5",  # Needed for formatting GitHub-flavored markdown
         "mdformat-frontmatter>=0.4.1",  # Needed for frontmatters-style headers in issue templates
@@ -75,7 +75,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.6.7,<0.7",
+        "eth-ape>=0.6.11,<0.7",
         "requests",  # Use same version as eth-ape
     ],
     python_requires=">=3.8,<4",
