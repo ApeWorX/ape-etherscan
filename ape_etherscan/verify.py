@@ -33,6 +33,8 @@ _SPDX_ID_TO_API_CODE = {
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
 
+ECOSYSTEMS_VERIFY_USING_JSON = ("ethereum")
+
 
 class LicenseType(Enum):
     """
@@ -312,7 +314,7 @@ class SourceVerifier(ManagerAccessMixin):
                 }
                 build_map(imported_source_id)
 
-        def flatten_source(_source_id: str):
+        def flatten_source(_source_id: str) -> str:
             _source_path = base_dir / _source_id
             flattened_source = str(compiler.flatten_contract(_source_path))
             return flattened_source
@@ -324,13 +326,15 @@ class SourceVerifier(ManagerAccessMixin):
             # libraries are handled below.
             settings.pop("libraries")
 
-        if self.provider.network.ecosystem.name == "ethereum":
+        if self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
+            # Use standard input json format
             data = {
                 "language": compiler.name.capitalize(),
                 "sources": sources,
                 "settings": settings,
             }
         else:
+            # Use flattened source, single-file approach
             data = {
                 "language": compiler.name.capitalize(),
                 "sourceCode": flatten_source(source_id),
@@ -399,10 +403,10 @@ class SourceVerifier(ManagerAccessMixin):
             raise ContractVerificationError("Timed out waiting for contract verification.")
 
 
-def extract_constructor_arguments(deployment_bytecode, runtime_bytecode):
+def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: str) -> str:
     # Ensure the bytecodes are stripped of the "0x" prefix
-    deployment_bytecode = deployment_bytecode[2:]
-    runtime_bytecode = runtime_bytecode[2:]
+    deployment_bytecode = deployment_bytecode[2:] if deployment_bytecode.startswith("0x") else deployment_bytecode
+    runtime_bytecode = runtime_bytecode[2:] if runtime_bytecode.startswith("0x") else runtime_bytecode
 
     if deployment_bytecode.endswith(runtime_bytecode):
         # If the runtime bytecode is at the end of the deployment bytecode,
@@ -415,12 +419,11 @@ def extract_constructor_arguments(deployment_bytecode, runtime_bytecode):
     # If the runtime bytecode is not found within the deployment bytecode,
     # return an error message
     if start_index == -1:
-        return "Runtime bytecode not found in deployment bytecode"
+        raise ContractVerificationError("Runtime bytecode not found within deployment bytecode")
 
     # Cut the deployment bytecode at the start of the runtime bytecode
     # The remaining part is the constructor arguments
-    constructor_start_index = start_index + len(runtime_bytecode)
-    constructor_arguments = deployment_bytecode[constructor_start_index:]
+    constructor_args_start_index = start_index + len(runtime_bytecode)
+    constructor_arguments = deployment_bytecode[constructor_args_start_index:]
 
-    # Prepend the constructor arguments with "0x"
     return constructor_arguments
