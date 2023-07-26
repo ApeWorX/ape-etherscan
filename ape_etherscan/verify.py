@@ -268,7 +268,7 @@ class SourceVerifier(ManagerAccessMixin):
             logger.debug(f"{standard_json}\n")
 
         # NOTE: Etherscan does not allow directory prefixes on the source ID.
-        if self.provider.network.ecosystem.name == "ethereum":
+        if self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
             request_source_id = Path(source_id).name
             contract_name = f"{request_source_id}:{self._contract_type.name}"
         else:
