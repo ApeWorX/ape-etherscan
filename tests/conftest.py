@@ -512,7 +512,6 @@ def address_to_verify_with_ctor_args(fake_connection, project, account):
     solidity.add_library(library)
 
     foo = project.fooWithConstructor.deploy(42, sender=account)
-    print(f"deployment bytecode: {foo.contract_type.deployment_bytecode}")
     ape.chain.contracts._local_contract_types[address] = foo.contract_type
     return foo.address
 
