@@ -401,7 +401,9 @@ class MockEtherscanBackend:
             self.set_network("ethereum", "mainnet")
             return response
 
-    def setup_mock_account_transactions_with_ctor_args_response(self, address: Optional[AddressType] = None):
+    def setup_mock_account_transactions_with_ctor_args_response(
+        self, address: Optional[AddressType] = None
+    ):
         file_name = "get_account_transactions_with_ctor_args.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
 
@@ -416,7 +418,6 @@ class MockEtherscanBackend:
             self.add_handler("GET", "account", params, return_value=response)
             self.set_network("ethereum", "mainnet")
             return response
-
 
     def get_mock_response(
         self, response_data: Optional[Union[IO, Dict, str, MagicMock]] = None, **kwargs
@@ -499,6 +500,7 @@ def address_to_verify(fake_connection, project, account):
     ape.chain.contracts._local_contract_types[address] = foo.contract_type
     return foo.address
 
+
 @pytest.fixture(scope="session")
 def address_to_verify_with_ctor_args(fake_connection, project, account):
     # Deploy the library first.
@@ -515,13 +517,13 @@ def address_to_verify_with_ctor_args(fake_connection, project, account):
     return foo.address
 
 
-
 @pytest.fixture(scope="session")
 def expected_verification_log(address_to_verify):
     return (
         "Contract verification successful!\n"
         f"https://etherscan.io/address/{address_to_verify}#code"
     )
+
 
 @pytest.fixture(scope="session")
 def expected_verification_log_with_ctor_args(address_to_verify_with_ctor_args):

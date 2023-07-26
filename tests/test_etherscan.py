@@ -104,11 +104,18 @@ def setup_verification_test(
 
 @pytest.fixture
 def setup_verification_test_with_ctor_args(
-        mock_backend, verification_params_with_ctor_args, verification_tester_cls, address_to_verify_with_ctor_args
+    mock_backend,
+    verification_params_with_ctor_args,
+    verification_tester_cls,
+    address_to_verify_with_ctor_args,
 ):
     def setup(found_handler: Callable, threshold: int = 2):
-        mock_backend.setup_mock_account_transactions_with_ctor_args_response(address=address_to_verify_with_ctor_args)
-        mock_backend.add_handler("POST", "contract", verification_params_with_ctor_args, return_value=PUBLISH_GUID)
+        mock_backend.setup_mock_account_transactions_with_ctor_args_response(
+            address=address_to_verify_with_ctor_args
+        )
+        mock_backend.add_handler(
+            "POST", "contract", verification_params_with_ctor_args, return_value=PUBLISH_GUID
+        )
         verification_tester = verification_tester_cls(found_handler, threshold=threshold)
         mock_backend.add_handler(
             "GET",
@@ -216,6 +223,7 @@ def test_publish_contract(
     explorer.publish_contract(address_to_verify)
     assert caplog.records[-1].message == expected_verification_log
 
+
 def test_publish_contract_when_guid_not_found_at_end(
     mocker,
     explorer,
@@ -230,6 +238,7 @@ def test_publish_contract_when_guid_not_found_at_end(
     setup_verification_test(raise_err, threshold=1)
     explorer.publish_contract(address_to_verify)
     assert caplog.records[-1].message == expected_verification_log
+
 
 def test_publish_contract_with_ctor_args(
     explorer,
