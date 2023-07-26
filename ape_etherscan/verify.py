@@ -405,8 +405,12 @@ class SourceVerifier(ManagerAccessMixin):
 
 def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: str) -> str:
     # Ensure the bytecodes are stripped of the "0x" prefix
-    deployment_bytecode = deployment_bytecode[2:] if deployment_bytecode.startswith("0x") else deployment_bytecode
-    runtime_bytecode = runtime_bytecode[2:] if runtime_bytecode.startswith("0x") else runtime_bytecode
+    deployment_bytecode = (
+        deployment_bytecode[2:] if deployment_bytecode.startswith("0x") else deployment_bytecode
+    )
+    runtime_bytecode = (
+        runtime_bytecode[2:] if runtime_bytecode.startswith("0x") else runtime_bytecode
+    )
 
     if deployment_bytecode.endswith(runtime_bytecode):
         # If the runtime bytecode is at the end of the deployment bytecode,
