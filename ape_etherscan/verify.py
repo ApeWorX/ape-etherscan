@@ -33,7 +33,7 @@ _SPDX_ID_TO_API_CODE = {
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
 
-ECOSYSTEMS_VERIFY_USING_JSON = ("ethereum")
+ECOSYSTEMS_VERIFY_USING_JSON = ("ethereum",)
 
 
 class LicenseType(Enum):
