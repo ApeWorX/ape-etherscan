@@ -110,6 +110,7 @@ etherscan = networks.provider.network.explorer
 etherscan.publish_contract("0x55a8a39bc9694714e2874c1ce77aa1e599461e18")
 ```
 
-Not every network's explorer supports multi-file verification. For those networks, the corresponding compiler plugin's `flatten` functionality is invoked, in order to verify the contract as a single file.
+Not every network's explorer supports multi-file verification. 
+For those networks, the corresponding compiler plugin's `flatten` functionality is invoked, in order to verify the contract as a single file.
 
 **NOTE**: You must set an Etherscan API key environment variable to use the publishing feature.
