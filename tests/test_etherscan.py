@@ -102,6 +102,32 @@ def setup_verification_test(
     return setup
 
 
+@pytest.fixture
+def setup_verification_test_with_ctor_args(
+    mock_backend,
+    verification_params_with_ctor_args,
+    verification_tester_cls,
+    address_to_verify_with_ctor_args,
+):
+    def setup(found_handler: Callable, threshold: int = 2):
+        mock_backend.setup_mock_account_transactions_with_ctor_args_response(
+            address=address_to_verify_with_ctor_args
+        )
+        mock_backend.add_handler(
+            "POST", "contract", verification_params_with_ctor_args, return_value=PUBLISH_GUID
+        )
+        verification_tester = verification_tester_cls(found_handler, threshold=threshold)
+        mock_backend.add_handler(
+            "GET",
+            "contract",
+            {"guid": PUBLISH_GUID},
+            side_effect=verification_tester.sim,
+        )
+        return verification_tester
+
+    return setup
+
+
 @base_url_test
 def test_get_address_url(ecosystem, network, url, address, get_explorer):
     expected = f"https://{url}/address/{address}"
@@ -212,3 +238,16 @@ def test_publish_contract_when_guid_not_found_at_end(
     setup_verification_test(raise_err, threshold=1)
     explorer.publish_contract(address_to_verify)
     assert caplog.records[-1].message == expected_verification_log
+
+
+def test_publish_contract_with_ctor_args(
+    explorer,
+    address_to_verify_with_ctor_args,
+    setup_verification_test_with_ctor_args,
+    expected_verification_log_with_ctor_args,
+    caplog,
+    fake_connection,
+):
+    setup_verification_test_with_ctor_args(lambda: "Pass - You made it!")
+    explorer.publish_contract(address_to_verify_with_ctor_args)
+    assert caplog.records[-1].message == expected_verification_log_with_ctor_args
