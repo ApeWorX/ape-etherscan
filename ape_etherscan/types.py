@@ -13,6 +13,13 @@ class SourceCodeResponse:
     name: str = "unknown"
 
 
+@dataclass
+class ContractCreationResponse:
+    contractAddress: str
+    contractCreator: str
+    txHash: str
+
+
 ResponseValue = Union[List, Dict, str]
 
 

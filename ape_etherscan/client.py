@@ -14,7 +14,7 @@ from ape_etherscan.exceptions import (
     UnsupportedEcosystemError,
     UnsupportedNetworkError,
 )
-from ape_etherscan.types import EtherscanResponse, SourceCodeResponse
+from ape_etherscan.types import ContractCreationResponse, EtherscanResponse, SourceCodeResponse
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 
@@ -333,6 +333,17 @@ class ContractClient(_APIClient):
         json_dict = {**self.base_params, "action": "checkverifystatus", "guid": guid}
         response = self._get(params=json_dict, raise_on_exceptions=False)
         return str(response.value)
+
+    def get_creation_data(self) -> List[ContractCreationResponse]:
+        params = {
+            **self.base_params,
+            "action": "getcontractcreation",
+            "contractaddresses": [self._address],
+        }
+        result = self._get(params=params)
+        assert isinstance(result.value, list)
+        assert all(isinstance(val, dict) for val in result.value)
+        return [ContractCreationResponse(**item) for item in result.value]
 
 
 class AccountClient(_APIClient):
