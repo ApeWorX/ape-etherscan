@@ -246,7 +246,8 @@ class SourceVerifier(ManagerAccessMixin):
         else:
             version = versions[0]
 
-        compiler_plugin = self.compiler_manager.registered_compilers[self._ext]
+        compiler_plugin = self.compiler_manager.get_compiler(self._ext)
+        assert compiler_plugin is not None
         all_settings = compiler_plugin.get_compiler_settings(
             [self._source_path], base_path=self._base_path
         )
@@ -302,10 +303,12 @@ class SourceVerifier(ManagerAccessMixin):
     ) -> Dict:
         base_dir = base_folder or self.project_manager.contracts_folder
         source_path = base_dir / source_id
-        compiler = self.compiler_manager.registered_compilers[source_path.suffix]
+        compiler = self.compiler_manager.get_compiler(source_path.suffix)
+        assert compiler is not None
         sources = {self._source_path.name: {"content": source_path.read_text()}}
 
         def build_map(_source_id: str):
+            assert compiler is not None
             _source_path = base_dir / _source_id
             source_imports = compiler.get_imports([_source_path]).get(_source_id, [])
             for imported_source_id in source_imports:
@@ -315,6 +318,7 @@ class SourceVerifier(ManagerAccessMixin):
                 build_map(imported_source_id)
 
         def flatten_source(_source_id: str) -> str:
+            assert compiler is not None
             _source_path = base_dir / _source_id
             flattened_source = str(compiler.flatten_contract(_source_path))
             return flattened_source
