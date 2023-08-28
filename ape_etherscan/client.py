@@ -15,7 +15,7 @@ from ape_etherscan.exceptions import (
     UnsupportedEcosystemError,
     UnsupportedNetworkError,
 )
-from ape_etherscan.types import EtherscanResponse, SourceCodeResponse
+from ape_etherscan.types import ContractCreationResponse, EtherscanResponse, SourceCodeResponse
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 
@@ -307,10 +307,17 @@ class ContractClient(_APIClient):
         if not compiler_version.startswith("v"):
             compiler_version = f"v{compiler_version}"
 
+        if "sourceCode" in standard_json_output:
+            source_code = standard_json_output["sourceCode"]
+            code_format = "solidity-single-file"
+        else:
+            source_code = StringIO(json.dumps(standard_json_output))
+            code_format = "solidity-standard-json-input"
+
         json_dict = {
             **self.base_params,
             "action": "verifysourcecode",
-            "codeformat": "solidity-standard-json-input",
+            "codeformat": code_format,
             "compilerversion": compiler_version,
             "constructorArguements": constructor_arguments,
             "contractaddress": self._address,
@@ -319,7 +326,7 @@ class ContractClient(_APIClient):
             "licenseType": license_type,
             "optimizationUsed": int(optimization_used),
             "runs": optimization_runs,
-            "sourceCode": StringIO(json.dumps(standard_json_output)),
+            "sourceCode": source_code,
         }
         iterator = 1
         for lib_address, lib_name in libraries.items():
@@ -334,6 +341,17 @@ class ContractClient(_APIClient):
         json_dict = {**self.base_params, "action": "checkverifystatus", "guid": guid}
         response = self._get(params=json_dict, raise_on_exceptions=False)
         return str(response.value)
+
+    def get_creation_data(self) -> List[ContractCreationResponse]:
+        params = {
+            **self.base_params,
+            "action": "getcontractcreation",
+            "contractaddresses": [self._address],
+        }
+        result = self._get(params=params)
+        assert isinstance(result.value, list)
+        assert all(isinstance(val, dict) for val in result.value)
+        return [ContractCreationResponse(**item) for item in result.value]
 
 
 class AccountClient(_APIClient):

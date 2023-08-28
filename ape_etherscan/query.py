@@ -1,7 +1,7 @@
 from typing import Iterator, Optional
 
 from ape.api import QueryAPI, QueryType, ReceiptAPI
-from ape.api.query import AccountTransactionQuery
+from ape.api.query import AccountTransactionQuery, ContractCreationQuery
 from ape.exceptions import QueryEngineError
 from ape.utils import singledispatchmethod
 
@@ -40,6 +40,18 @@ class EtherscanQueryEngine(QueryAPI):
             return 15
 
         return (10000 // self.rate_limit) * (1 + query.stop_nonce - query.start_nonce) // 100
+
+    @estimate_query.register
+    def estimate_contract_creation_query(self, query: ContractCreationQuery) -> Optional[int]:
+        if self.network_manager.active_provider:
+            # Ignore unsupported networks.
+            ecosystem = self.network_manager.provider.network.ecosystem.name
+            network = self.network_manager.provider.network.name
+            if network not in NETWORKS.get(ecosystem, {}):
+                return None
+
+        # About 300 ms per query
+        return 300
 
     @singledispatchmethod
     def perform_query(self, query: QueryType) -> Iterator:  # type: ignore[override]
@@ -81,3 +93,13 @@ class EtherscanQueryEngine(QueryAPI):
                 and query.start_nonce <= receipt.transaction.nonce <= query.stop_nonce
             ):
                 yield receipt
+
+    @perform_query.register
+    def get_contract_creation_receipt(self, query: ContractCreationQuery) -> Iterator[ReceiptAPI]:
+        client = self._client_factory.get_contract_client(query.contract)
+        creation_data = client.get_creation_data()
+
+        if len(creation_data) != 1:
+            raise
+
+        yield self.chain_manager.get_receipt(creation_data[0].txHash)

@@ -15,6 +15,7 @@ from ape.exceptions import NetworkError
 from ape.logging import logger
 from ape.types import AddressType
 from ape.utils import cached_property
+from ape_solidity._utils import OUTPUT_SELECTION
 from requests import Response
 
 from ape_etherscan import Etherscan
@@ -58,6 +59,13 @@ contract foo {
         require(MyLib.insert(value));
     }
 }
+
+contract fooWithConstructor {
+    uint public value;
+    constructor(uint _value) {
+        value = _value;
+    }
+}
 """
 BAR_SOURCE_CODE = r"""
 // SPDX-License-Identifier: AGPL-3.0
@@ -84,8 +92,8 @@ STANDARD_INPUT_JSON = {
     "settings": {
         "optimizer": {"enabled": True, "runs": 200},
         "outputSelection": {
-            "foo.sol": {"foo": ["abi", "bin", "bin-runtime", "devdoc", "userdoc", "srcmap"]},
-            "bar.sol": {"bar": ["abi", "bin", "bin-runtime", "devdoc", "userdoc", "srcmap"]},
+            "subcontracts/foo.sol": {"*": OUTPUT_SELECTION, "": ["ast"]},
+            ".cache/bar/local/bar.sol": {"*": OUTPUT_SELECTION, "": ["ast"]},
         },
         "remappings": ["@bar=.cache/bar/local"],
     },
@@ -393,6 +401,24 @@ class MockEtherscanBackend:
             self.set_network("ethereum", "mainnet")
             return response
 
+    def setup_mock_account_transactions_with_ctor_args_response(
+        self, address: Optional[AddressType] = None
+    ):
+        file_name = "get_account_transactions_with_ctor_args.json"
+        test_data_path = MOCK_RESPONSES_PATH / file_name
+
+        if address:
+            params = EXPECTED_ACCOUNT_TXNS_PARAMS.copy()
+            params["address"] = address
+        else:
+            params = EXPECTED_ACCOUNT_TXNS_PARAMS
+
+        with open(test_data_path) as response_data_file:
+            response = self.get_mock_response(response_data_file, file_name=file_name)
+            self.add_handler("GET", "account", params, return_value=response)
+            self.set_network("ethereum", "mainnet")
+            return response
+
     def get_mock_response(
         self, response_data: Optional[Union[IO, Dict, str, MagicMock]] = None, **kwargs
     ):
@@ -420,7 +446,7 @@ class MockEtherscanBackend:
 
 @pytest.fixture
 def verification_params(address_to_verify):
-    ctor_args = "00002833623465633162323163303133643932303665363338366532313839353566356166306565336362000000000000000000000000000000000000000000000000"  # noqa: E501
+    ctor_args = ""  # noqa: E501
 
     return {
         "action": "verifysourcecode",
@@ -437,6 +463,29 @@ def verification_params(address_to_verify):
     }
 
 
+@pytest.fixture
+def verification_params_with_ctor_args(address_to_verify_with_ctor_args):
+    # abi-encoded representation of uint256 value 42
+    ctor_args = "000000000000000000000000000000000000000000000000000000000000002a"  # noqa: E501
+
+    json_data = STANDARD_INPUT_JSON.copy()
+    json_data["libraryaddress1"] = "0xF2Df0b975c0C9eFa2f8CA0491C2d1685104d2488"
+
+    return {
+        "action": "verifysourcecode",
+        "codeformat": "solidity-standard-json-input",
+        "constructorArguements": ctor_args,
+        "contractaddress": address_to_verify_with_ctor_args,
+        "contractname": "foo.sol:fooWithConstructor",
+        "evmversion": None,
+        "licenseType": 1,
+        "module": "contract",
+        "optimizationUsed": 1,
+        "runs": 200,
+        "sourceCode": StringIO(json.dumps(json_data)),
+    }
+
+
 @pytest.fixture(scope="session")
 def address_to_verify(fake_connection, project, account):
     # Deploy the library first.
@@ -447,8 +496,22 @@ def address_to_verify(fake_connection, project, account):
     solidity = project.compiler_manager.solidity
     solidity.add_library(library)
 
-    # Use foo address for verification.
     foo = project.foo.deploy(sender=account)
+    ape.chain.contracts._local_contract_types[address] = foo.contract_type
+    return foo.address
+
+
+@pytest.fixture(scope="session")
+def address_to_verify_with_ctor_args(fake_connection, project, account):
+    # Deploy the library first.
+    library = account.deploy(project.MyLib)
+    ape.chain.contracts._local_contract_types[library.address] = library.contract_type
+
+    # Add the library to recompile contract `foo`.
+    solidity = project.compiler_manager.solidity
+    solidity.add_library(library)
+
+    foo = project.fooWithConstructor.deploy(42, sender=account)
     ape.chain.contracts._local_contract_types[address] = foo.contract_type
     return foo.address
 
@@ -458,4 +521,12 @@ def expected_verification_log(address_to_verify):
     return (
         "Contract verification successful!\n"
         f"https://etherscan.io/address/{address_to_verify}#code"
+    )
+
+
+@pytest.fixture(scope="session")
+def expected_verification_log_with_ctor_args(address_to_verify_with_ctor_args):
+    return (
+        "Contract verification successful!\n"
+        f"https://etherscan.io/address/{address_to_verify_with_ctor_args}#code"
     )
