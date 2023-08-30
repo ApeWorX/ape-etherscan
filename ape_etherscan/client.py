@@ -342,6 +342,9 @@ class ContractClient(_APIClient):
         }
         result = self._get(params=params)
         items = result.value or []
+        if not isinstance(items, list):
+            raise ValueError("Expecting list.")
+
         return [ContractCreationResponse(**item) for item in items]
 
 

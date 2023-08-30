@@ -98,7 +98,6 @@ class EtherscanQueryEngine(QueryAPI):
     def get_contract_creation_receipt(self, query: ContractCreationQuery) -> Iterator[ReceiptAPI]:
         client = self._client_factory.get_contract_client(query.contract)
         creation_data = client.get_creation_data()
-
         if len(creation_data) == 0:
             return
         elif len(creation_data) != 1:
