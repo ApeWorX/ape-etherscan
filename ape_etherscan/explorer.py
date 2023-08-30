@@ -5,6 +5,7 @@ from typing import Optional
 from ape.api import ExplorerAPI
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
+from ape.logging import logger
 from ape.types import AddressType, ContractType
 
 from ape_etherscan.client import ClientFactory, get_etherscan_uri
@@ -35,20 +36,19 @@ class Etherscan(ExplorerAPI):
 
         client = self._client_factory.get_contract_client(address)
         source_code = client.get_source_code()
-        abi_string = source_code.abi
-        if not abi_string:
+        if not (abi_string := source_code.abi):
             return None
 
         try:
             abi = json.loads(abi_string)
-        except JSONDecodeError:
+        except JSONDecodeError as err:
+            logger.error(f"Error with contract ABI: {err}")
             return None
 
         contract_type = ContractType(abi=abi, contractName=source_code.name)
         if source_code.name == "Vyper_contract" and "symbol" in contract_type.view_methods:
             try:
-                checksummed_address = self.provider.network.ecosystem.decode_address(address)
-                contract = ContractInstance(checksummed_address, contract_type)
+                contract = ContractInstance(address, contract_type)
                 contract_type.name = contract.symbol() or contract_type.name
             except ProviderNotConnectedError:
                 pass
