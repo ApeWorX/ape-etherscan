@@ -76,6 +76,10 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
         if network_name == "mainnet":
             return "https://gnosisscan.io"
         raise UnsupportedNetworkError(ecosystem_name, network_name)
+    elif ecosystem_name == "scroll":
+        if network_name == "sepolia":
+            return "https://sepolia-blockscout.scroll.io"
+        raise UnsupportedNetworkError(ecosystem_name, network_name)
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -140,6 +144,10 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
     elif ecosystem_name == "gnosis":
         if network_name == "mainnet":
             return "https://api.gnosisscan.io/api"
+        raise UnsupportedNetworkError(ecosystem_name, network_name)
+    elif ecosystem_name == "scroll":
+        if network_name == "sepolia":
+            return "https://sepolia-blockscout.scroll.io/api"
         raise UnsupportedNetworkError(ecosystem_name, network_name)
 
     raise UnsupportedEcosystemError(ecosystem_name)
