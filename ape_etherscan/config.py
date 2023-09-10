@@ -17,3 +17,4 @@ class EtherscanConfig(PluginConfig):
     avalanche: EcosystemConfig = EcosystemConfig()
     bsc: EcosystemConfig = EcosystemConfig()
     gnosis: EcosystemConfig = EcosystemConfig()
+    scroll: EcosystemConfig = EcosystemConfig()
