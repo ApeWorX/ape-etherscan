@@ -83,23 +83,28 @@ solidity:
   import_remapping:
     - "@bar=bar"
 """
-STANDARD_INPUT_JSON = {
-    "language": "Solidity",
-    "sources": {
-        "foo.sol": {"content": FOO_SOURCE_CODE},
-        ".cache/bar/local/bar.sol": {"content": BAR_SOURCE_CODE},
-    },
-    "settings": {
-        "optimizer": {"enabled": True, "runs": 200},
-        "outputSelection": {
-            "subcontracts/foo.sol": {"*": OUTPUT_SELECTION, "": ["ast"]},
-            ".cache/bar/local/bar.sol": {"*": OUTPUT_SELECTION, "": ["ast"]},
+
+
+@pytest.fixture(scope="session")
+def standard_input_json(library):
+    return {
+        "language": "Solidity",
+        "sources": {
+            "foo.sol": {"content": FOO_SOURCE_CODE},
+            ".cache/bar/local/bar.sol": {"content": BAR_SOURCE_CODE},
         },
-        "remappings": ["@bar=.cache/bar/local"],
-    },
-    "libraryname1": "MyLib",
-    "libraryaddress1": "0x274b028b03A250cA03644E6c578D81f019eE1323",
-}
+        "settings": {
+            "optimizer": {"enabled": True, "runs": 200},
+            "outputSelection": {
+                ".cache/bar/local/bar.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
+                "subcontracts/foo.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
+            },
+            "remappings": ["@bar=.cache/bar/local"],
+            "viaIR": False,
+        },
+        "libraryname1": "MyLib",
+        "libraryaddress1": library.address,
+    }
 
 
 @pytest.fixture(autouse=True)
@@ -445,7 +450,7 @@ class MockEtherscanBackend:
 
 
 @pytest.fixture
-def verification_params(address_to_verify):
+def verification_params(address_to_verify, standard_input_json):
     ctor_args = ""  # noqa: E501
 
     return {
@@ -459,16 +464,18 @@ def verification_params(address_to_verify):
         "module": "contract",
         "optimizationUsed": 1,
         "runs": 200,
-        "sourceCode": StringIO(json.dumps(STANDARD_INPUT_JSON)),
+        "sourceCode": StringIO(json.dumps(standard_input_json)),
     }
 
 
-@pytest.fixture
-def verification_params_with_ctor_args(address_to_verify_with_ctor_args):
+@pytest.fixture(scope="session")
+def verification_params_with_ctor_args(
+    address_to_verify_with_ctor_args, library, standard_input_json
+):
     # abi-encoded representation of uint256 value 42
     ctor_args = "000000000000000000000000000000000000000000000000000000000000002a"  # noqa: E501
 
-    json_data = STANDARD_INPUT_JSON.copy()
+    json_data = standard_input_json.copy()
     json_data["libraryaddress1"] = "0xF2Df0b975c0C9eFa2f8CA0491C2d1685104d2488"
 
     return {
@@ -487,15 +494,26 @@ def verification_params_with_ctor_args(address_to_verify_with_ctor_args):
 
 
 @pytest.fixture(scope="session")
-def address_to_verify(fake_connection, project, account):
-    # Deploy the library first.
-    library = account.deploy(project.MyLib)
-    ape.chain.contracts._local_contract_types[library.address] = library.contract_type
+def chain():
+    return ape.chain
 
-    # Add the library to recompile contract `foo`.
-    solidity = project.compiler_manager.solidity
-    solidity.add_library(library)
 
+@pytest.fixture(scope="session")
+def solidity(project):
+    return project.compiler_manager.solidity
+
+
+@pytest.fixture(scope="session")
+def library(account, project, chain, solidity):
+    lib = account.deploy(project.MyLib)
+    chain.contracts._local_contract_types[lib.address] = lib.contract_type
+    solidity.add_library(lib)
+    return lib
+
+
+@pytest.fixture(scope="session")
+def address_to_verify(fake_connection, library, project, account):
+    _ = library  # Ensure library is deployed first.
     foo = project.foo.deploy(sender=account)
     ape.chain.contracts._local_contract_types[address] = foo.contract_type
     return foo.address

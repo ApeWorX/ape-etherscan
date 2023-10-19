@@ -8,6 +8,7 @@ from typing import Dict, Iterator, List, Optional
 from ape.logging import logger
 from ape.utils import USER_AGENT, ManagerAccessMixin
 from requests import Session
+from yarl import URL
 
 from ape_etherscan.exceptions import (
     UnhandledResultError,
@@ -176,6 +177,11 @@ class _APIClient(ManagerAccessMixin):
     def _min_time_between_calls(self) -> float:
         return 1 / self._rate_limit  # seconds / calls per second
 
+    @property
+    def _clean_uri(self) -> str:
+        url = URL(self.base_uri).with_user(None).with_password(None)
+        return f"{url.with_path('')}/[hidden]" if url.path else f"{url}"
+
     def _get(
         self,
         params: Optional[Dict] = None,
@@ -216,6 +222,7 @@ class _APIClient(ManagerAccessMixin):
     ) -> EtherscanResponse:
         headers = headers or self.DEFAULT_HEADERS
         for i in range(self._retries):
+            logger.debug(f"Request sent to {self._clean_uri}.")
             response = self.session.request(
                 method.upper(),
                 self.base_uri,
@@ -225,14 +232,16 @@ class _APIClient(ManagerAccessMixin):
                 timeout=1024,
             )
             if response.status_code == 429:
-                time.sleep(2**i)
+                time_to_sleep = 2**i
+                logger.debug(f"Request was throttled. Retrying in {time_to_sleep} seconds.")
+                time.sleep(time_to_sleep)
                 continue
 
             # Recieved a real response unrelated to rate limiting.
             if raise_on_exceptions:
                 response.raise_for_status()
             elif not 200 <= response.status_code < 300:
-                logger.error(response.text)
+                logger.error(f"Response was not successful: {response.text}")
 
             break
 
@@ -264,9 +273,8 @@ class ContractClient(_APIClient):
             "address": self._address,
         }
         result = self._get(params=params)
-        result_list = result.value or []
 
-        if not result_list:
+        if not (result_list := result.value or []):
             return SourceCodeResponse()
 
         elif len(result_list) > 1:
@@ -341,9 +349,11 @@ class ContractClient(_APIClient):
             "contractaddresses": [self._address],
         }
         result = self._get(params=params)
-        assert isinstance(result.value, list)
-        assert all(isinstance(val, dict) for val in result.value)
-        return [ContractCreationResponse(**item) for item in result.value]
+        items = result.value or []
+        if not isinstance(items, list):
+            raise ValueError("Expecting list.")
+
+        return [ContractCreationResponse(**item) for item in items]
 
 
 class AccountClient(_APIClient):
