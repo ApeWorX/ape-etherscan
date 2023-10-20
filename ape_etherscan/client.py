@@ -349,9 +349,11 @@ class ContractClient(_APIClient):
             "contractaddresses": [self._address],
         }
         result = self._get(params=params)
-        assert isinstance(result.value, list)
-        assert all(isinstance(val, dict) for val in result.value)
-        return [ContractCreationResponse(**item) for item in result.value]
+        items = result.value or []
+        if not isinstance(items, list):
+            raise ValueError("Expecting list.")
+
+        return [ContractCreationResponse(**item) for item in items]
 
 
 class AccountClient(_APIClient):
