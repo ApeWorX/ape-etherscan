@@ -41,13 +41,11 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
             else "https://arbiscan.io"
         )
     elif ecosystem_name == "optimism":
-        if network_name == "mainnet":
-            return "https://optimistic.etherscan.io"
-        elif network_name == "goerli":
-            return "https://goerli-optimism.etherscan.io"
-        else:
-            return "https://sepolia-optimism.etherscan.io"
-
+        return (
+            "https://optimistic.etherscan.io"
+            if network_name == "mainnet"
+            else f"https://{network_name}-optimism.etherscan.io"
+        )
     elif ecosystem_name == "polygon-zkevm":
         return (
             "https://zkevm.polygonscan.com"
@@ -104,13 +102,11 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
             else "https://api.arbiscan.io/api"
         )
     elif ecosystem_name == "optimism":
-        if network_name == "mainnet":
-            return "https://api-optimistic.etherscan.io/api"
-        elif network_name == "goerli":
-            return "https://api-goerli-optimistic.etherscan.io/api"
-        else:
-            return "https://api-sepolia-optimistic.etherscan.io/api"
-
+        return (
+            "https://api-optimistic.etherscan.io/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}-optimistic.etherscan.io/api"
+        )
     elif ecosystem_name == "polygon-zkevm":
         return (
             "https://api-zkevm.polygonscan.com/api"
