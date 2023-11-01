@@ -43,6 +43,8 @@ base_url_test = pytest.mark.parametrize(
         ("optimism", "mainnet-fork", "optimistic.etherscan.io"),
         ("optimism", "goerli", "goerli-optimism.etherscan.io"),
         ("optimism", "goerli-fork", "goerli-optimism.etherscan.io"),
+        ("optimism", "sepolia", "sepolia-optimism.etherscan.io"),
+        ("optimism", "sepolia-fork", "sepolia-optimism.etherscan.io"),
         ("polygon", "mainnet", "polygonscan.com"),
         ("polygon", "mainnet-fork", "polygonscan.com"),
         ("polygon", "mumbai", "mumbai.polygonscan.com"),
