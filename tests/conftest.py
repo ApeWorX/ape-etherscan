@@ -253,6 +253,7 @@ class MockEtherscanBackend:
             "optimism": {
                 "mainnet": testnet_url("optimistic", "etherscan"),
                 "goerli": testnet_url("goerli-optimistic", "etherscan"),
+                "sepolia": testnet_url("sepolia-optimistic", "etherscan"),
             },
             "polygon": {
                 "mainnet": com_url("polygonscan"),
