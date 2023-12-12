@@ -78,6 +78,7 @@ setup(
     install_requires=[
         "eth-ape>=0.6.16,<0.7",
         "requests",  # Use same version as eth-ape
+        "yarl",  # Use same version as eth-ape
     ],
     python_requires=">=3.8,<4",
     extras_require=extras_require,
