@@ -250,7 +250,13 @@ class SourceVerifier(ManagerAccessMixin):
         all_settings = compiler_plugin.get_compiler_settings(
             [self._source_path], base_path=self._base_path
         )
-        settings = all_settings[version]
+
+        # Hack to allow any Version object work.
+        # TODO: Replace with all_settings[version] on 0.7 upgrade
+        settings = {str(v): s for v, s in all_settings.items() if str(v) == str(version)}[
+            str(version)
+        ]
+
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", 200)
@@ -421,7 +427,7 @@ def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: st
     start_index = deployment_bytecode.find(runtime_bytecode)
 
     # If the runtime bytecode is not found within the deployment bytecode,
-    # return an error message
+    # return an error message.
     if start_index == -1:
         raise ContractVerificationError("Runtime bytecode not found within deployment bytecode")
 
