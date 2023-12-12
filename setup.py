@@ -20,8 +20,8 @@ extras_require = {
         "pytest-mock",  # Test mocker
     ],
     "lint": [
-        "black>=23.10.0,<24",  # auto-formatter and linter
-        "mypy>=1.6.1,<2",  # Static type analyzer
+        "black>=23.12.0,<24",  # auto-formatter and linter
+        "mypy>=1.7.1,<2",  # Static type analyzer
         "types-requests>=2.28.7",  # Needed due to mypy typeshed
         "types-setuptools",  # Needed due to mypy typeshed
         "flake8>=6.1.0,<7",  # Style linter
