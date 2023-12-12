@@ -391,10 +391,11 @@ class MockEtherscanBackend:
     def _expected_get_ct_params(self, address: str) -> Dict:
         return {"module": "contract", "action": "getsourcecode", "address": address}
 
-    def setup_mock_account_transactions_response(self, address: Optional[AddressType] = None):
-        file_name = "get_account_transactions.json"
+    def setup_mock_account_transactions_response(
+        self, address: Optional[AddressType] = None, test_data_to_use: Optional[str] = None
+    ):
+        file_name = test_data_to_use or "get_account_transactions.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
-
         if address:
             params = EXPECTED_ACCOUNT_TXNS_PARAMS.copy()
             params["address"] = address
@@ -516,6 +517,7 @@ def library(account, project, chain, solidity):
 def address_to_verify(fake_connection, library, project, account):
     _ = library  # Ensure library is deployed first.
     foo = project.foo.deploy(sender=account)
+
     ape.chain.contracts._local_contract_types[address] = foo.contract_type
     return foo.address
 
