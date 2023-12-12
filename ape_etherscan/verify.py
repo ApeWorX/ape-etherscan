@@ -182,26 +182,23 @@ class SourceVerifier(ManagerAccessMixin):
         deploy_receipt = None
         while checks_done <= timeout:
             # If was just deployed, it takes a few seconds to show up in API response
+            if deploy_receipt := next(self._account_client.get_all_normal_transactions(), None):
+                break
 
-            try:
-                deploy_receipt = next(self._account_client.get_all_normal_transactions())
-            except StopIteration:
-                continue
-
-            logger.debug("Waiting for deploy receipt in Etherscan...")
-            checks_done += 1
-            time.sleep(2.5)
+            else:
+                logger.debug("Waiting for deploy receipt in Etherscan...")
+                checks_done += 1
+                time.sleep(2.5)
 
         if not deploy_receipt:
             raise ContractVerificationError(
                 f"Failed to find to deploy receipt for '{self.address}'"
             )
 
-        runtime_bytecode = self._contract_type.runtime_bytecode
-        if runtime_bytecode:
-            return extract_constructor_arguments(
-                deploy_receipt["input"], runtime_bytecode.bytecode or ""
-            )
+        if code := self._contract_type.runtime_bytecode:
+            runtime_code = code.bytecode or ""
+            deployment_code = deploy_receipt["input"]
+            return extract_constructor_arguments(deployment_code, runtime_code)
         else:
             raise ContractVerificationError("Failed to find runtime bytecode.")
 
@@ -429,6 +426,7 @@ def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: st
     # If the runtime bytecode is not found within the deployment bytecode,
     # return an error message.
     if start_index == -1:
+        breakpoint()
         raise ContractVerificationError("Runtime bytecode not found within deployment bytecode")
 
     # Cut the deployment bytecode at the start of the runtime bytecode
