@@ -407,12 +407,10 @@ class MockEtherscanBackend:
                 response_data_file, file_name=file_name, response_overrides=overrides
             )
 
-        self.add_handler("GET", "account", params, return_value=response)
-        self.set_network("ethereum", "mainnet")
-        return response
+        return self._setup_account_response(params, response)
 
     def setup_mock_account_transactions_with_ctor_args_response(
-        self, address: Optional[AddressType] = None
+        self, address: Optional[AddressType] = None, **overrides
     ):
         file_name = "get_account_transactions_with_ctor_args.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
@@ -424,10 +422,16 @@ class MockEtherscanBackend:
             params = EXPECTED_ACCOUNT_TXNS_PARAMS
 
         with open(test_data_path) as response_data_file:
-            response = self.get_mock_response(response_data_file, file_name=file_name)
-            self.add_handler("GET", "account", params, return_value=response)
-            self.set_network("ethereum", "mainnet")
-            return response
+            response = self.get_mock_response(
+                response_data_file, file_name=file_name, response_overrides=overrides
+            )
+
+        return self._setup_account_response(params, response)
+
+    def _setup_account_response(self, params, response):
+        self.add_handler("GET", "account", params, return_value=response)
+        self.set_network("ethereum", "mainnet")
+        return response
 
     def get_mock_response(
         self, response_data: Optional[Union[IO, Dict, str, MagicMock]] = None, **kwargs
@@ -476,19 +480,22 @@ def verification_params(address_to_verify, standard_input_json):
 
 
 @pytest.fixture(scope="session")
-def verification_params_with_ctor_args(
-    address_to_verify_with_ctor_args, library, standard_input_json
-):
+def constructor_arguments():
     # abi-encoded representation of uint256 value 42
-    ctor_args = "000000000000000000000000000000000000000000000000000000000000002a"  # noqa: E501
+    return "000000000000000000000000000000000000000000000000000000000000002a"  # noqa: E501
 
+
+@pytest.fixture(scope="session")
+def verification_params_with_ctor_args(
+    address_to_verify_with_ctor_args, library, standard_input_json, constructor_arguments
+):
     json_data = standard_input_json.copy()
     json_data["libraryaddress1"] = "0xF2Df0b975c0C9eFa2f8CA0491C2d1685104d2488"
 
     return {
         "action": "verifysourcecode",
         "codeformat": "solidity-standard-json-input",
-        "constructorArguements": ctor_args,
+        "constructorArguements": constructor_arguments,
         "contractaddress": address_to_verify_with_ctor_args,
         "contractname": "foo.sol:fooWithConstructor",
         "evmversion": None,
@@ -530,7 +537,7 @@ def address_to_verify(contract_to_verify):
 
 
 @pytest.fixture(scope="session")
-def address_to_verify_with_ctor_args(fake_connection, project, account):
+def contract_to_verify_with_ctor_args(fake_connection, project, account):
     # Deploy the library first.
     library = account.deploy(project.MyLib)
     ape.chain.contracts._local_contract_types[library.address] = library.contract_type
@@ -541,7 +548,12 @@ def address_to_verify_with_ctor_args(fake_connection, project, account):
 
     foo = project.fooWithConstructor.deploy(42, sender=account)
     ape.chain.contracts._local_contract_types[address] = foo.contract_type
-    return foo.address
+    return foo
+
+
+@pytest.fixture(scope="session")
+def address_to_verify_with_ctor_args(contract_to_verify_with_ctor_args):
+    return contract_to_verify_with_ctor_args.address
 
 
 @pytest.fixture(scope="session")

@@ -198,7 +198,8 @@ class SourceVerifier(ManagerAccessMixin):
         if code := self._contract_type.runtime_bytecode:
             runtime_code = code.bytecode or ""
             deployment_code = deploy_receipt["input"]
-            return extract_constructor_arguments(deployment_code, runtime_code)
+            ctor_args = extract_constructor_arguments(deployment_code, runtime_code)
+            return ctor_args
         else:
             raise ContractVerificationError("Failed to find runtime bytecode.")
 
@@ -414,7 +415,6 @@ def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: st
     runtime_bytecode = (
         runtime_bytecode[2:] if runtime_bytecode.startswith("0x") else runtime_bytecode
     )
-
     if deployment_bytecode.endswith(runtime_bytecode):
         # If the runtime bytecode is at the end of the deployment bytecode,
         # there are no constructor arguments

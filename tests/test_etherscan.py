@@ -90,9 +90,7 @@ def setup_verification_test(
     mock_backend, verification_params, verification_tester_cls, contract_to_verify
 ):
     def setup(found_handler: Callable, threshold: int = 2):
-        overrides = {
-            "result": [{"input": contract_to_verify.contract_type.deployment_bytecode.bytecode}]
-        }
+        overrides = _acct_tx_overrides(contract_to_verify)
         mock_backend.setup_mock_account_transactions_response(
             address=contract_to_verify.address, **overrides
         )
@@ -114,11 +112,15 @@ def setup_verification_test_with_ctor_args(
     mock_backend,
     verification_params_with_ctor_args,
     verification_tester_cls,
-    address_to_verify_with_ctor_args,
+    contract_to_verify_with_ctor_args,
+    constructor_arguments,
 ):
     def setup(found_handler: Callable, threshold: int = 2):
+        overrides = _acct_tx_overrides(
+            contract_to_verify_with_ctor_args, args=constructor_arguments
+        )
         mock_backend.setup_mock_account_transactions_with_ctor_args_response(
-            address=address_to_verify_with_ctor_args
+            address=contract_to_verify_with_ctor_args.address, **overrides
         )
         mock_backend.add_handler(
             "POST", "contract", verification_params_with_ctor_args, return_value=PUBLISH_GUID
@@ -258,3 +260,15 @@ def test_publish_contract_with_ctor_args(
     setup_verification_test_with_ctor_args(lambda: "Pass - You made it!")
     explorer.publish_contract(address_to_verify_with_ctor_args)
     assert caplog.records[-1].message == expected_verification_log_with_ctor_args
+
+
+def _acct_tx_overrides(contract, args=None):
+    suffix = args or ""
+    if suffix.startswith("0x"):
+        suffix = suffix[2:]
+
+    # Include construcor aguments!
+    ct = contract.contract_type
+    prefix = ct.deployment_bytecode.bytecode
+    code = f"{prefix}{suffix}"
+    return {"result": [{"input": code}]}
