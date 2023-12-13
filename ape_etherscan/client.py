@@ -44,7 +44,7 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
         return (
             "https://optimistic.etherscan.io"
             if network_name == "mainnet"
-            else "https://goerli-optimism.etherscan.io"
+            else f"https://{network_name}-optimism.etherscan.io"
         )
     elif ecosystem_name == "polygon-zkevm":
         return (
@@ -105,7 +105,7 @@ def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
         return (
             "https://api-optimistic.etherscan.io/api"
             if network_name == "mainnet"
-            else "https://api-goerli-optimistic.etherscan.io/api"
+            else f"https://api-{network_name}-optimistic.etherscan.io/api"
         )
     elif ecosystem_name == "polygon-zkevm":
         return (

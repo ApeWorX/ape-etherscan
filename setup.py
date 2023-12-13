@@ -20,8 +20,8 @@ extras_require = {
         "pytest-mock",  # Test mocker
     ],
     "lint": [
-        "black>=23.10.0,<24",  # auto-formatter and linter
-        "mypy>=1.6.1,<2",  # Static type analyzer
+        "black>=23.12.0,<24",  # auto-formatter and linter
+        "mypy>=1.7.1,<2",  # Static type analyzer
         "types-requests>=2.28.7",  # Needed due to mypy typeshed
         "types-setuptools",  # Needed due to mypy typeshed
         "flake8>=6.1.0,<7",  # Style linter
@@ -78,6 +78,7 @@ setup(
     install_requires=[
         "eth-ape>=0.6.16,<0.7",
         "requests",  # Use same version as eth-ape
+        "yarl",  # Use same version as eth-ape
     ],
     python_requires=">=3.8,<4",
     extras_require=extras_require,

@@ -11,42 +11,43 @@ API_KEY_ENV_KEY_MAP = {
     "gnosis": "GNOSISSCAN_API_KEY",
 }
 NETWORKS = {
-    "ethereum": [
-        "mainnet",
-        "goerli",
-        "sepolia",
-    ],
     "arbitrum": [
         "mainnet",
         "goerli",
-    ],
-    "fantom": [
-        "opera",
-        "testnet",
-    ],
-    "optimism": [
-        "mainnet",
-        "goerli",
-    ],
-    "base": [
-        "mainnet",
-        "goerli",
-    ],
-    "polygon-zkevm": [
-        "mainnet",
-        "goerli",
-    ],
-    "polygon": [
-        "mainnet",
-        "mumbai",
     ],
     "avalanche": [
         "mainnet",
         "fuji",
     ],
+    "base": [
+        "mainnet",
+        "goerli",
+    ],
     "bsc": [
         "mainnet",
         "testnet",
     ],
+    "ethereum": [
+        "mainnet",
+        "goerli",
+        "sepolia",
+    ],
+    "fantom": [
+        "opera",
+        "testnet",
+    ],
     "gnosis": ["mainnet"],
+    "optimism": [
+        "mainnet",
+        "goerli",
+        "sepolia",
+    ],
+    "polygon": [
+        "mainnet",
+        "mumbai",
+    ],
+    "polygon-zkevm": [
+        "mainnet",
+        "goerli",
+    ],
 }

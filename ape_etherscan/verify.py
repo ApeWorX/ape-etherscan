@@ -182,26 +182,24 @@ class SourceVerifier(ManagerAccessMixin):
         deploy_receipt = None
         while checks_done <= timeout:
             # If was just deployed, it takes a few seconds to show up in API response
+            if deploy_receipt := next(self._account_client.get_all_normal_transactions(), None):
+                break
 
-            try:
-                deploy_receipt = next(self._account_client.get_all_normal_transactions())
-            except StopIteration:
-                continue
-
-            logger.debug("Waiting for deploy receipt in Etherscan...")
-            checks_done += 1
-            time.sleep(2.5)
+            else:
+                logger.debug("Waiting for deploy receipt in Etherscan...")
+                checks_done += 1
+                time.sleep(2.5)
 
         if not deploy_receipt:
             raise ContractVerificationError(
                 f"Failed to find to deploy receipt for '{self.address}'"
             )
 
-        runtime_bytecode = self._contract_type.runtime_bytecode
-        if runtime_bytecode:
-            return extract_constructor_arguments(
-                deploy_receipt["input"], runtime_bytecode.bytecode or ""
-            )
+        if code := self._contract_type.runtime_bytecode:
+            runtime_code = code.bytecode or ""
+            deployment_code = deploy_receipt["input"]
+            ctor_args = extract_constructor_arguments(deployment_code, runtime_code)
+            return ctor_args
         else:
             raise ContractVerificationError("Failed to find runtime bytecode.")
 
@@ -250,7 +248,13 @@ class SourceVerifier(ManagerAccessMixin):
         all_settings = compiler_plugin.get_compiler_settings(
             [self._source_path], base_path=self._base_path
         )
-        settings = all_settings[version]
+
+        # Hack to allow any Version object work.
+        # TODO: Replace with all_settings[version] on 0.7 upgrade
+        settings = {str(v): s for v, s in all_settings.items() if str(v) == str(version)}[
+            str(version)
+        ]
+
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", 200)
@@ -411,7 +415,6 @@ def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: st
     runtime_bytecode = (
         runtime_bytecode[2:] if runtime_bytecode.startswith("0x") else runtime_bytecode
     )
-
     if deployment_bytecode.endswith(runtime_bytecode):
         # If the runtime bytecode is at the end of the deployment bytecode,
         # there are no constructor arguments
@@ -421,7 +424,7 @@ def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: st
     start_index = deployment_bytecode.find(runtime_bytecode)
 
     # If the runtime bytecode is not found within the deployment bytecode,
-    # return an error message
+    # return an error message.
     if start_index == -1:
         raise ContractVerificationError("Runtime bytecode not found within deployment bytecode")
 
