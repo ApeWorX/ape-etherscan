@@ -20,6 +20,12 @@ class ContractCreationResponse:
     txHash: str
 
 
+@dataclass
+class GetTransactionByHashResponse:
+    fromAddress: str = ""
+    toAddress: str = ""
+
+
 ResponseValue = Union[List, Dict, str]
 
 

@@ -15,7 +15,12 @@ from ape_etherscan.exceptions import (
     UnsupportedEcosystemError,
     UnsupportedNetworkError,
 )
-from ape_etherscan.types import ContractCreationResponse, EtherscanResponse, SourceCodeResponse
+from ape_etherscan.types import (
+    ContractCreationResponse,
+    EtherscanResponse,
+    GetTransactionByHashResponse,
+    SourceCodeResponse,
+)
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 
@@ -407,6 +412,30 @@ class AccountClient(_APIClient):
         return result.value
 
 
+class ProxyClient(_APIClient):
+    def __init__(self, ecosystem_name: str, network_name: str, tx_hash: str):
+        self._tx_hash = tx_hash
+        super().__init__(ecosystem_name, network_name, "proxy")
+
+    def get_transaction_by_hash(self) -> GetTransactionByHashResponse:
+        params = {
+            **self.base_params,
+            "action": "eth_getTransactionByHash",
+            "txhash": self._tx_hash,
+        }
+        result = self._get(params=params)
+
+        if not (data := result.value):
+            return GetTransactionByHashResponse()
+
+        if not isinstance(data, dict):
+            raise ValueError("Expecting dict.")
+
+        fromAddress = data.get("from") or ""
+        toAddress = data.get("to") or ""
+        return GetTransactionByHashResponse(fromAddress, toAddress)
+
+
 class ClientFactory:
     def __init__(self, ecosystem_name: str, network_name: str):
         self._ecosystem_name = ecosystem_name
@@ -417,3 +446,6 @@ class ClientFactory:
 
     def get_account_client(self, account_address: str) -> AccountClient:
         return AccountClient(self._ecosystem_name, self._network_name, account_address)
+
+    def get_proxy_client(self, tx_hash: str) -> ProxyClient:
+        return ProxyClient(self._ecosystem_name, self._network_name, tx_hash)
