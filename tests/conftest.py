@@ -392,9 +392,9 @@ class MockEtherscanBackend:
         return {"module": "contract", "action": "getsourcecode", "address": address}
 
     def setup_mock_account_transactions_response(
-        self, address: Optional[AddressType] = None, test_data_to_use: Optional[str] = None
+        self, address: Optional[AddressType] = None, **overrides
     ):
-        file_name = test_data_to_use or "get_account_transactions.json"
+        file_name = "get_account_transactions.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
         if address:
             params = EXPECTED_ACCOUNT_TXNS_PARAMS.copy()
@@ -403,10 +403,13 @@ class MockEtherscanBackend:
             params = EXPECTED_ACCOUNT_TXNS_PARAMS
 
         with open(test_data_path) as response_data_file:
-            response = self.get_mock_response(response_data_file, file_name=file_name)
-            self.add_handler("GET", "account", params, return_value=response)
-            self.set_network("ethereum", "mainnet")
-            return response
+            response = self.get_mock_response(
+                response_data_file, file_name=file_name, response_overrides=overrides
+            )
+
+        self.add_handler("GET", "account", params, return_value=response)
+        self.set_network("ethereum", "mainnet")
+        return response
 
     def setup_mock_account_transactions_with_ctor_args_response(
         self, address: Optional[AddressType] = None
@@ -440,7 +443,9 @@ class MockEtherscanBackend:
             response_data = {}
 
         response = self._mocker.MagicMock(spec=Response)
-        response.json.return_value = response_data
+        assert isinstance(response_data, dict)  # For mypy
+        overrides: Dict = kwargs.get("response_overrides", {})
+        response.json.return_value = {**response_data, **overrides}
         response.text = json.dumps(response_data or {})
 
         response.status_code = 200
@@ -514,12 +519,14 @@ def library(account, project, chain, solidity):
 
 
 @pytest.fixture(scope="session")
-def address_to_verify(fake_connection, library, project, account):
+def contract_to_verify(fake_connection, library, project, account):
     _ = library  # Ensure library is deployed first.
-    foo = project.foo.deploy(sender=account)
+    return project.foo.deploy(sender=account)
 
-    ape.chain.contracts._local_contract_types[address] = foo.contract_type
-    return foo.address
+
+@pytest.fixture(scope="session")
+def address_to_verify(contract_to_verify):
+    return contract_to_verify
 
 
 @pytest.fixture(scope="session")

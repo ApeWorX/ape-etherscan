@@ -87,10 +87,15 @@ def verification_tester_cls():
 
 @pytest.fixture
 def setup_verification_test(
-    mock_backend, verification_params, verification_tester_cls, address_to_verify
+    mock_backend, verification_params, verification_tester_cls, contract_to_verify
 ):
     def setup(found_handler: Callable, threshold: int = 2):
-        mock_backend.setup_mock_account_transactions_response(address=address_to_verify)
+        overrides = {
+            "result": [{"input": contract_to_verify.contract_type.deployment_bytecode.bytecode}]
+        }
+        mock_backend.setup_mock_account_transactions_response(
+            address=contract_to_verify.address, **overrides
+        )
         mock_backend.add_handler("POST", "contract", verification_params, return_value=PUBLISH_GUID)
         verification_tester = verification_tester_cls(found_handler, threshold=threshold)
         mock_backend.add_handler(
