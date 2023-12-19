@@ -26,22 +26,6 @@ ape.config.DATA_FOLDER = Path(mkdtemp()).resolve()
 ape.config.PROJECT_FOLDER = Path(mkdtemp()).resolve()
 
 MOCK_RESPONSES_PATH = Path(__file__).parent / "mock_responses"
-CONTRACT_ADDRESS = "0xFe80e7afB7041c1592a2A5d8f617518c1591Aad4"
-CONTRACT_ADDRESS_MAP = {
-    "get_contract_response": CONTRACT_ADDRESS,
-    "get_proxy_contract_response": "0x55A8a39bc9694714E2874c1ce77aa1E599461E18",
-    "get_vyper_contract_response": "0xdA816459F1AB5631232FE5e97a05BBBb94970c95",
-}
-EXPECTED_ACCOUNT_TXNS_PARAMS = {
-    "module": "account",
-    "action": "txlist",
-    "address": "0x1e59ce931B4CFea3fe4B875411e280e173cB7A9C",
-    "endblock": None,
-    "startblock": None,
-    "offset": 100,
-    "page": 1,
-    "sort": "asc",
-}
 FOO_SOURCE_CODE = """
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.20;
@@ -100,7 +84,6 @@ def standard_input_json(library):
                 "subcontracts/foo.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
             },
             "remappings": ["@bar=.cache/bar/local"],
-            "viaIR": False,
         },
         "libraryname1": "MyLib",
         "libraryaddress1": library.address,
@@ -140,13 +123,39 @@ def project():
 
 
 @pytest.fixture(scope="session")
-def address():
-    return CONTRACT_ADDRESS
+def address(contract_to_verify):
+    return contract_to_verify.address
+
+
+@pytest.fixture(scope="session")
+def contract_address_map(address):
+    return {
+        "get_contract_response": address,
+        "get_proxy_contract_response": "0x55A8a39bc9694714E2874c1ce77aa1E599461E18",
+        "get_vyper_contract_response": "0xdA816459F1AB5631232FE5e97a05BBBb94970c95",
+    }
 
 
 @pytest.fixture(scope="session")
 def account():
     return ape.accounts.test_accounts[0]
+
+
+@pytest.fixture
+def get_expected_account_txns_params():
+    def fn(addr):
+        return {
+            "module": "account",
+            "action": "txlist",
+            "address": addr,
+            "endblock": None,
+            "startblock": None,
+            "offset": 100,
+            "page": 1,
+            "sort": "asc",
+        }
+
+    return fn
 
 
 @pytest.fixture(scope="session")
@@ -187,7 +196,7 @@ def get_explorer(mocker):
             network.name = network_name
             network.ecosystem = ecosystem
             etherscan = ape.networks.get_ecosystem("ethereum").get_network("mainnet")
-            explorer = Etherscan.construct(name=etherscan.name, network=network)
+            explorer = Etherscan.model_construct(name=etherscan.name, network=network)
             network.explorer = explorer
             explorer.network = network
         else:
@@ -207,19 +216,23 @@ def response(mocker):
 
 
 @pytest.fixture
-def mock_backend(mocker):
+def mock_backend(mocker, get_expected_account_txns_params, contract_address_map):
     session = mocker.MagicMock()
-    backend = MockEtherscanBackend(mocker, session)
+    backend = MockEtherscanBackend(
+        mocker, session, get_expected_account_txns_params, contract_address_map
+    )
     _APIClient.session = session
     return backend
 
 
 class MockEtherscanBackend:
-    def __init__(self, mocker, session):
-        self._mocker = mocker
-        self._session = session
-        self._expected_base_uri = "https://api.etherscan.io/api"  # Default
-        self._handlers = {"get": {}, "post": {}}
+    def __init__(self, mocker, session, get_expected_account_txns_params, contract_address_map):
+        self.mocker = mocker
+        self.session = session
+        self.expected_base_uri = "https://api.etherscan.io/api"  # Default
+        self.handlers = {"get": {}, "post": {}}
+        self.get_expected_account_txns_params = get_expected_account_txns_params
+        self.contract_address_map = contract_address_map
 
     @cached_property
     def expected_uri_map(
@@ -278,7 +291,7 @@ class MockEtherscanBackend:
         }
 
     def set_network(self, ecosystem: str, network: str):
-        self._expected_base_uri = self.expected_uri_map[ecosystem][network.replace("-fork", "")]
+        self.expected_base_uri = self.expected_uri_map[ecosystem][network.replace("-fork", "")]
 
     def add_handler(
         self,
@@ -330,8 +343,8 @@ class MockEtherscanBackend:
                 result = side_effect()
                 return result if isinstance(result, Response) else self.get_mock_response(result)
 
-        self._handlers[method.lower()][module] = handler
-        self._session.request.side_effect = self.handle_request
+        self.handlers[method.lower()][module] = handler
+        self.session.request.side_effect = self.handle_request
 
     def handle_request(self, method, base_uri, timeout, headers=None, params=None, data=None):
         if params and "apikey" in params:
@@ -339,7 +352,7 @@ class MockEtherscanBackend:
         if data and "apiKey" in data:
             del data["apiKey"]
 
-        assert base_uri == self._expected_base_uri
+        assert base_uri == self.expected_base_uri
 
         if params:
             module = params.get("module")
@@ -348,12 +361,12 @@ class MockEtherscanBackend:
         else:
             raise AssertionError("Expected either 'params' or 'data'.")
 
-        handler = self._handlers[method.lower()][module]
+        handler = self.handlers[method.lower()][module]
         return handler(self, method, base_uri, headers=headers, params=params, data=data)
 
     def setup_mock_get_contract_type_response(self, file_name: str):
         response = self._get_contract_type_response(file_name)
-        address = CONTRACT_ADDRESS_MAP[file_name]
+        address = self.contract_address_map[file_name]
         expected_params = self._expected_get_ct_params(address)
         self.add_handler("GET", "contract", expected_params, return_value=response)
         response.expected_address = address
@@ -363,9 +376,9 @@ class MockEtherscanBackend:
         self, file_name: str, retries: int = 2
     ):
         response = self._get_contract_type_response(file_name)
-        address = CONTRACT_ADDRESS_MAP[file_name]
+        address = self.contract_address_map[file_name]
         expected_params = self._expected_get_ct_params(address)
-        throttled = self._mocker.MagicMock(spec=Response)
+        throttled = self.mocker.MagicMock(spec=Response)
         throttled.status_code = 429
 
         class ThrottleMock:
@@ -391,16 +404,11 @@ class MockEtherscanBackend:
     def _expected_get_ct_params(self, address: str) -> Dict:
         return {"module": "contract", "action": "getsourcecode", "address": address}
 
-    def setup_mock_account_transactions_response(
-        self, address: Optional[AddressType] = None, **overrides
-    ):
+    def setup_mock_account_transactions_response(self, address: AddressType, **overrides):
         file_name = "get_account_transactions.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
-        if address:
-            params = EXPECTED_ACCOUNT_TXNS_PARAMS.copy()
-            params["address"] = address
-        else:
-            params = EXPECTED_ACCOUNT_TXNS_PARAMS
+        params = self.get_expected_account_txns_params(address)
+        params["address"] = address
 
         with open(test_data_path) as response_data_file:
             response = self.get_mock_response(
@@ -410,16 +418,12 @@ class MockEtherscanBackend:
         return self._setup_account_response(params, response)
 
     def setup_mock_account_transactions_with_ctor_args_response(
-        self, address: Optional[AddressType] = None, **overrides
+        self, address: AddressType, **overrides
     ):
         file_name = "get_account_transactions_with_ctor_args.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
-
-        if address:
-            params = EXPECTED_ACCOUNT_TXNS_PARAMS.copy()
-            params["address"] = address
-        else:
-            params = EXPECTED_ACCOUNT_TXNS_PARAMS
+        params = self.get_expected_account_txns_params(address)
+        params["address"] = address
 
         with open(test_data_path) as response_data_file:
             response = self.get_mock_response(
@@ -446,7 +450,7 @@ class MockEtherscanBackend:
             # Mock wasn't set.
             response_data = {}
 
-        response = self._mocker.MagicMock(spec=Response)
+        response = self.mocker.MagicMock(spec=Response)
         assert isinstance(response_data, dict)  # For mypy
         overrides: Dict = kwargs.get("response_overrides", {})
         response.json.return_value = {**response_data, **overrides}
@@ -490,7 +494,7 @@ def verification_params_with_ctor_args(
     address_to_verify_with_ctor_args, library, standard_input_json, constructor_arguments
 ):
     json_data = standard_input_json.copy()
-    json_data["libraryaddress1"] = "0xF2Df0b975c0C9eFa2f8CA0491C2d1685104d2488"
+    json_data["libraryaddress1"] = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
 
     return {
         "action": "verifysourcecode",

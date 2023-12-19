@@ -4,12 +4,13 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, Optional
 
+from ape.api import CompilerAPI
 from ape.contracts import ContractInstance
 from ape.logging import LogLevel, logger
 from ape.types import AddressType
 from ape.utils import ManagerAccessMixin, cached_property
-from ethpm_types import ContractType
-from semantic_version import Version  # type: ignore
+from ape_solidity.compiler import DEFAULT_OPTIMIZATION_RUNS
+from ethpm_types import Compiler, ContractType
 
 from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 from ape_etherscan.exceptions import ContractVerificationError, EtherscanResponseError
@@ -144,32 +145,36 @@ class SourceVerifier(ManagerAccessMixin):
         self.client_factory = client_factory
 
     @cached_property
-    def _account_client(self) -> AccountClient:
+    def account_client(self) -> AccountClient:
         return self.client_factory.get_account_client(str(self.address))
 
     @cached_property
-    def _contract_client(self) -> ContractClient:
+    def contract_client(self) -> ContractClient:
         return self.client_factory.get_contract_client(str(self.address))
 
     @cached_property
-    def _contract(self) -> ContractInstance:
+    def contract(self) -> ContractInstance:
         return self.chain_manager.contracts.instance_at(self.address)
 
     @property
-    def _contract_type(self) -> ContractType:
-        return self._contract.contract_type
+    def contract_type(self) -> ContractType:
+        return self.contract.contract_type
+
+    @property
+    def contract_name(self) -> str:
+        return self.contract.contract_type.name or ""
 
     @property
     def _base_path(self) -> Path:
         return self.project_manager.contracts_folder
 
     @property
-    def _source_path(self) -> Path:
-        return self._base_path / (self._contract_type.source_id or "")
+    def source_path(self) -> Path:
+        return self._base_path / (self.contract_type.source_id or "")
 
     @property
-    def _ext(self) -> str:
-        return self._source_path.suffix
+    def ext(self) -> str:
+        return self.source_path.suffix
 
     @cached_property
     def constructor_arguments(self) -> str:
@@ -182,7 +187,7 @@ class SourceVerifier(ManagerAccessMixin):
         deploy_receipt = None
         while checks_done <= timeout:
             # If was just deployed, it takes a few seconds to show up in API response
-            if deploy_receipt := next(self._account_client.get_all_normal_transactions(), None):
+            if deploy_receipt := next(self.account_client.get_all_normal_transactions(), None):
                 break
 
             else:
@@ -195,7 +200,7 @@ class SourceVerifier(ManagerAccessMixin):
                 f"Failed to find to deploy receipt for '{self.address}'"
             )
 
-        if code := self._contract_type.runtime_bytecode:
+        if code := self.contract_type.runtime_bytecode:
             runtime_code = code.bytecode or ""
             deployment_code = deploy_receipt["input"]
             ctor_args = extract_constructor_arguments(deployment_code, runtime_code)
@@ -209,8 +214,36 @@ class SourceVerifier(ManagerAccessMixin):
         The license type used in the code.
         """
 
-        spdx_id = self._source_path.read_text().split("\n")[0]
+        spdx_id = self.source_path.read_text().split("\n")[0]
         return LicenseType.from_spdx_id(spdx_id)
+
+    @property
+    def compiler_api(self) -> CompilerAPI:
+        if compiler := self.compiler_manager.registered_compilers.get(self.ext):
+            return compiler
+
+        raise ContractVerificationError(
+            f"Missing required compiler plugin for '{self.ext}' to verify."
+        )
+
+    @cached_property
+    def compiler_name(self) -> str:
+        return self.compiler_api.name
+
+    @property
+    def compiler(self) -> Compiler:
+        # Check the cached manifest for the compiler artifacts.
+        if manifest := self.project_manager.local_project.cached_manifest:
+            if compiler := manifest.get_contract_compiler(self.contract_name):
+                return compiler
+
+        # Look in the publishable manifest, as Ape includes these there.
+        manifest = self.project_manager.extract_manifest()
+        if compiler := manifest.get_contract_compiler(self.contract_name):
+            return compiler
+
+        # Build a default one and hope for the best.
+        return Compiler(name=self.compiler_name, contractType=[self.contract_name], version=None)
 
     def attempt_verification(self):
         """
@@ -223,45 +256,14 @@ class SourceVerifier(ManagerAccessMixin):
               to validate the contract.
         """
 
-        manifest = self.project_manager.extract_manifest()
-        compilers_used = [
-            c for c in manifest.compilers if self._contract_type.name in c.contractTypes
-        ]
-
-        if not compilers_used:
-            raise ContractVerificationError("Compiler data missing from project manifest.")
-
-        versions = [Version(c.version) for c in compilers_used]
-        if not versions:
-            # Might be impossible to get here.
-            raise ContractVerificationError("Unable to find compiler version used.")
-
-        elif len(versions) > 1:
-            # Might be impossible to get here.
-            logger.warning("Source was compiled by multiple versions. Using max.")
-            version = max(versions)
-
-        else:
-            version = versions[0]
-
-        compiler_plugin = self.compiler_manager.registered_compilers[self._ext]
-        all_settings = compiler_plugin.get_compiler_settings(
-            [self._source_path], base_path=self._base_path
-        )
-
-        # Hack to allow any Version object work.
-        # TODO: Replace with all_settings[version] on 0.7 upgrade
-        settings = {str(v): s for v, s in all_settings.items() if str(v) == str(version)}[
-            str(version)
-        ]
-
+        version = str(self.compiler.version)
+        settings = self.compiler.settings or self._get_new_settings(version)
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
-        runs = optimizer.get("runs", 200)
-        source_id = self._contract_type.source_id
+        runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
+        source_id = self.contract_type.source_id
         base_folder = self.project_manager.contracts_folder
         standard_input_json = self._get_standard_input_json(source_id, base_folder, **settings)
-
         evm_version = settings.get("evmVersion")
         license_code = self.license_code
         license_code_value = license_code.value if license_code else None
@@ -274,14 +276,14 @@ class SourceVerifier(ManagerAccessMixin):
         # NOTE: Etherscan does not allow directory prefixes on the source ID.
         if self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
             request_source_id = Path(source_id).name
-            contract_name = f"{request_source_id}:{self._contract_type.name}"
+            contract_name = f"{request_source_id}:{self.contract_type.name or ''}"
         else:
             # When we have a flattened contract, we don't need to specify the file name
             # only the contract name
-            contract_name = f"{self._contract_type.name}"
+            contract_name = self.contract_type.name or ""
 
         try:
-            guid = self._contract_client.verify_source_code(
+            guid = self.contract_client.verify_source_code(
                 standard_input_json,
                 str(version),
                 contract_name=contract_name,
@@ -301,13 +303,27 @@ class SourceVerifier(ManagerAccessMixin):
 
         self._wait_for_verification(guid)
 
+    def _get_new_settings(self, version: str) -> Dict:
+        logger.warning(
+            "Settings missing from cached manifest. " "Attempting to re-calculate find settings."
+        )
+
+        # Attempt to re-calculate settings.
+        compiler_plugin = self.compiler_manager.registered_compilers[self.ext]
+        all_settings = compiler_plugin.get_compiler_settings(
+            [self.source_path], base_path=self._base_path
+        )
+
+        # Hack to allow any Version object work.
+        return {str(v): s for v, s in all_settings.items() if str(v) == version}[version]
+
     def _get_standard_input_json(
         self, source_id: str, base_folder: Optional[Path] = None, **settings
     ) -> Dict:
         base_dir = base_folder or self.project_manager.contracts_folder
         source_path = base_dir / source_id
         compiler = self.compiler_manager.registered_compilers[source_path.suffix]
-        sources = {self._source_path.name: {"content": source_path.read_text()}}
+        sources = {self.source_path.name: {"content": source_path.read_text()}}
 
         def build_map(_source_id: str):
             _source_path = base_dir / _source_id
@@ -375,7 +391,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         for iteration in range(100):
             try:
-                verification_update = self._contract_client.check_verify_status(guid)
+                verification_update = self.contract_client.check_verify_status(guid)
                 guid_did_exist = True
             except EtherscanResponseError as err:
                 if "Resource not found" in str(err) and guid_did_exist:
@@ -426,7 +442,7 @@ def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: st
     # If the runtime bytecode is not found within the deployment bytecode,
     # return an error message.
     if start_index == -1:
-        raise ContractVerificationError("Runtime bytecode not found within deployment bytecode")
+        raise ContractVerificationError("Runtime bytecode not found within deployment bytecode.")
 
     # Cut the deployment bytecode at the start of the runtime bytecode
     # The remaining part is the constructor arguments
