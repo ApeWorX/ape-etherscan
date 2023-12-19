@@ -14,7 +14,7 @@ extras_require = {
         "ape-infura",  # Needed for live network tests
         "ape-solidity",  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
-        "pytest-xdist",  # multi-process runner
+        "pytest-xdist",  # Multi-process runner
         "pytest-cov",  # Coverage analyzer plugin
         "hypothesis>=6.2.0,<7",  # Strategy-based fuzzer
         "pytest-mock",  # Test mocker
@@ -25,15 +25,17 @@ extras_require = {
         "types-requests>=2.28.7",  # Needed due to mypy typeshed
         "types-setuptools",  # Needed due to mypy typeshed
         "flake8>=6.1.0,<7",  # Style linter
+        "flake8-breakpoint>=1.1.0,<2",  # Detect breakpoints left in code
+        "flake8-print>=5.0.0,<6",  # Detect print statements left in code
         "isort>=5.10.1,<6",  # Import sorting linter
         "mdformat>=0.7.17",  # Auto-formatter for markdown
         "mdformat-gfm>=0.3.5",  # Needed for formatting GitHub-flavored markdown
         "mdformat-frontmatter>=0.4.1",  # Needed for frontmatters-style headers in issue templates
-        "pydantic<2",  # Needed for successful type check.
+        "mdformat-pyproject>=0.0.1",  # Allows configuring in pyproject.toml
     ],
     "doc": [
-        "Sphinx>=3.4.3,<4",  # Documentation generator
-        "sphinx_rtd_theme>=0.1.9,<1",  # Readthedocs.org theme
+        "Sphinx>=6.1.3,<7",  # Documentation generator
+        "sphinx_rtd_theme>=1.2.0,<2",  # Readthedocs.org theme
         "towncrier>=19.2.0,<20",  # Generate release notes
     ],
     "release": [  # `release` GitHub Action job uses this
@@ -76,7 +78,8 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.6.16,<0.7",
+        "eth-ape>=0.7.0,<0.8",
+        "ethpm_types",  # Use same version as eth-ape
         "requests",  # Use same version as eth-ape
         "yarl",  # Use same version as eth-ape
     ],

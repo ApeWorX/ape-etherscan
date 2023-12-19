@@ -187,7 +187,7 @@ def get_explorer(mocker):
             network.name = network_name
             network.ecosystem = ecosystem
             etherscan = ape.networks.get_ecosystem("ethereum").get_network("mainnet")
-            explorer = Etherscan.construct(name=etherscan.name, network=network)
+            explorer = Etherscan.model_construct(name=etherscan.name, network=network)
             network.explorer = explorer
             explorer.network = network
         else:
