@@ -2,32 +2,50 @@ import json
 from json.decoder import JSONDecodeError
 from typing import Optional
 
-from ape.api import ExplorerAPI
+from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
 from ape.logging import logger
 from ape.types import AddressType, ContractType
 
-from ape_etherscan.client import ClientFactory, get_etherscan_uri
+from ape_etherscan.client import ClientFactory, get_etherscan_api_uri, get_etherscan_uri
+from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.verify import SourceVerifier
 
 
 class Etherscan(ExplorerAPI):
-    def get_address_url(self, address: str) -> str:
-        etherscan_uri = get_etherscan_uri(
-            self.network.ecosystem.name, self.network.name.replace("-fork", "")
+    @property
+    def _config(self) -> PluginConfig:
+        return self.config_manager.get_config("etherscan")
+
+    @property
+    def etherscan_uri(self):
+        return get_etherscan_uri(
+            self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
         )
-        return f"{etherscan_uri}/address/{address}"
+
+    @property
+    def etherscan_api_uri(self):
+        return get_etherscan_api_uri(
+            self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
+        )
+
+    def get_address_url(self, address: str) -> str:
+        return f"{self.etherscan_uri}/address/{address}"
 
     def get_transaction_url(self, transaction_hash: str) -> str:
-        etherscan_uri = get_etherscan_uri(
-            self.network.ecosystem.name, self.network.name.replace("-fork", "")
-        )
-        return f"{etherscan_uri}/tx/{transaction_hash}"
+        return f"{self.etherscan_uri}/tx/{transaction_hash}"
 
     @property
     def _client_factory(self) -> ClientFactory:
-        return ClientFactory(self.network.ecosystem.name, self.network.name.replace("-fork", ""))
+        return ClientFactory(
+            EtherscanInstance(
+                ecosystem_name=self.network.ecosystem.name,
+                network_name=self.network.name.replace("-fork", ""),
+                uri=self.etherscan_uri,
+                api_uri=self.etherscan_api_uri,
+            )
+        )
 
     def get_contract_type(self, address: AddressType) -> Optional[ContractType]:
         if not self.conversion_manager.is_type(address, AddressType):

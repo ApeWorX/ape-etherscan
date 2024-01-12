@@ -1,11 +1,12 @@
 from typing import Iterator, Optional
 
-from ape.api import QueryAPI, QueryType, ReceiptAPI
+from ape.api import PluginConfig, QueryAPI, QueryType, ReceiptAPI
 from ape.api.query import AccountTransactionQuery, ContractCreationQuery
 from ape.exceptions import QueryEngineError
 from ape.utils import singledispatchmethod
 
-from ape_etherscan.client import ClientFactory
+from ape_etherscan.client import ClientFactory, get_etherscan_api_uri, get_etherscan_uri
+from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.utils import NETWORKS
 
 
@@ -13,6 +14,30 @@ class EtherscanQueryEngine(QueryAPI):
     @property
     def _client_factory(self) -> ClientFactory:
         return ClientFactory(
+            EtherscanInstance(
+                ecosystem_name=self.provider.network.ecosystem.name,
+                network_name=self.provider.network.name.replace("-fork", ""),
+                uri=self.etherscan_uri,
+                api_uri=self.etherscan_api_uri,
+            )
+        )
+
+    @property
+    def _config(self) -> PluginConfig:
+        return self.config_manager.get_config("etherscan")
+
+    @property
+    def etherscan_uri(self):
+        return get_etherscan_uri(
+            self._config,
+            self.provider.network.ecosystem.name,
+            self.provider.network.name.replace("-fork", ""),
+        )
+
+    @property
+    def etherscan_api_uri(self):
+        return get_etherscan_api_uri(
+            self._config,
             self.provider.network.ecosystem.name,
             self.provider.network.name.replace("-fork", ""),
         )

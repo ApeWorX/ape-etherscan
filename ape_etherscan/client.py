@@ -5,21 +5,41 @@ import time
 from io import StringIO
 from typing import Dict, Iterator, List, Optional
 
+from ape.api import PluginConfig
 from ape.logging import logger
 from ape.utils import USER_AGENT, ManagerAccessMixin
 from requests import Session
 from yarl import URL
 
+from ape_etherscan.config import EtherscanConfig
 from ape_etherscan.exceptions import (
     UnhandledResultError,
     UnsupportedEcosystemError,
     UnsupportedNetworkError,
 )
-from ape_etherscan.types import ContractCreationResponse, EtherscanResponse, SourceCodeResponse
+from ape_etherscan.types import (
+    ContractCreationResponse,
+    EtherscanInstance,
+    EtherscanResponse,
+    SourceCodeResponse,
+)
 from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
 
 
-def get_etherscan_uri(ecosystem_name: str, network_name: str):
+def get_network_config(
+    etherscan_config: EtherscanConfig, ecosystem_name: str, network_name: str
+) -> Optional[PluginConfig]:
+    if ecosystem_name in etherscan_config:
+        return etherscan_config[ecosystem_name].get(network_name)
+    return None
+
+
+def get_etherscan_uri(etherscan_config: EtherscanConfig, ecosystem_name: str, network_name: str):
+    # Look for explicitly configured Etherscan config
+    network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
+    if network_conf and hasattr(network_conf, "uri"):
+        return network_conf.uri
+
     if ecosystem_name == "ethereum":
         return (
             f"https://{network_name}.etherscan.io"
@@ -80,7 +100,14 @@ def get_etherscan_uri(ecosystem_name: str, network_name: str):
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
-def get_etherscan_api_uri(ecosystem_name: str, network_name: str):
+def get_etherscan_api_uri(
+    etherscan_config: EtherscanConfig, ecosystem_name: str, network_name: str
+):
+    # Look for explicitly configured Etherscan config
+    network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
+    if network_conf and hasattr(network_conf, "api_uri"):
+        return network_conf.uri
+
     if ecosystem_name == "ethereum":
         return (
             f"https://api-{network_name}.etherscan.io/api"
@@ -149,15 +176,14 @@ class _APIClient(ManagerAccessMixin):
     DEFAULT_HEADERS = {"User-Agent": USER_AGENT}
     session = Session()
 
-    def __init__(self, ecosystem_name: str, network_name: str, module_name: str):
-        self._ecosystem_name = ecosystem_name
-        self._network_name = network_name
+    def __init__(self, instance: EtherscanInstance, module_name: str):
+        self._instance = instance
         self._module_name = module_name
         self._last_call = 0.0
 
     @property
     def base_uri(self) -> str:
-        return get_etherscan_api_uri(self._ecosystem_name, self._network_name)
+        return self._instance.api_uri
 
     @property
     def base_params(self) -> Dict:
@@ -245,10 +271,10 @@ class _APIClient(ManagerAccessMixin):
 
             break
 
-        return EtherscanResponse(response, self._ecosystem_name, raise_on_exceptions)
+        return EtherscanResponse(response, self._instance.ecosystem_name, raise_on_exceptions)
 
     def __authorize(self, params_or_data: Optional[Dict] = None) -> Optional[Dict]:
-        env_var_key = API_KEY_ENV_KEY_MAP.get(self._ecosystem_name)
+        env_var_key = API_KEY_ENV_KEY_MAP.get(self._instance.ecosystem_name)
         if not env_var_key:
             return params_or_data
 
@@ -262,9 +288,9 @@ class _APIClient(ManagerAccessMixin):
 
 
 class ContractClient(_APIClient):
-    def __init__(self, ecosystem_name: str, network_name: str, address: str):
+    def __init__(self, instance: EtherscanInstance, address: str):
         self._address = address
-        super().__init__(ecosystem_name, network_name, "contract")
+        super().__init__(instance, "contract")
 
     def get_source_code(self) -> SourceCodeResponse:
         params = {
@@ -357,9 +383,9 @@ class ContractClient(_APIClient):
 
 
 class AccountClient(_APIClient):
-    def __init__(self, ecosystem_name: str, network_name: str, address: str):
+    def __init__(self, instance: EtherscanInstance, address: str):
         self._address = address
-        super().__init__(ecosystem_name, network_name, "account")
+        super().__init__(instance, "account")
 
     def get_all_normal_transactions(
         self,
@@ -408,12 +434,11 @@ class AccountClient(_APIClient):
 
 
 class ClientFactory:
-    def __init__(self, ecosystem_name: str, network_name: str):
-        self._ecosystem_name = ecosystem_name
-        self._network_name = network_name
+    def __init__(self, instance: EtherscanInstance):
+        self._instance = instance
 
     def get_contract_client(self, contract_address: str) -> ContractClient:
-        return ContractClient(self._ecosystem_name, self._network_name, contract_address)
+        return ContractClient(self._instance, contract_address)
 
     def get_account_client(self, account_address: str) -> AccountClient:
-        return AccountClient(self._ecosystem_name, self._network_name, account_address)
+        return AccountClient(self._instance, account_address)
