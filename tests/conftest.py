@@ -188,7 +188,7 @@ def get_explorer(mocker):
     ) -> ExplorerAPI:
         try:
             ecosystem = ape.networks.get_ecosystem(ecosystem_name)
-        except NetworkError as err:
+        except NetworkError:
             # Use mock
             logger.warning(
                 f"Ecosystem 'ape-{ecosystem_name}' not installed; resorting to a mock ecosystem."

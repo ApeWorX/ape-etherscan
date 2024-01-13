@@ -1,10 +1,8 @@
 from typing import Callable
 
-import ape
 import pytest
 from ape.api.query import AccountTransactionQuery
 
-from ape_etherscan import NETWORKS
 from ape_etherscan.exceptions import EtherscanResponseError, EtherscanTooManyRequestsError
 
 from ._utils import ecosystems_and_networks
