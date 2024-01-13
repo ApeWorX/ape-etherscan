@@ -9,6 +9,8 @@ from ape_etherscan.exceptions import EtherscanResponseError, get_request_error
 
 @dataclass
 class EtherscanInstance:
+    """Used to pass around Etherscan instance information"""
+
     ecosystem_name: str
     network_name: str  # normalized (e.g. no -fork)
     uri: str
