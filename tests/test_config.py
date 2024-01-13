@@ -29,14 +29,14 @@ def test_no_config(account, ecosystem, network, get_explorer, temp_config):
 
 def test_config_rate_limit(account, get_explorer, temp_config):
     """Test that rate limit config is set"""
-    conf = DEFAULT_CONFIG | {"etherscan": {"ethereum": {"rate_limit": 123}}}
+    conf = {**DEFAULT_CONFIG, **{"etherscan": {"ethereum": {"rate_limit": 123}}}}
     with temp_config(conf):
         assert account.query_manager.engines["etherscan"].rate_limit == 123
 
 
 def test_config_retries(account, get_explorer, temp_config):
     """Test that rate limit config is set"""
-    conf = DEFAULT_CONFIG | {"etherscan": {"ethereum": {"retries": 321}}}
+    conf = {**DEFAULT_CONFIG, **{"etherscan": {"ethereum": {"retries": 321}}}}
     with temp_config(conf):
         assert account.query_manager.engines["etherscan"].rate_limit == 5
         client = account.query_manager.engines["etherscan"]._client_factory.get_account_client(
@@ -52,10 +52,15 @@ def test_config_uri(account, get_explorer, temp_config):
     expected_uri = "https://monke.chain/"
     expected_api_uri = "https://api.monke.chain/api"
     custon_network_name = "monkechain"
-    conf = DEFAULT_CONFIG | {
-        "networks": {"custom": [{"name": custon_network_name, "chain_id": 31337}]},
-        "etherscan": {
-            "ethereum": {custon_network_name: {"uri": expected_uri, "api_uri": expected_api_uri}}
+    conf = {
+        **DEFAULT_CONFIG,
+        **{
+            "networks": {"custom": [{"name": custon_network_name, "chain_id": 31337}]},
+            "etherscan": {
+                "ethereum": {
+                    custon_network_name: {"uri": expected_uri, "api_uri": expected_api_uri}
+                }
+            },
         },
     }
 
