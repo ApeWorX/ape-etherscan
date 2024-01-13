@@ -1,5 +1,8 @@
 import json
 import os
+import tempfile
+import yaml
+from contextlib import contextmanager
 from io import StringIO
 from json import JSONDecodeError
 from pathlib import Path
@@ -13,6 +16,7 @@ import pytest
 from ape.api import ExplorerAPI
 from ape.exceptions import NetworkError
 from ape.logging import logger
+from ape.managers.config import CONFIG_FILE_NAME
 from ape.types import AddressType
 from ape.utils import cached_property
 from ape_solidity._utils import OUTPUT_SELECTION
@@ -180,12 +184,11 @@ def explorer(get_explorer):
 @pytest.fixture
 def get_explorer(mocker):
     def fn(
-        ecosystem_name: str = "ethereum",
-        network_name: str = "development",
+        ecosystem_name: str = "ethereum", network_name: str = "development", no_mock=False
     ) -> ExplorerAPI:
         try:
             ecosystem = ape.networks.get_ecosystem(ecosystem_name)
-        except NetworkError:
+        except NetworkError as err:
             # Use mock
             logger.warning(
                 f"Ecosystem 'ape-{ecosystem_name}' not installed; resorting to a mock ecosystem."
@@ -574,3 +577,31 @@ def expected_verification_log_with_ctor_args(address_to_verify_with_ctor_args):
         "Contract verification successful!\n"
         f"https://etherscan.io/address/{address_to_verify_with_ctor_args}#code"
     )
+
+
+@pytest.fixture(scope="session")
+def temp_config():
+    config = ape.config
+
+    @contextmanager
+    def func(data: Dict, package_json: Optional[Dict] = None):
+        with tempfile.TemporaryDirectory() as temp_dir_str:
+            temp_dir = Path(temp_dir_str)
+
+            config._cached_configs = {}
+            config_file = temp_dir / CONFIG_FILE_NAME
+            config_file.touch()
+            config_file.write_text(yaml.dump(data))
+            config.load(force_reload=True)
+
+            if package_json:
+                package_json_file = temp_dir / "package.json"
+                package_json_file.write_text(json.dumps(package_json))
+
+            with config.using_project(temp_dir):
+                yield temp_dir
+
+            config_file.unlink()
+            config._cached_configs = {}
+
+    return func

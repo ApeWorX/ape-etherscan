@@ -1,10 +1,13 @@
 from typing import Callable
 
 import pytest
+import ape
 from ape.api.query import AccountTransactionQuery
 
 from ape_etherscan import NETWORKS
 from ape_etherscan.exceptions import EtherscanResponseError, EtherscanTooManyRequestsError
+
+from ._utils import ecosystems_and_networks
 
 # A map of each mock response to its contract name for testing `get_contract_type()`.
 EXPECTED_CONTRACT_NAME_MAP = {
@@ -15,14 +18,6 @@ EXPECTED_CONTRACT_NAME_MAP = {
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 PUBLISH_GUID = "123"
 
-# Every supported ecosystem / network combo as `[("ecosystem", "network") ... ]`
-ecosystems_and_networks = [
-    p
-    for plist in [
-        [(e, n) for n in nets] + [(e, f"{n}-fork") for n in nets] for e, nets in NETWORKS.items()
-    ]
-    for p in plist
-]
 base_url_test = pytest.mark.parametrize(
     "ecosystem,network,url",
     [
