@@ -34,11 +34,13 @@ def get_network_config(
     return None
 
 
-def get_etherscan_uri(etherscan_config: EtherscanConfig, ecosystem_name: str, network_name: str):
+def get_etherscan_uri(
+    etherscan_config: EtherscanConfig, ecosystem_name: str, network_name: str
+) -> str:
     # Look for explicitly configured Etherscan config
     network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
     if network_conf and hasattr(network_conf, "uri"):
-        return network_conf.uri
+        return str(network_conf.uri)
 
     if ecosystem_name == "ethereum":
         return (
@@ -102,11 +104,11 @@ def get_etherscan_uri(etherscan_config: EtherscanConfig, ecosystem_name: str, ne
 
 def get_etherscan_api_uri(
     etherscan_config: EtherscanConfig, ecosystem_name: str, network_name: str
-):
+) -> str:
     # Look for explicitly configured Etherscan config
     network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
     if network_conf and hasattr(network_conf, "api_uri"):
-        return network_conf.uri
+        return str(network_conf.api_uri)
 
     if ecosystem_name == "ethereum":
         return (
