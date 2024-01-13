@@ -1,7 +1,6 @@
 import json
 import os
 import tempfile
-import yaml
 from contextlib import contextmanager
 from io import StringIO
 from json import JSONDecodeError
@@ -13,6 +12,7 @@ from unittest.mock import MagicMock
 import _io  # type: ignore
 import ape
 import pytest
+import yaml
 from ape.api import ExplorerAPI
 from ape.exceptions import NetworkError
 from ape.logging import logger

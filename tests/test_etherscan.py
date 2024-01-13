@@ -1,7 +1,7 @@
 from typing import Callable
 
-import pytest
 import ape
+import pytest
 from ape.api.query import AccountTransactionQuery
 
 from ape_etherscan import NETWORKS
