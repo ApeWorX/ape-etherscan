@@ -117,7 +117,8 @@ For those networks, the corresponding compiler plugin's `flatten` functionality 
 
 ## Custom Networks
 
-If you would like to use ape-etherscan with your [custom network configuration](https://docs.apeworx.io/ape/stable/userguides/networks.html#custom-network-connection), you can use the same network identifier you used to configure it.  For instance, with a custom Ethereum network called "apechain" your configuration might look something like this:
+If you would like to use ape-etherscan with your [custom network configuration](https://docs.apeworx.io/ape/stable/userguides/networks.html#custom-network-connection), you can use the same network identifier you used to configure it.
+For instance, with a custom Ethereum network called "apechain" your configuration might look something like this:
 
 ```yaml
 networks:
