@@ -55,7 +55,11 @@ def test_config_uri(account, get_explorer, temp_config):
     conf = {
         **DEFAULT_CONFIG,
         **{
-            "networks": {"custom": [{"name": custon_network_name, "chain_id": 31337}]},
+            "networks": {
+                "custom": [
+                    {"name": custon_network_name, "chain_id": 31337, "ecosystem": "ethereum"}
+                ]
+            },
             "etherscan": {
                 "ethereum": {
                     custon_network_name: {"uri": expected_uri, "api_uri": expected_api_uri}
