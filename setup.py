@@ -24,6 +24,7 @@ extras_require = {
         "mypy>=1.7.1,<2",  # Static type analyzer
         "types-requests>=2.28.7",  # Needed due to mypy typeshed
         "types-setuptools",  # Needed due to mypy typeshed
+        "types-PyYAML",  # Needed due to mypy typeshed
         "flake8>=6.1.0,<7",  # Style linter
         "flake8-breakpoint>=1.1.0,<2",  # Detect breakpoints left in code
         "flake8-print>=5.0.0,<6",  # Detect print statements left in code
@@ -78,7 +79,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.7.0,<0.8",
+        "eth-ape>=0.7.6,<0.8",
         "ethpm_types",  # Use same version as eth-ape
         "requests",  # Use same version as eth-ape
         "yarl",  # Use same version as eth-ape

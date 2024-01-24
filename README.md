@@ -114,3 +114,27 @@ Not every network's explorer supports multi-file verification.
 For those networks, the corresponding compiler plugin's `flatten` functionality is invoked, in order to verify the contract as a single file.
 
 **NOTE**: You must set an Etherscan API key environment variable to use the publishing feature.
+
+## Custom Networks
+
+If you would like to use ape-etherscan with your [custom network configuration](https://docs.apeworx.io/ape/stable/userguides/networks.html#custom-network-connection), you can use the same network identifier you used to configure it.
+For instance, with a custom Ethereum network called "apechain" your configuration might look something like this:
+
+```yaml
+networks:
+  custom:
+    - name: apechain
+      chain_id: 31337
+
+geth:
+  ethereum:
+    apechain:
+      uri: http://localhost:8545
+
+etherscan:
+  ethereum:
+    rate_limit: 15
+    apechain:
+      uri: https://custom.scan
+      api_uri: https://api.custom.scan/api
+```
