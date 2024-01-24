@@ -20,7 +20,7 @@ class EcosystemConfig(PluginConfig):
     def verify_extras(self) -> "EcosystemConfig":
         if self.__pydantic_extra__:
             for aname in self.__pydantic_extra__.keys():
-                self.__pydantic_extra__[aname] = NetworkConfig.parse_obj(
+                self.__pydantic_extra__[aname] = NetworkConfig.model_validate(
                     self.__pydantic_extra__[aname]
                 )
         return self
