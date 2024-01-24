@@ -45,7 +45,7 @@ def test_config_retries(account, get_explorer, temp_config):
         assert client._retries == 321
 
 
-def test_config_uri(account, get_explorer, temp_config):
+def test_config_uri(account, get_explorer, mock_provider, temp_config):
     """
     Make sure URI parameter is used when configured
     """
@@ -69,7 +69,7 @@ def test_config_uri(account, get_explorer, temp_config):
     }
 
     with temp_config(conf):
-        with ape.networks.ethereum.monkechain.use_provider("geth"):
+        with mock_provider("ethereum", "monkechain"):
             assert account.query_manager.engines["etherscan"].etherscan_uri == expected_uri
             assert account.query_manager.engines["etherscan"].etherscan_api_uri == expected_api_uri
             account_client = account.query_manager.engines[

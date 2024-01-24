@@ -100,6 +100,24 @@ def connection(explorer):
         yield provider
 
 
+@pytest.fixture
+def mock_provider(mocker):
+    @contextmanager
+    def func(ecosystem_name="ethereum", network_name="mock"):
+        mock_provider = mocker.MagicMock()
+        mock_provider.network = mocker.MagicMock()
+        mock_provider.network.name = network_name
+        mock_provider.network.ecosystem = mocker.MagicMock()
+        mock_provider.network.ecosystem.name = ecosystem_name
+        ape.networks.active_provider = mock_provider
+
+        yield mock_provider
+
+        ape.networks.active_provider = None
+
+    return func
+
+
 def make_source(base_dir: Path, name: str, content: str):
     source_file = base_dir / f"{name}.sol"
     source_file.touch()
