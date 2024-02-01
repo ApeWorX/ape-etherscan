@@ -1,6 +1,7 @@
 from ape import plugins
 
 from .config import EtherscanConfig
+from .dependency import EtherscanDependency
 from .explorer import Etherscan
 from .query import EtherscanQueryEngine
 from .utils import NETWORKS
@@ -22,3 +23,8 @@ def query_engines():
 @plugins.register(plugins.Config)
 def config_class():
     return EtherscanConfig
+
+
+@plugins.register(plugins.DependencyPlugin)
+def dependencies():
+    yield "etherscan", EtherscanDependency

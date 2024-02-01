@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Union
 
 from ape.utils import cached_property
+from ethpm_types import BaseModel
+from pydantic import Field, field_validator
 
 from ape_etherscan.exceptions import EtherscanResponseError, get_request_error
 
@@ -17,10 +19,24 @@ class EtherscanInstance:
     api_uri: str
 
 
-@dataclass
-class SourceCodeResponse:
-    abi: str = ""
-    name: str = "unknown"
+class SourceCodeResponse(BaseModel):
+    abi: str = Field("", alias="ABI")
+    name: str = Field("unknown", alias="ContractName")
+    source_code: str = Field("", alias="SourceCode")
+    compiler_version: str = Field("", alias="CompilerVersion")
+    optimization_used: bool = Field(True, alias="OptimizationUsed")
+    optimization_runs: int = Field(200, alias="Runs")
+    evm_version: str = Field("Default", alias="EVMVersion")
+    library: str = Field("", alias="Library")
+    license_type: str = Field("", alias="LicenseType")
+    proxy: bool = Field(False, alias="Proxy")
+    implementation: str = Field("", alias="Implementation")
+    swarm_source: str = Field("", alias="SwarmSource")
+
+    @field_validator("optimization_used", "proxy", mode="before")
+    @classmethod
+    def validate_bools(cls, value):
+        return bool(int(value))
 
 
 @dataclass

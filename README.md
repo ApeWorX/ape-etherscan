@@ -138,3 +138,24 @@ etherscan:
       uri: https://custom.scan
       api_uri: https://api.custom.scan/api
 ```
+
+## Dependencies
+
+You can use dependencies from Etherscan in your projects.
+Configure them like this:
+
+```yaml
+dependencies:
+  - name: Spork
+    etherscan: "0xb624FdE1a972B1C89eC1dAD691442d5E8E891469"
+    ecosystem: ethereum
+    network: mainnet
+```
+
+Then, access contract types from the dependency in your code:
+
+```python
+from ape import project
+
+spork_contract_type = project.dependencies["Spork"]["etherscan"].Spork
+```

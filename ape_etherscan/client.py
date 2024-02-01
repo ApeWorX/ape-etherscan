@@ -312,9 +312,7 @@ class ContractClient(_APIClient):
         if not isinstance(data, dict):
             raise UnhandledResultError(result, data)
 
-        abi = data.get("ABI") or ""
-        name = data.get("ContractName") or "unknown"
-        return SourceCodeResponse(abi, name)
+        return SourceCodeResponse.model_validate(data)
 
     def verify_source_code(
         self,
