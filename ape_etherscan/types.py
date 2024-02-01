@@ -1,4 +1,5 @@
 import json
+import re
 from dataclasses import dataclass
 from typing import Dict, List, Union
 
@@ -43,6 +44,21 @@ class SourceCodeResponse(BaseModel):
     def validate_abi(cls, value):
         return json.loads(value)
 
+    @field_validator("source_code", mode="before")
+    @classmethod
+    def validate_source_code(cls, value):
+        if value.startswith("{"):
+            # NOTE: Have to deal with very poor JSON
+            # response from Etherscan.
+            fixed = re.sub(r"\r\n\s*", "", value)
+            fixed = re.sub(r"\r\n\s*", "", fixed)
+            if fixed.startswith("{{"):
+                fixed = fixed[1:-1]
+
+            return fixed
+
+        return value
+
 
 @dataclass
 class ContractCreationResponse:
@@ -70,7 +86,7 @@ class EtherscanResponse:
 
         message = response_data.get("message", "")
         is_error = response_data.get("isError", 0) or message == "NOTOK"
-        if is_error and self.raise_on_exceptions:
+        if is_error is True and self.raise_on_exceptions:
             raise get_request_error(self.response, self.ecosystem)
 
         result = response_data.get("result", message)

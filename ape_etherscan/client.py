@@ -302,7 +302,7 @@ class ContractClient(_APIClient):
         }
         result = self._get(params=params)
 
-        if not (result_list := result.value or []):
+        if not (result_list := result.value):
             return SourceCodeResponse()
 
         elif len(result_list) > 1:

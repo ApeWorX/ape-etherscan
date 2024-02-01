@@ -1,9 +1,11 @@
+import json
 from typing import Optional
 
 from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
+from ethpm_types import Compiler, PackageManifest
 from ethpm_types.source import Source
 
 from ape_etherscan.client import (
@@ -50,9 +52,43 @@ class Etherscan(ExplorerAPI):
             )
         )
 
-    def get_source(self, address: AddressType) -> Source:
-        code = self._get_source_code(address)
-        return Source(content=code.source_code)
+    def get_manifest(self, address: AddressType) -> PackageManifest:
+        response = self._get_source_code(address)
+        settings = {
+            "optimizer": {
+                "enabled": response.optimization_used,
+                "runs": response.optimization_runs,
+            },
+        }
+
+        code = response.source_code
+        if code.startswith("{"):
+            # JSON verified.
+            data = json.loads(code)
+            compiler = Compiler(
+                name=data.get("language", "Solidity"),
+                version=response.compiler_version,
+                settings=data.get("settings", settings),
+                contractTypes=[response.name],
+            )
+            source_data = data.get("sources", {})
+            sources = {
+                src_id: Source(content=cont.get("content", ""))
+                for src_id, cont in source_data.items()
+            }
+
+        else:
+            # A flattened source.
+            source_id = f"{response.name}.sol"
+            compiler = Compiler(
+                name="Solidity",
+                version=response.compiler_version,
+                settings=settings,
+                contractTypes=[response.name],
+            )
+            sources = {source_id: Source(content=response.source_code)}
+
+        return PackageManifest(compilers=[compiler], sources=sources)
 
     def _get_source_code(self, address: AddressType) -> SourceCodeResponse:
         if not self.conversion_manager.is_type(address, AddressType):

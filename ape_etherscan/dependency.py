@@ -1,10 +1,8 @@
-import tempfile
-from pathlib import Path
-
 from ape.api.projects import DependencyAPI
 from ape.types import AddressType
-from ethpm_types import Compiler, PackageManifest
-from pydantic import AnyUrl, HttpUrl
+from ethpm_types import PackageManifest
+from hexbytes import HexBytes
+from pydantic import AnyUrl, HttpUrl, field_validator
 
 from .explorer import Etherscan
 
@@ -13,6 +11,11 @@ class EtherscanDependency(DependencyAPI):
     etherscan: str
     ecosystem: str = "ethereum"
     network: str = "mainnet"
+
+    @field_validator("etherscan", mode="before")
+    @classmethod
+    def handle_int(cls, value):
+        return value if isinstance(value, str) else HexBytes(value).hex()
 
     @property
     def version_id(self) -> str:
@@ -49,28 +52,9 @@ class EtherscanDependency(DependencyAPI):
             ctx.__enter__()
 
         try:
-            with tempfile.TemporaryDirectory() as temp_dir:
-                project_path = Path(temp_dir).resolve()
-                contracts_folder = project_path / "contracts"
-                contracts_folder.mkdir()
-                response = self.explorer._get_source_code(self.address)
-                compiler = Compiler(
-                    name="Solidity",
-                    version=response.compiler_version,
-                    settings={
-                        "optimizer": {
-                            "enabled": response.optimization_used,
-                            "runs": response.optimization_runs,
-                        },
-                    },
-                    contractTypes=[response.name],
-                )
-                new_path = contracts_folder / f"{response.name}.sol"
-                new_path.write_text(response.source_code)
-                manifest = self._extract_local_manifest(project_path, use_cache=use_cache)
-                manifest.compilers = [compiler]
-                return manifest
-
+            manifest = self.explorer.get_manifest(self.address)
         finally:
             if ctx:
                 ctx.__exit__(None)
+
+        return manifest
