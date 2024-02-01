@@ -20,7 +20,7 @@ class EtherscanInstance:
 
 
 class SourceCodeResponse(BaseModel):
-    abi: str = Field("", alias="ABI")
+    abi: List = Field([], alias="ABI")
     name: str = Field("unknown", alias="ContractName")
     source_code: str = Field("", alias="SourceCode")
     compiler_version: str = Field("", alias="CompilerVersion")
@@ -37,6 +37,11 @@ class SourceCodeResponse(BaseModel):
     @classmethod
     def validate_bools(cls, value):
         return bool(int(value))
+
+    @field_validator("abi", mode="before")
+    @classmethod
+    def validate_abi(cls, value):
+        return json.loads(value)
 
 
 @dataclass

@@ -1,11 +1,8 @@
-import json
-from json.decoder import JSONDecodeError
 from typing import Optional
 
 from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
-from ape.logging import logger
 from ape.types import AddressType, ContractType
 from ethpm_types.source import Source
 
@@ -67,16 +64,7 @@ class Etherscan(ExplorerAPI):
 
     def get_contract_type(self, address: AddressType) -> Optional[ContractType]:
         source_code = self._get_source_code(address)
-        if not (abi_string := source_code.abi):
-            return None
-
-        try:
-            abi = json.loads(abi_string)
-        except JSONDecodeError as err:
-            logger.error(f"Error with contract ABI: {err}")
-            return None
-
-        contract_type = ContractType(abi=abi, contractName=source_code.name)
+        contract_type = ContractType(abi=source_code.abi, contractName=source_code.name)
         if source_code.name == "Vyper_contract" and "symbol" in contract_type.view_methods:
             try:
                 contract = ContractInstance(address, contract_type)
