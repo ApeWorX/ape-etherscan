@@ -1,10 +1,9 @@
 import tempfile
 from pathlib import Path
 
-import yaml
 from ape.api.projects import DependencyAPI
 from ape.types import AddressType
-from ethpm_types import PackageManifest
+from ethpm_types import Compiler, PackageManifest
 from pydantic import AnyUrl, HttpUrl
 
 from .explorer import Etherscan
@@ -54,19 +53,23 @@ class EtherscanDependency(DependencyAPI):
                 project_path = Path(temp_dir).resolve()
                 contracts_folder = project_path / "contracts"
                 contracts_folder.mkdir()
-
                 response = self.explorer._get_source_code(self.address)
-
-                # Ensure compiler settings match.
-                if response.evm_version and response.evm_version != "Default":
-                    data = {"solidity": {"evm_version": response.evm_version}}
-                    config_file = project_path / "ape-config.yaml"
-                    with open(config_file, "w") as file:
-                        yaml.safe_dump(data, file)
-
+                compiler = Compiler(
+                    name="Solidity",
+                    version=response.compiler_version,
+                    settings={
+                        "optimizer": {
+                            "enabled": response.optimization_used,
+                            "runs": response.optimization_runs,
+                        },
+                    },
+                    contractTypes=[response.name],
+                )
                 new_path = contracts_folder / f"{response.name}.sol"
                 new_path.write_text(response.source_code)
-                return self._extract_local_manifest(project_path, use_cache=use_cache)
+                manifest = self._extract_local_manifest(project_path, use_cache=use_cache)
+                manifest.compilers = [compiler]
+                return manifest
 
         finally:
             if ctx:

@@ -13,3 +13,6 @@ def test_dependency(mock_backend):
     )
     actual = dependency.extract_manifest()
     assert "BoredApeYachtClub.sol" in actual.sources
+    assert actual.compilers[0].name == "Solidity"
+    assert not actual.compilers[0].settings["optimizer"]["enabled"]
+    assert actual.compilers[0].contractTypes == ["BoredApeYachtClub"]
