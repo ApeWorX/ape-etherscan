@@ -20,7 +20,7 @@ class EtherscanDependency(DependencyAPI):
 
     @property
     def version_id(self) -> str:
-        return "etherscan"  # Only 1 version
+        return f"{self.ecosystem}_{self.network}"
 
     @property
     def address(self) -> AddressType:

@@ -12,16 +12,19 @@ from ape_etherscan.dependency import EtherscanDependency
     ],
 )
 def test_dependency(mock_backend, verification_type, expected_name, contract_address):
-    mock_backend.set_network("ethereum", "mainnet")
+    ecosystem = "ethereum"
+    network = "mainnet"
+    mock_backend.set_network(ecosystem, network)
     mock_backend.setup_mock_get_contract_type_response(f"get_contract_response_{verification_type}")
 
     dependency = EtherscanDependency(
         name="Apes",
         etherscan=contract_address,
-        ecosystem="ethereum",
-        network="mainnet",
+        ecosystem=ecosystem,
+        network=network,
     )
     actual = dependency.extract_manifest()
+    assert dependency.version_id == f"{ecosystem}_{network}"
     assert f"{expected_name}.sol" in actual.sources
     assert actual.compilers[0].name == "Solidity"
     assert not actual.compilers[0].settings["optimizer"]["enabled"]
