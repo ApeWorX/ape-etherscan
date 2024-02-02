@@ -1,4 +1,5 @@
 from ape.api.projects import DependencyAPI
+from ape.exceptions import ProjectError
 from ape.types import AddressType
 from ethpm_types import PackageManifest
 from hexbytes import HexBytes
@@ -56,5 +57,8 @@ class EtherscanDependency(DependencyAPI):
         finally:
             if ctx:
                 ctx.__exit__(None)
+
+        if not manifest:
+            raise ProjectError(f"Etherscan dependency '{self.name}' not verified.")
 
         return manifest

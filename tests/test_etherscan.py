@@ -11,6 +11,7 @@ from ._utils import ecosystems_and_networks
 EXPECTED_CONTRACT_NAME_MAP = {
     "get_contract_response_flattened": "BoredApeYachtClub",
     "get_contract_response_json": "BoredApeYachtClub",
+    "get_contract_response_not_verified": "",
     "get_proxy_contract_response": "MIM-UST-f",
     "get_vyper_contract_response": "yvDAI",
 }

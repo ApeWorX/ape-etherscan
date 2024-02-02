@@ -47,6 +47,15 @@ class EtherscanResponseError(ApeEtherscanException):
         super().__init__(f"Response indicated failure: {message}")
 
 
+class ContractNotVerifiedError(EtherscanResponseError):
+    """
+    Raised when a contract is not verified on Etherscan.
+    """
+
+    def __init__(self, response: Union[Response, "EtherscanResponse"], address: str):
+        super().__init__(response, f"Contract '{address}' not verified.")
+
+
 class UnhandledResultError(EtherscanResponseError):
     """
     Raised in specific client module where the result from Etherscan

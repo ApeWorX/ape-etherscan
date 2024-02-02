@@ -1,4 +1,5 @@
 import pytest
+from ape.exceptions import ProjectError
 
 from ape_etherscan.dependency import EtherscanDependency
 
@@ -25,3 +26,17 @@ def test_dependency(mock_backend, verification_type, expected_name, contract_add
     assert actual.compilers[0].name == "Solidity"
     assert not actual.compilers[0].settings["optimizer"]["enabled"]
     assert actual.compilers[0].contractTypes == [expected_name]
+
+
+def test_dependency_not_verified(mock_backend):
+    mock_backend.set_network("ethereum", "mainnet")
+    mock_backend.setup_mock_get_contract_type_response("get_contract_response_not_verified")
+    dependency = EtherscanDependency(
+        name="Apes",
+        etherscan="0x5777d92f208679db4b9778590fa3cab3ac9e2168",
+        ecosystem="ethereum",
+        network="mainnet",
+    )
+    expected = "Etherscan dependency 'Apes' not verified."
+    with pytest.raises(ProjectError, match=expected):
+        dependency.extract_manifest()

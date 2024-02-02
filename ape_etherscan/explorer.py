@@ -14,6 +14,7 @@ from ape_etherscan.client import (
     get_etherscan_api_uri,
     get_etherscan_uri,
 )
+from ape_etherscan.exceptions import ContractNotVerifiedError
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.verify import SourceVerifier
 
@@ -52,8 +53,12 @@ class Etherscan(ExplorerAPI):
             )
         )
 
-    def get_manifest(self, address: AddressType) -> PackageManifest:
-        response = self._get_source_code(address)
+    def get_manifest(self, address: AddressType) -> Optional[PackageManifest]:
+        try:
+            response = self._get_source_code(address)
+        except ContractNotVerifiedError:
+            return None
+
         settings = {
             "optimizer": {
                 "enabled": response.optimization_used,
@@ -99,7 +104,11 @@ class Etherscan(ExplorerAPI):
         return client.get_source_code()
 
     def get_contract_type(self, address: AddressType) -> Optional[ContractType]:
-        source_code = self._get_source_code(address)
+        try:
+            source_code = self._get_source_code(address)
+        except ContractNotVerifiedError:
+            return None
+
         contract_type = ContractType(abi=source_code.abi, contractName=source_code.name)
         if source_code.name == "Vyper_contract" and "symbol" in contract_type.view_methods:
             try:

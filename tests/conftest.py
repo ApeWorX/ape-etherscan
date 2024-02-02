@@ -154,6 +154,7 @@ def contract_address_map(address):
     return {
         "get_contract_response_flattened": address,
         "get_contract_response_json": "0x000075Dc60EdE898f11b0d5C6cA31D7A6D050eeD",
+        "get_contract_response_not_verified": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
         "get_proxy_contract_response": "0x55A8a39bc9694714E2874c1ce77aa1E599461E18",
         "get_vyper_contract_response": "0xdA816459F1AB5631232FE5e97a05BBBb94970c95",
     }
