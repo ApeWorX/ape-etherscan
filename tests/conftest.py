@@ -152,7 +152,9 @@ def address(contract_to_verify):
 @pytest.fixture(scope="session")
 def contract_address_map(address):
     return {
-        "get_contract_response": address,
+        "get_contract_response_flattened": address,
+        "get_contract_response_json": "0x000075Dc60EdE898f11b0d5C6cA31D7A6D050eeD",
+        "get_contract_response_not_verified": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
         "get_proxy_contract_response": "0x55A8a39bc9694714E2874c1ce77aa1E599461E18",
         "get_vyper_contract_response": "0xdA816459F1AB5631232FE5e97a05BBBb94970c95",
     }
@@ -419,8 +421,20 @@ class MockEtherscanBackend:
 
     def _get_contract_type_response(self, file_name: str) -> Any:
         test_data_path = MOCK_RESPONSES_PATH / f"{file_name}.json"
-        with open(test_data_path) as response_data_file:
-            return self.get_mock_response(response_data_file, file_name=file_name)
+        assert test_data_path.is_file(), f"Setup failed - missing test data {file_name}"
+        if "flattened" in file_name:
+            with open(test_data_path) as response_data_file:
+                return self.get_mock_response(response_data_file, file_name=file_name)
+
+        else:
+            # NOTE: Since the JSON is messed up for these, we can' load the mocks
+            # even without a weird hack.
+            content = (
+                MOCK_RESPONSES_PATH / "get_contract_response_json_source_code.json"
+            ).read_text()
+            data = json.loads(test_data_path.read_text())
+            data["SourceCode"] = content
+            return self.get_mock_response(data, file_name=file_name)
 
     def _expected_get_ct_params(self, address: str) -> Dict:
         return {"module": "contract", "action": "getsourcecode", "address": address}
@@ -462,23 +476,37 @@ class MockEtherscanBackend:
         self, response_data: Optional[Union[IO, Dict, str, MagicMock]] = None, **kwargs
     ):
         if isinstance(response_data, str):
-            return self.get_mock_response({"result": response_data})
+            return self.get_mock_response({"result": response_data, **kwargs})
 
         elif isinstance(response_data, _io.TextIOWrapper):
             return self.get_mock_response(json.load(response_data), **kwargs)
 
         elif isinstance(response_data, MagicMock):
             # Mock wasn't set.
-            response_data = {}
+            response_data = {**kwargs}
 
+        assert isinstance(response_data, dict)
+        return self._get_mock_response(response_data=response_data, **kwargs)
+
+    def _get_mock_response(
+        self,
+        response_data: Optional[Dict] = None,
+        response_text: Optional[str] = None,
+        *args,
+        **kwargs,
+    ):
         response = self.mocker.MagicMock(spec=Response)
-        assert isinstance(response_data, dict)  # For mypy
-        overrides: Dict = kwargs.get("response_overrides", {})
-        response.json.return_value = {**response_data, **overrides}
-        response.text = json.dumps(response_data or {})
+        if response_data:
+            assert isinstance(response_data, dict)  # For mypy
+            overrides: Dict = kwargs.get("response_overrides", {})
+            response.json.return_value = {**response_data, **overrides}
+            if not response_text:
+                response_text = json.dumps(response_data or {})
+
+        if response_text:
+            response.text = response_text
 
         response.status_code = 200
-
         for key, val in kwargs.items():
             setattr(response, key, val)
 

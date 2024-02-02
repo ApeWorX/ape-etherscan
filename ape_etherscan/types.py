@@ -1,8 +1,11 @@
 import json
+import re
 from dataclasses import dataclass
 from typing import Dict, List, Union
 
 from ape.utils import cached_property
+from ethpm_types import BaseModel
+from pydantic import Field, field_validator
 
 from ape_etherscan.exceptions import EtherscanResponseError, get_request_error
 
@@ -17,10 +20,44 @@ class EtherscanInstance:
     api_uri: str
 
 
-@dataclass
-class SourceCodeResponse:
-    abi: str = ""
-    name: str = "unknown"
+class SourceCodeResponse(BaseModel):
+    abi: List = Field([], alias="ABI")
+    name: str = Field("unknown", alias="ContractName")
+    source_code: str = Field("", alias="SourceCode")
+    compiler_version: str = Field("", alias="CompilerVersion")
+    optimization_used: bool = Field(True, alias="OptimizationUsed")
+    optimization_runs: int = Field(200, alias="Runs")
+    evm_version: str = Field("Default", alias="EVMVersion")
+    library: str = Field("", alias="Library")
+    license_type: str = Field("", alias="LicenseType")
+    proxy: bool = Field(False, alias="Proxy")
+    implementation: str = Field("", alias="Implementation")
+    swarm_source: str = Field("", alias="SwarmSource")
+
+    @field_validator("optimization_used", "proxy", mode="before")
+    @classmethod
+    def validate_bools(cls, value):
+        return bool(int(value))
+
+    @field_validator("abi", mode="before")
+    @classmethod
+    def validate_abi(cls, value):
+        return json.loads(value)
+
+    @field_validator("source_code", mode="before")
+    @classmethod
+    def validate_source_code(cls, value):
+        if value.startswith("{"):
+            # NOTE: Have to deal with very poor JSON
+            # response from Etherscan.
+            fixed = re.sub(r"\r\n\s*", "", value)
+            fixed = re.sub(r"\r\n\s*", "", fixed)
+            if fixed.startswith("{{"):
+                fixed = fixed[1:-1]
+
+            return fixed
+
+        return value
 
 
 @dataclass
@@ -49,7 +86,7 @@ class EtherscanResponse:
 
         message = response_data.get("message", "")
         is_error = response_data.get("isError", 0) or message == "NOTOK"
-        if is_error and self.raise_on_exceptions:
+        if is_error is True and self.raise_on_exceptions:
             raise get_request_error(self.response, self.ecosystem)
 
         result = response_data.get("result", message)

@@ -1,14 +1,20 @@
 import json
-from json.decoder import JSONDecodeError
 from typing import Optional
 
 from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
-from ape.logging import logger
 from ape.types import AddressType, ContractType
+from ethpm_types import Compiler, PackageManifest
+from ethpm_types.source import Source
 
-from ape_etherscan.client import ClientFactory, get_etherscan_api_uri, get_etherscan_uri
+from ape_etherscan.client import (
+    ClientFactory,
+    SourceCodeResponse,
+    get_etherscan_api_uri,
+    get_etherscan_uri,
+)
+from ape_etherscan.exceptions import ContractNotVerifiedError
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.verify import SourceVerifier
 
@@ -47,23 +53,63 @@ class Etherscan(ExplorerAPI):
             )
         )
 
-    def get_contract_type(self, address: AddressType) -> Optional[ContractType]:
+    def get_manifest(self, address: AddressType) -> Optional[PackageManifest]:
+        try:
+            response = self._get_source_code(address)
+        except ContractNotVerifiedError:
+            return None
+
+        settings = {
+            "optimizer": {
+                "enabled": response.optimization_used,
+                "runs": response.optimization_runs,
+            },
+        }
+
+        code = response.source_code
+        if code.startswith("{"):
+            # JSON verified.
+            data = json.loads(code)
+            compiler = Compiler(
+                name=data.get("language", "Solidity"),
+                version=response.compiler_version,
+                settings=data.get("settings", settings),
+                contractTypes=[response.name],
+            )
+            source_data = data.get("sources", {})
+            sources = {
+                src_id: Source(content=cont.get("content", ""))
+                for src_id, cont in source_data.items()
+            }
+
+        else:
+            # A flattened source.
+            source_id = f"{response.name}.sol"
+            compiler = Compiler(
+                name="Solidity",
+                version=response.compiler_version,
+                settings=settings,
+                contractTypes=[response.name],
+            )
+            sources = {source_id: Source(content=response.source_code)}
+
+        return PackageManifest(compilers=[compiler], sources=sources)
+
+    def _get_source_code(self, address: AddressType) -> SourceCodeResponse:
         if not self.conversion_manager.is_type(address, AddressType):
             # Handle non-checksummed addresses
             address = self.conversion_manager.convert(str(address), AddressType)
 
         client = self._client_factory.get_contract_client(address)
-        source_code = client.get_source_code()
-        if not (abi_string := source_code.abi):
-            return None
+        return client.get_source_code()
 
+    def get_contract_type(self, address: AddressType) -> Optional[ContractType]:
         try:
-            abi = json.loads(abi_string)
-        except JSONDecodeError as err:
-            logger.error(f"Error with contract ABI: {err}")
+            source_code = self._get_source_code(address)
+        except ContractNotVerifiedError:
             return None
 
-        contract_type = ContractType(abi=abi, contractName=source_code.name)
+        contract_type = ContractType(abi=source_code.abi, contractName=source_code.name)
         if source_code.name == "Vyper_contract" and "symbol" in contract_type.view_methods:
             try:
                 contract = ContractInstance(address, contract_type)

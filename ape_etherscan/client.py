@@ -13,6 +13,7 @@ from yarl import URL
 
 from ape_etherscan.config import EtherscanConfig
 from ape_etherscan.exceptions import (
+    ContractNotVerifiedError,
     UnhandledResultError,
     UnsupportedEcosystemError,
     UnsupportedNetworkError,
@@ -302,7 +303,7 @@ class ContractClient(_APIClient):
         }
         result = self._get(params=params)
 
-        if not (result_list := result.value or []):
+        if not (result_list := result.value):
             return SourceCodeResponse()
 
         elif len(result_list) > 1:
@@ -312,9 +313,10 @@ class ContractClient(_APIClient):
         if not isinstance(data, dict):
             raise UnhandledResultError(result, data)
 
-        abi = data.get("ABI") or ""
-        name = data.get("ContractName") or "unknown"
-        return SourceCodeResponse(abi, name)
+        if data.get("ABI") == "Contract source code not verified":
+            raise ContractNotVerifiedError(result, self._address)
+
+        return SourceCodeResponse.model_validate(data)
 
     def verify_source_code(
         self,

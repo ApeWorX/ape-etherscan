@@ -9,7 +9,9 @@ from ._utils import ecosystems_and_networks
 
 # A map of each mock response to its contract name for testing `get_contract_type()`.
 EXPECTED_CONTRACT_NAME_MAP = {
-    "get_contract_response": "BoredApeYachtClub",
+    "get_contract_response_flattened": "BoredApeYachtClub",
+    "get_contract_response_json": "BoredApeYachtClub",
+    "get_contract_response_not_verified": "",
     "get_proxy_contract_response": "MIM-UST-f",
     "get_vyper_contract_response": "yvDAI",
 }
@@ -155,7 +157,7 @@ def test_get_contract_type_ecosystems_and_networks(
 ):
     # This test parametrizes getting contract types across ecosystem / network combos
     mock_backend.set_network(ecosystem, network)
-    response = mock_backend.setup_mock_get_contract_type_response("get_contract_response")
+    response = mock_backend.setup_mock_get_contract_type_response("get_contract_response_flattened")
     explorer = get_explorer(ecosystem, network)
     actual = explorer.get_contract_type(response.expected_address)
     contract_type_from_lowered_address = explorer.get_contract_type(
