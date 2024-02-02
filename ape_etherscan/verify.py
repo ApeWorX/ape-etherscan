@@ -9,12 +9,12 @@ from ape.contracts import ContractInstance
 from ape.logging import LogLevel, logger
 from ape.types import AddressType
 from ape.utils import ManagerAccessMixin, cached_property
-from ape_solidity.compiler import DEFAULT_OPTIMIZATION_RUNS
 from ethpm_types import Compiler, ContractType
 
 from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 from ape_etherscan.exceptions import ContractVerificationError, EtherscanResponseError
 
+DEFAULT_OPTIMIZATION_RUNS = 200
 _SPDX_ID_TO_API_CODE = {
     "unlicense": 2,
     "mit": 3,
