@@ -14,6 +14,7 @@ NETWORKS = {
     "arbitrum": [
         "mainnet",
         "goerli",
+        "sepolia",
     ],
     "avalanche": [
         "mainnet",
