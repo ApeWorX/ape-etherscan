@@ -16,6 +16,10 @@ from ape_etherscan.exceptions import ContractVerificationError, EtherscanRespons
 
 DEFAULT_OPTIMIZATION_RUNS = 200
 _SPDX_ID_TO_API_CODE = {
+    "none": 1,
+    "no-license": 1,
+    "no-permission": 1,
+    "unlicensed": 1,
     "unlicense": 2,
     "mit": 3,
     "gpl-2.0": 4,
@@ -44,68 +48,92 @@ class LicenseType(Enum):
 
     NO_LICENSE = 1
     """
-    Nobody else can copy, distribute, or modify your work without being at risk of
+    Nobody else can copy, distribute, or modify your work without risk of
     take-downs, shake-downs, or litigation.
+    https://github.com/github/choosealicense.com/blob/gh-pages/no-permission.md
     """
 
     UNLICENSED = 2
     """
-    A license with no conditions whatsoever which dedicates works to the public domain.
+    Unlicensed works, modifications, and larger works may be distributed
+    under different terms and without source code.
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/unlicense.txt
     """
 
     MIT = 3
     """
-    Licensed works, modifications, and larger works may be distributed under different
-    terms and without source code.
+    Licensed works, modifications, and larger works may be distributed
+    under different terms and without source code.
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/mit.txt
     """
 
     GPL_2 = 4
     """
+    The source code of derived works must be made available under the same license.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/gpl-2.0.txt
     """
 
     GPL_3 = 5
     """
+    When distributing derived works, the source code of the work must be made available
+    under the same license and contributors provide an express grant of patent rights.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/gpl-3.0.txt
     """
 
     LGLP_2_1 = 6
     """
+    Derived works must be licensed under the same license, but works that only link
+    to it do not fall under this restriction.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/lgpl-3.0.txt
     """
 
     LGLP_3 = 7
     """
+    When distributing derived works, the source code of the work must be made available
+    under the same license and contributors provide an express grant of patent rights
+    with exceptions for a larger works using provided interfaces.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/lgpl-3.0.txt
     """
 
     BSD_2_CLAUSE = 8
     """
+    Licensed works, modifications, and larger works may be distributed under different
+    terms and without source code.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsd-2-clause.txt
     """
 
     BSD_3_CLAUSE = 9
     """
+    Licensed works, modifications, and larger works may be distributed under different
+    terms and without source code. The name of the project or its contributors may not
+    be used to promote derived products without written consent.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsd-3-clause.txt
     """
 
     MPL_2 = 10
     """
+    Source code must be made available of licensed/modified files, but not additional files.
+    Copyright and license notices must be preserved. Contributors grant patent rights.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/mpl-2.0.txt
     """
 
     OSL_3 = 11
     """
+    Does not require reciprocal licensing on linked works.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/osl-3.0.txt
     """
 
     APACHE = 2
     """
+    Requires preservation of copyright and license notices.  Licensed works, modifications,
+    and larger works may be distributed under different terms and without source code.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/apache-2.0.txt
     """
 
     AGLP_3 = 13
     """
+    When a modified version is used to provide a service over a network, the complete
+    source code of the modified version must be made available.
     https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/agpl-3.0.txt
     """
 
@@ -114,6 +142,7 @@ class LicenseType(Enum):
     The BSL is structured to allow free and open usage for many use cases, and only requires
     a commercial license by those who make production use of the software, which is typically
     indicative of an environment that is delivering significant value to a business.
+    https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsl-1.0.txt
     """
 
     @classmethod
