@@ -106,7 +106,6 @@ def get_etherscan_uri(
             else "https://blastscan.io"
         )
 
-
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
