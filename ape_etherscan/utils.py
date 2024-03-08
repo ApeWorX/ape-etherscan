@@ -9,6 +9,7 @@ API_KEY_ENV_KEY_MAP = {
     "avalanche": "SNOWTRACE_API_KEY",
     "bsc": "BSCSCAN_API_KEY",
     "gnosis": "GNOSISSCAN_API_KEY",
+    "blast": "BLASTSCAN_API_KEY",
 }
 NETWORKS = {
     "arbitrum": [
@@ -49,5 +50,9 @@ NETWORKS = {
     "polygon-zkevm": [
         "mainnet",
         "goerli",
+    ],
+    "blast": [
+        "mainnet",
+        "sepolia",
     ],
 }

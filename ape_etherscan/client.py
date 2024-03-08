@@ -99,6 +99,13 @@ def get_etherscan_uri(
         if network_name == "mainnet":
             return "https://gnosisscan.io"
         raise UnsupportedNetworkError(ecosystem_name, network_name)
+    elif ecosystem_name == "blast":
+        return (
+            f"https://{network_name}.blastscan.io"
+            if network_name != "mainnet"
+            else "https://blastscan.io"
+        )
+
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -171,7 +178,12 @@ def get_etherscan_api_uri(
         if network_name == "mainnet":
             return "https://api.gnosisscan.io/api"
         raise UnsupportedNetworkError(ecosystem_name, network_name)
-
+    elif ecosystem_name == "blast":
+        return (
+            f"https://api-{network_name}.blastscan.io/api"
+            if network_name != "mainnet"
+            else "https://api.blastscan.io/api"
+        )
     raise UnsupportedEcosystemError(ecosystem_name)
 
 
