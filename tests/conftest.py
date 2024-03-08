@@ -300,8 +300,8 @@ class MockEtherscanBackend:
                 "mainnet": org_url("basescan"),
             },
             "blast": {
-                "sepolia": org_testnet_url("sepolia", "blastscan"),
-                "mainnet": org_url("blastscan"),
+                "sepolia": testnet_url("sepolia", "blastscan"),
+                "mainnet": url("blastscan"),
             },
             "polygon-zkevm": {
                 "mainnet": com_testnet_url("zkevm", "polygonscan"),
