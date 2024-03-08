@@ -6,6 +6,7 @@ extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
         "ape-arbitrum",  # Needed for Arbitrum integration
         "ape-base",  # Needed for Base networks integration
+        "ape-blast",  # Needed for Blast networks integration
         "ape-bsc",  # For testing BSC integration
         "ape-fantom",  # For testing Fantom integration
         "ape-optimism",  # Needed for Optimism integration

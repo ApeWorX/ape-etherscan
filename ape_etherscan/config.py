@@ -28,14 +28,14 @@ class EcosystemConfig(PluginConfig):
 
 class EtherscanConfig(PluginConfig):
     model_config = SettingsConfigDict(extra="allow")
-
-    ethereum: EcosystemConfig = EcosystemConfig()
     arbitrum: EcosystemConfig = EcosystemConfig()
-    fantom: EcosystemConfig = EcosystemConfig()
-    optimism: EcosystemConfig = EcosystemConfig()
-    base: EcosystemConfig = EcosystemConfig()
-    polygon_zkevm: EcosystemConfig = EcosystemConfig()
-    polygon: EcosystemConfig = EcosystemConfig()
     avalanche: EcosystemConfig = EcosystemConfig()
+    base: EcosystemConfig = EcosystemConfig()
+    blast: EcosystemConfig = EcosystemConfig()
     bsc: EcosystemConfig = EcosystemConfig()
+    ethereum: EcosystemConfig = EcosystemConfig()
+    fantom: EcosystemConfig = EcosystemConfig()
     gnosis: EcosystemConfig = EcosystemConfig()
+    optimism: EcosystemConfig = EcosystemConfig()
+    polygon: EcosystemConfig = EcosystemConfig()
+    polygon_zkevm: EcosystemConfig = EcosystemConfig()
