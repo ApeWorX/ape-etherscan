@@ -73,11 +73,11 @@ def get_etherscan_uri(
         return (
             "https://zkevm.polygonscan.com"
             if network_name == "mainnet"
-            else "https://testnet-zkevm.polygonscan.com"
+            else "https://cardona-zkevm.polygonscan.com"
         )
     elif ecosystem_name == "base":
         return (
-            "https://basescan.org" if network_name == "mainnet" else "https://goerli.basescan.org"
+            "https://basescan.org" if network_name == "mainnet" else "https://sepolia.basescan.org"
         )
     elif ecosystem_name == "polygon":
         return (
@@ -145,13 +145,13 @@ def get_etherscan_api_uri(
         return (
             "https://api-zkevm.polygonscan.com/api"
             if network_name == "mainnet"
-            else "https://api-testnet-zkevm.polygonscan.com/api"
+            else "https://api-cardona-zkevm.polygonscan.com/api"
         )
     elif ecosystem_name == "base":
         return (
             "https://api.basescan.org/api"
             if network_name == "mainnet"
-            else "https://api-goerli.basescan.org/api"
+            else "https://api-sepolia.basescan.org/api"
         )
     elif ecosystem_name == "polygon":
         return (

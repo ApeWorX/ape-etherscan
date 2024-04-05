@@ -275,12 +275,11 @@ class MockEtherscanBackend:
         return {
             "ethereum": {
                 "mainnet": url("etherscan"),
-                "goerli": testnet_url("goerli", "etherscan"),
                 "sepolia": testnet_url("sepolia", "etherscan"),
             },
             "arbitrum": {
                 "mainnet": url("arbiscan"),
-                "goerli": testnet_url("goerli", "arbiscan"),
+                "sepolia": testnet_url("sepolia", "arbiscan"),
             },
             "fantom": {
                 "opera": com_url("ftmscan"),
@@ -288,7 +287,6 @@ class MockEtherscanBackend:
             },
             "optimism": {
                 "mainnet": testnet_url("optimistic", "etherscan"),
-                "goerli": testnet_url("goerli-optimistic", "etherscan"),
                 "sepolia": testnet_url("sepolia-optimistic", "etherscan"),
             },
             "polygon": {
@@ -296,7 +294,7 @@ class MockEtherscanBackend:
                 "mumbai": com_testnet_url("testnet", "polygonscan"),
             },
             "base": {
-                "goerli": org_testnet_url("goerli", "basescan"),
+                "sepolia": org_testnet_url("sepolia", "basescan"),
                 "mainnet": org_url("basescan"),
             },
             "blast": {
@@ -305,7 +303,7 @@ class MockEtherscanBackend:
             },
             "polygon-zkevm": {
                 "mainnet": com_testnet_url("zkevm", "polygonscan"),
-                "goerli": com_testnet_url("testnet-zkevm", "polygonscan"),
+                "cardona": com_testnet_url("cardona-zkevm", "polygonscan"),
             },
             "avalanche": {"mainnet": url("snowtrace"), "fuji": testnet_url("testnet", "snowtrace")},
             "bsc": {

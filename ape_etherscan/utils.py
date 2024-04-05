@@ -14,7 +14,6 @@ API_KEY_ENV_KEY_MAP = {
 NETWORKS = {
     "arbitrum": [
         "mainnet",
-        "goerli",
         "sepolia",
     ],
     "avalanche": [
@@ -23,7 +22,7 @@ NETWORKS = {
     ],
     "base": [
         "mainnet",
-        "goerli",
+        "sepolia",
     ],
     "blast": [
         "mainnet",
@@ -35,7 +34,6 @@ NETWORKS = {
     ],
     "ethereum": [
         "mainnet",
-        "goerli",
         "sepolia",
     ],
     "fantom": [
@@ -45,7 +43,6 @@ NETWORKS = {
     "gnosis": ["mainnet"],
     "optimism": [
         "mainnet",
-        "goerli",
         "sepolia",
     ],
     "polygon": [
@@ -54,6 +51,6 @@ NETWORKS = {
     ],
     "polygon-zkevm": [
         "mainnet",
-        "goerli",
+        "cardona",
     ],
 }
