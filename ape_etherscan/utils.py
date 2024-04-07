@@ -47,7 +47,7 @@ NETWORKS = {
     ],
     "polygon": [
         "mainnet",
-        "mumbai",
+        "amoy",
     ],
     "polygon-zkevm": [
         "mainnet",

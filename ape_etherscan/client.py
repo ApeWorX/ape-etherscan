@@ -83,7 +83,7 @@ def get_etherscan_uri(
         return (
             "https://polygonscan.com"
             if network_name == "mainnet"
-            else "https://mumbai.polygonscan.com"
+            else "https://amoy.polygonscan.com"
         )
     elif ecosystem_name == "avalanche":
         return (
