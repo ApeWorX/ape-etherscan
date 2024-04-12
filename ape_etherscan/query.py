@@ -134,7 +134,7 @@ class EtherscanQueryEngine(QueryAPI):
         receipt = self.chain_manager.get_receipt(creation_data[0].txHash)
         yield ContractCreation(
             txn_hash=receipt.txn_hash,
-            deploy_block=receipt.block_number,
+            block=receipt.block_number,
             deployer=receipt.sender,
             # factory is not implemented by this query provider
             factory=None,
