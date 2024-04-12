@@ -131,9 +131,9 @@ class EtherscanQueryEngine(QueryAPI):
         elif len(creation_data) != 1:
             raise ValueError("Expecting single creation data.")
 
-        receipt = self.chain_manager.get_receipt(creation_data.txHash)
+        receipt = self.chain_manager.get_receipt(creation_data[0].txHash)
         yield ContractCreation(
-            txn_hash=creation_data.txHash,
+            txn_hash=receipt.txn_hash,
             deploy_block=receipt.block_number,
             deployer=receipt.sender,
             # factory is not implemented by this query provider
