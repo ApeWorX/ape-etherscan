@@ -53,7 +53,7 @@ class LicenseType(Enum):
     https://github.com/github/choosealicense.com/blob/gh-pages/no-permission.md
     """
 
-    UNLICENSED = 2
+    UNLICENSE = 2
     """
     Unlicensed works, modifications, and larger works may be distributed
     under different terms and without source code.
