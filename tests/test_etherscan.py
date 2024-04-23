@@ -48,6 +48,7 @@ base_url_test = pytest.mark.parametrize(
         ("polygon-zkevm", "goerli", "testnet-zkevm.polygonscan.com"),
         ("base", "mainnet", "basescan.org"),
         ("base", "goerli", "goerli.basescan.org"),
+        ("base", "sepolia", "sepolia.basescan.org"),
         ("blast", "mainnet", "blastscan.io"),
         ("blast", "sepolia", "sepolia.blastscan.io"),
         ("avalanche", "mainnet", "snowtrace.io"),
