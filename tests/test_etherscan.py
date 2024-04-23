@@ -181,6 +181,7 @@ def test_get_contract_type_additional_types(mock_backend, file_name, explorer):
     # This test parametrizes getting edge-case contract types.
     # NOTE: Purposely not merged with test above to avoid adding a new dimension
     #  to the parametrization.
+    mock_backend.set_network("ethereum", "mainnet")
     response = mock_backend.setup_mock_get_contract_type_response(file_name)
     actual = explorer.get_contract_type(response.expected_address).name
     expected = EXPECTED_CONTRACT_NAME_MAP[response.file_name]
