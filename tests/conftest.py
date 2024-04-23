@@ -281,6 +281,7 @@ class MockEtherscanBackend:
             "arbitrum": {
                 "mainnet": url("arbiscan"),
                 "goerli": testnet_url("goerli", "arbiscan"),
+                "sepolia": testnet_url("sepolia", "arbiscan"),
             },
             "fantom": {
                 "opera": com_url("ftmscan"),
