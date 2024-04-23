@@ -24,6 +24,7 @@ NETWORKS = {
     "base": [
         "mainnet",
         "goerli",
+        "sepolia",
     ],
     "blast": [
         "mainnet",
