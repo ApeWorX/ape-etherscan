@@ -299,6 +299,10 @@ class MockEtherscanBackend:
                 "goerli": org_testnet_url("goerli", "basescan"),
                 "mainnet": org_url("basescan"),
             },
+            "blast": {
+                "sepolia": testnet_url("sepolia", "blastscan"),
+                "mainnet": url("blastscan"),
+            },
             "polygon-zkevm": {
                 "mainnet": com_testnet_url("zkevm", "polygonscan"),
                 "goerli": com_testnet_url("testnet-zkevm", "polygonscan"),
