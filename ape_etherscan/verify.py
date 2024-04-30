@@ -39,7 +39,8 @@ _SPDX_ID_TO_API_CODE = {
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
 
-ECOSYSTEMS_VERIFY_USING_JSON = ("ethereum",)
+ECOSYSTEMS_VERIFY_USING_JSON = ("ethereum", "base", "blast")
+# TODO: Check them all - I think that they've released this feature undocumented across all networks
 
 
 class LicenseType(Enum):
@@ -315,6 +316,7 @@ class SourceVerifier(ManagerAccessMixin):
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
+        viaIR = settings.get("viaIR", False)
         source_id = self.contract_type.source_id
         standard_input_json = self._get_standard_input_json(source_id, **settings)
         evm_version = settings.get("evmVersion")
@@ -345,9 +347,17 @@ class SourceVerifier(ManagerAccessMixin):
                 constructor_arguments=self.constructor_arguments,
                 evm_version=evm_version,
                 license_type=license_code_value,
+                via_ir=viaIR,
             )
         except EtherscanResponseError as err:
             if "source code already verified" in str(err):
+                logger.warning(str(err))
+                return
+
+            else:
+                raise  # this error
+        except ContractVerificationError as err:
+            if "Incompatible compiler setting" in str(err):
                 logger.warning(str(err))
                 return
 

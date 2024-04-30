@@ -15,6 +15,7 @@ from yarl import URL
 from ape_etherscan.config import EtherscanConfig
 from ape_etherscan.exceptions import (
     ContractNotVerifiedError,
+    IncompatibleCompilerSettingsError,
     UnhandledResultError,
     UnsupportedEcosystemError,
     UnsupportedNetworkError,
@@ -342,6 +343,7 @@ class ContractClient(_APIClient):
         evm_version: Optional[str] = None,
         license_type: Optional[int] = None,
         libraries: Optional[dict[str, str]] = None,
+        via_ir: bool = False,
     ) -> str:
         libraries = libraries or {}
         if len(libraries) > 10:
@@ -376,6 +378,9 @@ class ContractClient(_APIClient):
             json_dict[f"libraryname{iterator}"] = lib_name
             json_dict[f"libraryaddress{iterator}"] = lib_address
             iterator += 1
+
+        if code_format == "solidity-single-file" and via_ir:
+            raise IncompatibleCompilerSettingsError("via_ir", via_ir)
 
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         return str(self._post(json_dict=json_dict, headers=headers).value)
