@@ -273,7 +273,7 @@ class SourceVerifier(ManagerAccessMixin):
                     valid = False
                     continue
 
-                _, cname  = parts
+                _, cname = parts
                 if cname not in output_contracts:
                     valid = False
                     break
