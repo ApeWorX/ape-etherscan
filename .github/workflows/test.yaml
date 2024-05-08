@@ -81,8 +81,7 @@ jobs:
             pip install .[test]
 
         - name: Run Tests
-          run: |
-            pytest -m "not fuzzing" -n 0 -s --cov -vvv
+          run: pytest -m "not fuzzing" -n 0 -s --cov -vvv
           env:
             WEB3_INFURA_PROJECT_ID: ${{ secrets.WEB3_INFURA_PROJECT_ID }}
 
