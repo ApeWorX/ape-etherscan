@@ -257,7 +257,23 @@ class SourceVerifier(ManagerAccessMixin):
         """
 
         version = str(self.compiler.version)
-        settings = self.compiler.settings or self._get_new_settings(version)
+
+        # TODO: Fix compiler output in ape-solidity
+        #  and/or add more validation to ethpm_types.Compiler
+        compiler = self.compiler
+        valid = True
+        settings = {}
+        if compiler:
+            settings = self.compiler.settings or {}
+            output_contracts = settings.get("outputSelection", {})
+            for cname in self.compiler.contractTypes or []:
+                if cname not in output_contracts:
+                    valid = False
+                    break
+
+        if not valid:
+            settings = self._get_new_settings(version)
+
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
