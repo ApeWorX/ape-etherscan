@@ -97,6 +97,11 @@ def standard_input_json(library):
 @pytest.fixture(autouse=True)
 def connection(explorer):
     with ape.networks.ethereum.mainnet.use_provider("infura") as provider:
+        # TODO: Figure out why this is still needed sometimes,
+        #   even after https://github.com/ApeWorX/ape/pull/2022
+        if not provider.is_connected:
+            provider.connect()
+
         yield provider
 
 
