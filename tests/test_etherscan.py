@@ -188,11 +188,11 @@ def test_get_contract_type_additional_types(mock_backend, file_name, explorer):
     assert actual == expected
 
 
-def test_get_contract_type_with_rate_limiting(mock_backend, explorer):
+def test_get_contract_type_with_rate_limiting(mock_backend, explorer, connection):
     """
     This test ensures the rate limiting logic in the Etherscan client works.
     """
-
+    _ = connection  # Needed for calling symbol() on Vyper_contract
     file_name = "get_vyper_contract_response"
     setter_upper = mock_backend.setup_mock_get_contract_type_response_with_throttling
     throttler, response = setter_upper(file_name)
