@@ -77,7 +77,9 @@ def get_etherscan_uri(
         )
     elif ecosystem_name == "base":
         return (
-            "https://basescan.org" if network_name == "mainnet" else "https://sepolia.basescan.org"
+            f"https://{network_name}.basescan.org"
+            if network_name != "mainnet"
+            else "https://basescan.org"
         )
     elif ecosystem_name == "polygon":
         return (
@@ -149,9 +151,9 @@ def get_etherscan_api_uri(
         )
     elif ecosystem_name == "base":
         return (
-            "https://api.basescan.org/api"
-            if network_name == "mainnet"
-            else "https://api-sepolia.basescan.org/api"
+            f"https://api-{network_name}.basescan.org/api"
+            if network_name != "mainnet"
+            else "https://api.basescan.org/api"
         )
     elif ecosystem_name == "polygon":
         return (
