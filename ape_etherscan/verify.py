@@ -266,15 +266,8 @@ class SourceVerifier(ManagerAccessMixin):
         if compiler:
             settings = self.compiler.settings or {}
             output_contracts = settings.get("outputSelection", {})
-            for contract_id in self.compiler.contractTypes or []:
-                parts = contract_id.split(":")
-                if len(parts) != 2:
-                    # Bad compiler.
-                    valid = False
-                    continue
-
-                _, cname = parts
-                if cname not in output_contracts:
+            for contract_name in self.compiler.contractTypes or []:
+                if contract_name not in output_contracts:
                     valid = False
                     break
 
