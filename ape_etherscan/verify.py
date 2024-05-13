@@ -256,24 +256,9 @@ class SourceVerifier(ManagerAccessMixin):
               to validate the contract.
         """
 
-        version = str(self.compiler.version)
-
-        # TODO: Fix compiler output in ape-solidity
-        #  and/or add more validation to ethpm_types.Compiler
         compiler = self.compiler
-        valid = True
-        settings = {}
-        if compiler:
-            settings = self.compiler.settings or {}
-            output_contracts = settings.get("outputSelection", {})
-            for contract_name in self.compiler.contractTypes or []:
-                if contract_name not in output_contracts:
-                    valid = False
-                    break
-
-        if not valid:
-            settings = self._get_new_settings(version)
-
+        version = compiler.version
+        settings = compiler.settings or {}
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
@@ -318,20 +303,6 @@ class SourceVerifier(ManagerAccessMixin):
                 raise  # this error
 
         self._wait_for_verification(guid)
-
-    def _get_new_settings(self, version: str) -> Dict:
-        logger.warning(
-            "Settings missing from cached manifest. " "Attempting to re-calculate find settings."
-        )
-
-        # Attempt to re-calculate settings.
-        compiler_plugin = self.compiler_manager.registered_compilers[self.ext]
-        all_settings = compiler_plugin.get_compiler_settings(
-            [self.source_path], base_path=self._base_path
-        )
-
-        # Hack to allow any Version object work.
-        return {str(v): s for v, s in all_settings.items() if str(v) == version}[version]
 
     def _get_standard_input_json(
         self, source_id: str, base_folder: Optional[Path] = None, **settings
