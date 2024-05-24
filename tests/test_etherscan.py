@@ -23,31 +23,27 @@ base_url_test = pytest.mark.parametrize(
     [
         ("ethereum", "mainnet", "etherscan.io"),
         ("ethereum", "mainnet-fork", "etherscan.io"),
-        ("ethereum", "goerli", "goerli.etherscan.io"),
-        ("ethereum", "goerli-fork", "goerli.etherscan.io"),
         ("ethereum", "sepolia", "sepolia.etherscan.io"),
+        ("ethereum", "sepolia-fork", "sepolia.etherscan.io"),
         ("fantom", "opera", "ftmscan.com"),
         ("fantom", "opera-fork", "ftmscan.com"),
         ("fantom", "testnet", "testnet.ftmscan.com"),
         ("fantom", "testnet-fork", "testnet.ftmscan.com"),
         ("arbitrum", "mainnet", "arbiscan.io"),
         ("arbitrum", "mainnet-fork", "arbiscan.io"),
-        ("arbitrum", "goerli", "goerli.arbiscan.io"),
-        ("arbitrum", "goerli-fork", "goerli.arbiscan.io"),
+        ("arbitrum", "sepolia", "sepolia.arbiscan.io"),
+        ("arbitrum", "sepolia-fork", "sepolia.arbiscan.io"),
         ("optimism", "mainnet", "optimistic.etherscan.io"),
         ("optimism", "mainnet-fork", "optimistic.etherscan.io"),
-        ("optimism", "goerli", "goerli-optimism.etherscan.io"),
-        ("optimism", "goerli-fork", "goerli-optimism.etherscan.io"),
         ("optimism", "sepolia", "sepolia-optimism.etherscan.io"),
         ("optimism", "sepolia-fork", "sepolia-optimism.etherscan.io"),
         ("polygon", "mainnet", "polygonscan.com"),
         ("polygon", "mainnet-fork", "polygonscan.com"),
-        ("polygon", "mumbai", "mumbai.polygonscan.com"),
-        ("polygon", "mumbai-fork", "mumbai.polygonscan.com"),
+        ("polygon", "amoy", "amoy.polygonscan.com"),
+        ("polygon", "amoy-fork", "amoy.polygonscan.com"),
         ("polygon-zkevm", "mainnet", "zkevm.polygonscan.com"),
-        ("polygon-zkevm", "goerli", "testnet-zkevm.polygonscan.com"),
+        ("polygon-zkevm", "cardona", "cardona-zkevm.polygonscan.com"),
         ("base", "mainnet", "basescan.org"),
-        ("base", "goerli", "goerli.basescan.org"),
         ("base", "sepolia", "sepolia.basescan.org"),
         ("blast", "mainnet", "blastscan.io"),
         ("blast", "sepolia", "sepolia.blastscan.io"),
@@ -177,21 +173,23 @@ def test_get_contract_type_ecosystems_and_networks(
 @pytest.mark.parametrize(
     "file_name", ("get_proxy_contract_response", ("get_vyper_contract_response"))
 )
-def test_get_contract_type_additional_types(mock_backend, file_name, explorer):
+def test_get_contract_type_additional_types(mock_backend, file_name, explorer, connection):
     # This test parametrizes getting edge-case contract types.
     # NOTE: Purposely not merged with test above to avoid adding a new dimension
     #  to the parametrization.
+    _ = connection  # Needed for symbol lookup
+    mock_backend.set_network("ethereum", "mainnet")
     response = mock_backend.setup_mock_get_contract_type_response(file_name)
     actual = explorer.get_contract_type(response.expected_address).name
     expected = EXPECTED_CONTRACT_NAME_MAP[response.file_name]
     assert actual == expected
 
 
-def test_get_contract_type_with_rate_limiting(mock_backend, explorer):
+def test_get_contract_type_with_rate_limiting(mock_backend, explorer, connection):
     """
     This test ensures the rate limiting logic in the Etherscan client works.
     """
-
+    _ = connection  # Needed for calling symbol() on Vyper_contract
     file_name = "get_vyper_contract_response"
     setter_upper = mock_backend.setup_mock_get_contract_type_response_with_throttling
     throttler, response = setter_upper(file_name)
