@@ -1,9 +1,11 @@
+from pathlib import Path
+
 from ape.api.projects import DependencyAPI
 from ape.exceptions import ProjectError
 from ape.types import AddressType
 from ethpm_types import PackageManifest
 from hexbytes import HexBytes
-from pydantic import AnyUrl, HttpUrl, field_validator
+from pydantic import field_validator
 
 from .explorer import Etherscan
 
@@ -27,8 +29,12 @@ class EtherscanDependency(DependencyAPI):
         return self.network_manager.ethereum.decode_address(self.etherscan)
 
     @property
-    def uri(self) -> AnyUrl:
-        return HttpUrl(f"{self.explorer.get_address_url(self.address)}#code")
+    def package_id(self) -> str:
+        return self.address
+
+    @property
+    def uri(self) -> str:
+        return f"{self.explorer.get_address_url(self.address)}#code"
 
     @property
     def explorer(self) -> Etherscan:
@@ -43,7 +49,11 @@ class EtherscanDependency(DependencyAPI):
         # Assume Ethereum
         return self.network_manager.ethereum.mainnet.explorer
 
-    def extract_manifest(self, use_cache: bool = True) -> PackageManifest:
+    def fetch(self, destination: Path):
+        manifest = self._get_manifest()
+        manifest.unpack_sources(destination)
+
+    def _get_manifest(self) -> PackageManifest:
         ecosystem = self.network_manager.get_ecosystem(self.ecosystem)
         network = ecosystem.get_network(self.network)
 

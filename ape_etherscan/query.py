@@ -1,4 +1,5 @@
-from typing import Iterator, Optional
+from collections.abc import Iterator
+from typing import Optional
 
 from ape.api import PluginConfig, QueryAPI, QueryType, ReceiptAPI
 from ape.api.query import AccountTransactionQuery, ContractCreationQuery

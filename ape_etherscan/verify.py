@@ -2,11 +2,12 @@ import json
 import time
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 from ape.api import CompilerAPI
 from ape.contracts import ContractInstance
 from ape.logging import LogLevel, logger
+from ape.managers.project import ProjectManager
 from ape.types import AddressType
 from ape.utils import ManagerAccessMixin, cached_property
 from ethpm_types import Compiler, ContractType
@@ -140,9 +141,15 @@ class LicenseType(Enum):
 
 
 class SourceVerifier(ManagerAccessMixin):
-    def __init__(self, address: AddressType, client_factory: ClientFactory):
+    def __init__(
+        self,
+        address: AddressType,
+        client_factory: ClientFactory,
+        project: Optional[ProjectManager] = None,
+    ):
         self.address = address
         self.client_factory = client_factory
+        self.project = project or self.local_project
 
     @cached_property
     def account_client(self) -> AccountClient:
@@ -165,12 +172,8 @@ class SourceVerifier(ManagerAccessMixin):
         return self.contract.contract_type.name or ""
 
     @property
-    def _base_path(self) -> Path:
-        return self.project_manager.contracts_folder
-
-    @property
     def source_path(self) -> Path:
-        return self._base_path / (self.contract_type.source_id or "")
+        return self.project.path / (self.contract_type.source_id or "")
 
     @property
     def ext(self) -> str:
@@ -213,8 +216,7 @@ class SourceVerifier(ManagerAccessMixin):
         """
         The license type used in the code.
         """
-
-        spdx_id = self.source_path.read_text().split("\n")[0]
+        spdx_id = self.source_path.read_text().splitlines()[0]
         return LicenseType.from_spdx_id(spdx_id)
 
     @property
@@ -233,17 +235,17 @@ class SourceVerifier(ManagerAccessMixin):
     @property
     def compiler(self) -> Compiler:
         # Check the cached manifest for the compiler artifacts.
-        if manifest := self.project_manager.local_project.cached_manifest:
+        if manifest := self.local_project.manifest:
             if compiler := manifest.get_contract_compiler(self.contract_name):
                 return compiler
 
         # Look in the publishable manifest, as Ape includes these there.
-        manifest = self.project_manager.extract_manifest()
+        manifest = self.local_project.extract_manifest()
         if compiler := manifest.get_contract_compiler(self.contract_name):
             return compiler
 
         # Build a default one and hope for the best.
-        return Compiler(name=self.compiler_name, contractType=[self.contract_name], version=None)
+        return Compiler(name=self.compiler_name, contractType=[self.contract_name], version="")
 
     def attempt_verification(self):
         """
@@ -285,8 +287,7 @@ class SourceVerifier(ManagerAccessMixin):
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
         source_id = self.contract_type.source_id
-        base_folder = self.project_manager.contracts_folder
-        standard_input_json = self._get_standard_input_json(source_id, base_folder, **settings)
+        standard_input_json = self._get_standard_input_json(source_id, **settings)
         evm_version = settings.get("evmVersion")
         license_code = self.license_code
         license_code_value = license_code.value if license_code else None
@@ -326,7 +327,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         self._wait_for_verification(guid)
 
-    def _get_new_settings(self, version: str) -> Dict:
+    def _get_new_settings(self, version: str) -> dict:
         logger.warning(
             "Settings missing from cached manifest. " "Attempting to re-calculate find settings."
         )
@@ -334,31 +335,27 @@ class SourceVerifier(ManagerAccessMixin):
         # Attempt to re-calculate settings.
         compiler_plugin = self.compiler_manager.registered_compilers[self.ext]
         all_settings = compiler_plugin.get_compiler_settings(
-            [self.source_path], base_path=self._base_path
+            [self.source_path], project=self.project
         )
 
         # Hack to allow any Version object work.
         return {str(v): s for v, s in all_settings.items() if str(v) == version}[version]
 
-    def _get_standard_input_json(
-        self, source_id: str, base_folder: Optional[Path] = None, **settings
-    ) -> Dict:
-        base_dir = base_folder or self.project_manager.contracts_folder
-        source_path = base_dir / source_id
+    def _get_standard_input_json(self, source_id: str, **settings) -> dict:
+        source_path = self.local_project.sources.lookup(source_id)
         compiler = self.compiler_manager.registered_compilers[source_path.suffix]
-        sources = {self.source_path.name: {"content": source_path.read_text()}}
+        sources = {source_id: {"content": source_path.read_text()}}
 
         def build_map(_source_id: str):
-            _source_path = base_dir / _source_id
+            _source_path = self.local_project.sources.lookup(_source_id)
             source_imports = compiler.get_imports([_source_path]).get(_source_id, [])
             for imported_source_id in source_imports:
-                sources[imported_source_id] = {
-                    "content": (base_dir / imported_source_id).read_text()
-                }
-                build_map(imported_source_id)
+                if imp_path := self.local_project.sources.lookup(imported_source_id):
+                    sources[imported_source_id] = {"content": imp_path.read_text()}
+                    build_map(imported_source_id)
 
         def flatten_source(_source_id: str) -> str:
-            _source_path = base_dir / _source_id
+            _source_path = self.local_project.sources.lookup(_source_id)
             flattened_source = str(compiler.flatten_contract(_source_path))
             return flattened_source
 
