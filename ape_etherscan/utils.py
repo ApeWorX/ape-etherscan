@@ -34,6 +34,7 @@ NETWORKS = {
     ],
     "ethereum": [
         "mainnet",
+        "holesky",
         "sepolia",
     ],
     "fantom": [
