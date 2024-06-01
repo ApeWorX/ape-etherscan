@@ -1,7 +1,7 @@
 import json
 import re
 from dataclasses import dataclass
-from typing import Dict, List, Union
+from typing import Union
 
 from ape.utils import cached_property
 from ethpm_types import BaseModel
@@ -21,7 +21,7 @@ class EtherscanInstance:
 
 
 class SourceCodeResponse(BaseModel):
-    abi: List = Field([], alias="ABI")
+    abi: list = Field([], alias="ABI")
     name: str = Field("unknown", alias="ContractName")
     source_code: str = Field("", alias="SourceCode")
     compiler_version: str = Field("", alias="CompilerVersion")
@@ -67,7 +67,7 @@ class ContractCreationResponse:
     txHash: str
 
 
-ResponseValue = Union[List, Dict, str]
+ResponseValue = Union[list, dict, str]
 
 
 class EtherscanResponse:

@@ -1,22 +1,21 @@
 import json
 import os
-import tempfile
+import shutil
+from collections.abc import Callable
 from contextlib import contextmanager
 from io import StringIO
 from json import JSONDecodeError
 from pathlib import Path
 from tempfile import mkdtemp
-from typing import IO, Any, Callable, Dict, Optional, Union
+from typing import IO, Any, Optional, Union
 from unittest.mock import MagicMock
 
 import _io  # type: ignore
 import ape
 import pytest
-import yaml
 from ape.api import ExplorerAPI
 from ape.exceptions import NetworkError
 from ape.logging import logger
-from ape.managers.config import CONFIG_FILE_NAME
 from ape.types import AddressType
 from ape.utils import cached_property
 from ape_solidity._utils import OUTPUT_SELECTION
@@ -25,52 +24,21 @@ from requests import Response
 from ape_etherscan import Etherscan
 from ape_etherscan.client import _APIClient
 from ape_etherscan.types import EtherscanResponse
+from ape_etherscan.verify import LicenseType
 
-ape.config.DATA_FOLDER = Path(mkdtemp()).resolve()
-ape.config.PROJECT_FOLDER = Path(mkdtemp()).resolve()
+DATA_FOLDER = Path(mkdtemp()).resolve()
+ape.config.DATA_FOLDER = DATA_FOLDER
 
-MOCK_RESPONSES_PATH = Path(__file__).parent / "mock_responses"
-FOO_SOURCE_CODE = """
-// SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.20;
+HERE = Path(__file__).parent
+MOCK_RESPONSES_PATH = HERE / "mock_responses"
+FOO_SOURCE_CODE = (HERE / "contracts" / "subcontracts" / "foo.sol").read_text()
+BAR_SOURCE_CODE = (HERE / "dependency" / "contracts" / "bar.sol").read_text()
 
-import "@bar/bar.sol";
 
-library MyLib {
-    function insert(uint value) public returns (bool) {
-        return true;
-    }
-}
-
-contract foo {
-    function register(uint value) public {
-        require(MyLib.insert(value));
-    }
-}
-
-contract fooWithConstructor {
-    uint public value;
-    constructor(uint _value) {
-        value = _value;
-    }
-}
-"""
-BAR_SOURCE_CODE = r"""
-// SPDX-License-Identifier: AGPL-3.0
-pragma solidity ^0.8.20;
-
-contract bar {
-}
-"""
-APE_CONFIG_FILE = r"""
-dependencies:
-  - name: bar
-    local: ./bar
-
-solidity:
-  import_remapping:
-    - "@bar=bar"
-"""
+@pytest.fixture(scope="session", autouse=True)
+def clean_datafolder():
+    yield  # Run all collected tests.
+    shutil.rmtree(DATA_FOLDER, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
@@ -78,16 +46,19 @@ def standard_input_json(library):
     return {
         "language": "Solidity",
         "sources": {
-            "foo.sol": {"content": FOO_SOURCE_CODE},
-            ".cache/bar/local/bar.sol": {"content": BAR_SOURCE_CODE},
+            "tests/contracts/.cache/bar/local/contracts/bar.sol": {"content": BAR_SOURCE_CODE},
+            "tests/contracts/subcontracts/foo.sol": {"content": FOO_SOURCE_CODE},
         },
         "settings": {
             "optimizer": {"enabled": True, "runs": 200},
             "outputSelection": {
-                ".cache/bar/local/bar.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
-                "subcontracts/foo.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
+                "tests/contracts/.cache/bar/local/contracts/bar.sol": {
+                    "": ["ast"],
+                    "*": OUTPUT_SELECTION,
+                },
+                "tests/contracts/subcontracts/foo.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
             },
-            "remappings": ["@bar=.cache/bar/local"],
+            "remappings": ["@bar=tests/contracts/.cache/bar/local"],
         },
         "libraryname1": "MyLib",
         "libraryaddress1": library.address,
@@ -129,24 +100,9 @@ def make_source(base_dir: Path, name: str, content: str):
     source_file.write_text(content)
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def project():
-    base_dir = ape.config.PROJECT_FOLDER
-    contracts_dir = base_dir / "contracts"
-    dependency_contracts_dir = base_dir / "bar" / "contracts"
-    sub_contracts_dir = contracts_dir / "subcontracts"
-    sub_contracts_dir.mkdir(exist_ok=True, parents=True)
-    dependency_contracts_dir.mkdir(exist_ok=True, parents=True)
-
-    make_source(sub_contracts_dir, "foo", FOO_SOURCE_CODE)
-    make_source(dependency_contracts_dir, "bar", BAR_SOURCE_CODE)
-
-    config_file = base_dir / "ape-config.yaml"
-    config_file.unlink(missing_ok=True)
-    config_file.write_text(APE_CONFIG_FILE)
-
-    with ape.config.using_project(base_dir) as project:
-        yield project
+    return ape.project
 
 
 @pytest.fixture(scope="session")
@@ -265,7 +221,7 @@ class MockEtherscanBackend:
     @cached_property
     def expected_uri_map(
         self,
-    ) -> Dict[str, Dict[str, str]]:
+    ) -> dict[str, dict[str, str]]:
         def get_url_f(testnet: bool = False, tld: str = "io"):
             f_str = f"https://api-{{}}.{{}}.{tld}/api" if testnet else f"https://api.{{}}.{tld}/api"
             return f_str.format
@@ -327,7 +283,7 @@ class MockEtherscanBackend:
         self,
         method: str,
         module: str,
-        expected_params: Dict,
+        expected_params: dict,
         return_value: Optional[Any] = None,
         side_effect: Optional[Callable] = None,
     ):
@@ -443,7 +399,7 @@ class MockEtherscanBackend:
             data["SourceCode"] = content
             return self.get_mock_response(data, file_name=file_name)
 
-    def _expected_get_ct_params(self, address: str) -> Dict:
+    def _expected_get_ct_params(self, address: str) -> dict:
         return {"module": "contract", "action": "getsourcecode", "address": address}
 
     def setup_mock_account_transactions_response(self, address: AddressType, **overrides):
@@ -480,7 +436,7 @@ class MockEtherscanBackend:
         return response
 
     def get_mock_response(
-        self, response_data: Optional[Union[IO, Dict, str, MagicMock]] = None, **kwargs
+        self, response_data: Optional[Union[IO, dict, str, MagicMock]] = None, **kwargs
     ):
         if isinstance(response_data, str):
             return self.get_mock_response({"result": response_data, **kwargs})
@@ -497,7 +453,7 @@ class MockEtherscanBackend:
 
     def _get_mock_response(
         self,
-        response_data: Optional[Dict] = None,
+        response_data: Optional[dict] = None,
         response_text: Optional[str] = None,
         *args,
         **kwargs,
@@ -505,7 +461,7 @@ class MockEtherscanBackend:
         response = self.mocker.MagicMock(spec=Response)
         if response_data:
             assert isinstance(response_data, dict)  # For mypy
-            overrides: Dict = kwargs.get("response_overrides", {})
+            overrides: dict = kwargs.get("response_overrides", {})
             response.json.return_value = {**response_data, **overrides}
             if not response_text:
                 response_text = json.dumps(response_data or {})
@@ -531,7 +487,7 @@ def verification_params(address_to_verify, standard_input_json):
         "contractaddress": address_to_verify,
         "contractname": "foo.sol:foo",
         "evmversion": None,
-        "licenseType": 1,
+        "licenseType": LicenseType.AGLP_3.value,
         "module": "contract",
         "optimizationUsed": 1,
         "runs": 200,
@@ -559,7 +515,7 @@ def verification_params_with_ctor_args(
         "contractaddress": address_to_verify_with_ctor_args,
         "contractname": "foo.sol:fooWithConstructor",
         "evmversion": None,
-        "licenseType": 1,
+        "licenseType": LicenseType.AGLP_3.value,
         "module": "contract",
         "optimizationUsed": 1,
         "runs": 200,
@@ -630,31 +586,3 @@ def expected_verification_log_with_ctor_args(address_to_verify_with_ctor_args):
         "Contract verification successful!\n"
         f"https://etherscan.io/address/{address_to_verify_with_ctor_args}#code"
     )
-
-
-@pytest.fixture(scope="session")
-def temp_config():
-    config = ape.config
-
-    @contextmanager
-    def func(data: Dict, package_json: Optional[Dict] = None):
-        with tempfile.TemporaryDirectory() as temp_dir_str:
-            temp_dir = Path(temp_dir_str)
-
-            config._cached_configs = {}
-            config_file = temp_dir / CONFIG_FILE_NAME
-            config_file.touch()
-            config_file.write_text(yaml.dump(data))
-            config.load(force_reload=True)
-
-            if package_json:
-                package_json_file = temp_dir / "package.json"
-                package_json_file.write_text(json.dumps(package_json))
-
-            with config.using_project(temp_dir):
-                yield temp_dir
-
-            config_file.unlink()
-            config._cached_configs = {}
-
-    return func

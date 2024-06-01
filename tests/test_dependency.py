@@ -1,5 +1,6 @@
 import pytest
 from ape.exceptions import ProjectError
+from ape.utils import create_tempdir
 
 from ape_etherscan.dependency import EtherscanDependency
 
@@ -23,7 +24,7 @@ def test_dependency(mock_backend, verification_type, expected_name, contract_add
         ecosystem=ecosystem,
         network=network,
     )
-    actual = dependency.extract_manifest()
+    actual = dependency._get_manifest()
     assert dependency.version_id == f"{ecosystem}_{network}"
     assert f"{expected_name}.sol" in actual.sources
     assert actual.compilers[0].name == "Solidity"
@@ -40,6 +41,7 @@ def test_dependency_not_verified(mock_backend):
         ecosystem="ethereum",
         network="mainnet",
     )
-    expected = "Etherscan dependency 'Apes' not verified."
-    with pytest.raises(ProjectError, match=expected):
-        dependency.extract_manifest()
+    expected = "Etherscan dependency 'apes' not verified."
+    with create_tempdir() as temp_dir:
+        with pytest.raises(ProjectError, match=expected):
+            dependency.fetch(temp_dir)
