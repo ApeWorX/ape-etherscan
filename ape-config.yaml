@@ -1,0 +1,7 @@
+name: ape-etherscan-tests
+
+contracts_folder: tests/contracts
+
+dependencies:
+  - name: bar
+    local: ./tests/dependency

@@ -4,6 +4,7 @@ from typing import Optional
 from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
+from ape.managers.project import ProjectManager
 from ape.types import AddressType, ContractType
 from ethpm_types import Compiler, PackageManifest
 from ethpm_types.source import Source
@@ -120,5 +121,8 @@ class Etherscan(ExplorerAPI):
         return contract_type
 
     def publish_contract(self, address: AddressType):
-        verifier = SourceVerifier(address, self._client_factory)
+        return self._publish_contract(address)
+
+    def _publish_contract(self, address: AddressType, project: Optional["ProjectManager"] = None):
+        verifier = SourceVerifier(address, self._client_factory, project=project)
         return verifier.attempt_verification()
