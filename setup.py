@@ -80,7 +80,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.8.1,<0.9",
+        "eth-ape>=0.8.2,<0.9",
         "ethpm_types",  # Use same version as eth-ape
         "requests",  # Use same version as eth-ape
         "yarl",  # Use same version as eth-ape
