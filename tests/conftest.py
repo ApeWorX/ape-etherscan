@@ -236,6 +236,7 @@ class MockEtherscanBackend:
         return {
             "ethereum": {
                 "mainnet": url("etherscan"),
+                "holesky": testnet_url("holesky", "etherscan"),
                 "sepolia": testnet_url("sepolia", "etherscan"),
             },
             "arbitrum": {

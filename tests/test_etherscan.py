@@ -25,6 +25,8 @@ base_url_test = pytest.mark.parametrize(
         ("ethereum", "mainnet-fork", "etherscan.io"),
         ("ethereum", "sepolia", "sepolia.etherscan.io"),
         ("ethereum", "sepolia-fork", "sepolia.etherscan.io"),
+        ("ethereum", "holesky", "holesky.etherscan.io"),
+        ("ethereum", "holesky-fork", "holesky.etherscan.io"),
         ("fantom", "opera", "ftmscan.com"),
         ("fantom", "opera-fork", "ftmscan.com"),
         ("fantom", "testnet", "testnet.ftmscan.com"),
