@@ -93,8 +93,8 @@ class IncompatibleCompilerSettingsError(ApeEtherscanException):
     is enabled and the compiler settings are not compatible with the API.
     """
 
-    def __init__(self, setting: str, value: Any):
-        super().__init__(f"Incompatible compiler setting: `{setting}: {value}`")
+    def __init__(self, compiler: str, setting: str, value: Any):
+        super().__init__(f"Incompatible {compiler} setting: '{setting}={value}'.")
 
 
 def get_request_error(response: Response, ecosystem: str) -> EtherscanResponseError:

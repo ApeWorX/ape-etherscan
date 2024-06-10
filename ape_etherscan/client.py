@@ -380,7 +380,7 @@ class ContractClient(_APIClient):
             iterator += 1
 
         if code_format == "solidity-single-file" and via_ir:
-            raise IncompatibleCompilerSettingsError("via_ir", via_ir)
+            raise IncompatibleCompilerSettingsError("Solidity", "via_ir", via_ir)
 
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         return str(self._post(json_dict=json_dict, headers=headers).value)

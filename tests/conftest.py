@@ -478,22 +478,35 @@ class MockEtherscanBackend:
 
 
 @pytest.fixture
-def verification_params(address_to_verify, standard_input_json):
-    ctor_args = ""  # noqa: E501
+def get_base_verification_params():
+    def fn(
+        ctor_args,
+        address,
+        std_json,
+        **kwargs,
+    ):
+        return {
+            "action": "verifysourcecode",
+            "codeformat": "solidity-standard-json-input",
+            "constructorArguements": ctor_args,
+            "contractaddress": address,
+            "contractname": "foo.sol:foo",
+            "evmversion": None,
+            "licenseType": LicenseType.AGLP_3.value,
+            "module": "contract",
+            "optimizationUsed": 1,
+            "runs": 200,
+            "sourceCode": StringIO(json.dumps(std_json)),
+            **kwargs,
+        }
 
-    return {
-        "action": "verifysourcecode",
-        "codeformat": "solidity-standard-json-input",
-        "constructorArguements": ctor_args,
-        "contractaddress": address_to_verify,
-        "contractname": "foo.sol:foo",
-        "evmversion": None,
-        "licenseType": LicenseType.AGLP_3.value,
-        "module": "contract",
-        "optimizationUsed": 1,
-        "runs": 200,
-        "sourceCode": StringIO(json.dumps(standard_input_json)),
-    }
+    return fn
+
+
+@pytest.fixture
+def verification_params(address_to_verify, standard_input_json, get_base_verification_params):
+    ctor_args = ""  # noqa: E501
+    return get_base_verification_params(ctor_args, address_to_verify, standard_input_json)
 
 
 @pytest.fixture(scope="session")
