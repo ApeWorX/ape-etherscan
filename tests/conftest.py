@@ -58,7 +58,10 @@ def standard_input_json(library):
                 },
                 "tests/contracts/subcontracts/foo.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
             },
-            "remappings": ["@bar=tests/contracts/.cache/bar/local"],
+            "remappings": [
+                "@bar=tests/contracts/.cache/bar/local",
+                "bar=tests/contracts/.cache/bar/local",
+            ],
         },
         "libraryname1": "MyLib",
         "libraryaddress1": library.address,
