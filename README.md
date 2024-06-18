@@ -127,7 +127,7 @@ networks:
     - name: apechain
       chain_id: 31337
 
-geth:
+node:
   ethereum:
     apechain:
       uri: http://localhost:8545
