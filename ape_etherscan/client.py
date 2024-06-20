@@ -106,6 +106,12 @@ def get_etherscan_uri(
         return (
             "https://blastscan.io" if network_name == "mainnet" else "https://sepolia.blastscan.io"
         )
+    elif ecosystem_name == "scroll":
+        return (
+            "https://scrollscan.com"
+            if network_name == "mainnet"
+            else f"https://{network_name}.scrollscan.com"
+        )
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -183,6 +189,12 @@ def get_etherscan_api_uri(
             "https://api.blastscan.io/api"
             if network_name == "mainnet"
             else "https://api-sepolia.blastscan.io/api"
+        )
+    elif ecosystem_name == "scroll":
+        return (
+            "https://api.scrollscan.com/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.scrollscan.com/api"
         )
 
     raise UnsupportedEcosystemError(ecosystem_name)
