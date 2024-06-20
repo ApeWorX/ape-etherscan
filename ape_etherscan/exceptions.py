@@ -1,5 +1,5 @@
 import os
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Union
 
 from ape.exceptions import ApeException
 from requests import Response
@@ -85,6 +85,16 @@ class ContractVerificationError(ApeEtherscanException):
     """
     An error that occurs when unable to verify or publish a contract.
     """
+
+
+class IncompatibleCompilerSettingsError(ApeEtherscanException):
+    """
+    An error that occurs when unable to verify or publish a contract because viaIR (or some other)
+    is enabled and the compiler settings are not compatible with the API.
+    """
+
+    def __init__(self, compiler: str, setting: str, value: Any):
+        super().__init__(f"Incompatible {compiler} setting: '{setting}={value}'.")
 
 
 def get_request_error(response: Response, ecosystem: str) -> EtherscanResponseError:

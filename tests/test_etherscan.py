@@ -3,7 +3,12 @@ from collections.abc import Callable
 import pytest
 from ape.api.query import AccountTransactionQuery
 
-from ape_etherscan.exceptions import EtherscanResponseError, EtherscanTooManyRequestsError
+from ape_etherscan.exceptions import (
+    EtherscanResponseError,
+    EtherscanTooManyRequestsError,
+    IncompatibleCompilerSettingsError,
+)
+from ape_etherscan.verify import SourceVerifier, VerificationApproach
 
 from ._utils import ecosystems_and_networks
 
@@ -85,12 +90,13 @@ def verification_tester_cls():
 def setup_verification_test(
     mock_backend, verification_params, verification_tester_cls, contract_to_verify
 ):
-    def setup(found_handler: Callable, threshold: int = 2):
+    def setup(found_handler: Callable, threshold: int = 2, params=None):
+        params = params or verification_params
         overrides = _acct_tx_overrides(contract_to_verify)
         mock_backend.setup_mock_account_transactions_response(
             address=contract_to_verify.address, **overrides
         )
-        mock_backend.add_handler("POST", "contract", verification_params, return_value=PUBLISH_GUID)
+        mock_backend.add_handler("POST", "contract", params, return_value=PUBLISH_GUID)
         verification_tester = verification_tester_cls(found_handler, threshold=threshold)
         mock_backend.add_handler(
             "GET",
@@ -258,6 +264,22 @@ def test_publish_contract_with_ctor_args(
     setup_verification_test_with_ctor_args(lambda: "Pass - You made it!")
     explorer.publish_contract(address_to_verify_with_ctor_args)
     assert caplog.records[-1].message == expected_verification_log_with_ctor_args
+
+
+def test_publish_contract_flatten_via_ir(mocker, address_to_verify):
+    client = mocker.MagicMock()
+    project = mocker.MagicMock()
+
+    compiler = mocker.MagicMock()
+    compiler.settings = {"viaIR": True, "outputSelection": {"Contract": []}}
+    compiler.contractTypes = ["Contract"]
+    compiler.name = "Solidity"
+    source_verifier = SourceVerifier(address_to_verify, client, project=project)
+    expected = "Incompatible Solidity setting: 'viaIR=True'."
+    with pytest.raises(IncompatibleCompilerSettingsError, match=expected):
+        source_verifier.attempt_verification(
+            compiler=compiler, approach=VerificationApproach.FLATTEN
+        )
 
 
 def _acct_tx_overrides(contract, args=None):
