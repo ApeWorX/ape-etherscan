@@ -39,3 +39,4 @@ class EtherscanConfig(PluginConfig):
     optimism: EcosystemConfig = EcosystemConfig()
     polygon: EcosystemConfig = EcosystemConfig()
     polygon_zkevm: EcosystemConfig = EcosystemConfig()
+    scroll: EcosystemConfig = EcosystemConfig()
