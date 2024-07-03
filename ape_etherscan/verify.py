@@ -328,8 +328,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         # NOTE: Etherscan does not allow directory prefixes on the source ID.
         if self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
-            request_source_id = Path(source_id).name
-            contract_name = f"{request_source_id}:{self.contract_type.name or ''}"
+            contract_name = f"{source_id}:{self.contract_type.name or ''}"
         else:
             # When we have a flattened contract, we don't need to specify the file name
             # only the contract name
