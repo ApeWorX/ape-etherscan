@@ -12,9 +12,7 @@ extras_require = {
         "ape-optimism",  # Needed for Optimism integration
         "ape-polygon",  # Needed for Polygon integration
         "ape-polygon-zkevm",  # Needed for Polygon ZkEVM integration
-        # "ape-scroll",  # Needed for Scroll networks integration
-        # Temporary fix due to version restrictions
-        "ape-scroll @ git+https://github.com/Barabazs/ape-scroll.git@chore/version-restriction",
+        "ape-scroll",  # Needed for Scroll networks integration
         "ape-infura",  # Needed for live network tests
         "ape-solidity",  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
