@@ -39,7 +39,7 @@ _SPDX_ID_TO_API_CODE = {
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
 
-ECOSYSTEMS_VERIFY_USING_JSON = ("ethereum",)
+ECOSYSTEMS_VERIFY_USING_JSON = ("arbitrum", "base", "blast", "ethereum")
 
 
 class LicenseType(Enum):
@@ -289,8 +289,6 @@ class SourceVerifier(ManagerAccessMixin):
 
         version = str(self.compiler.version)
 
-        # TODO: Fix compiler output in ape-solidity
-        #  and/or add more validation to ethpm_types.Compiler
         compiler = self.compiler
         valid = True
         settings = {}
@@ -299,12 +297,12 @@ class SourceVerifier(ManagerAccessMixin):
             output_contracts = settings.get("outputSelection", {})
             for contract_id in self.compiler.contractTypes or []:
                 parts = contract_id.split(":")
-                if len(parts) != 2:
-                    # Bad compiler.
-                    valid = False
-                    continue
+                if len(parts) == 2:
+                    _, cname = parts
 
-                _, cname = parts
+                else:
+                    cname = parts[0]
+
                 if cname not in output_contracts:
                     valid = False
                     break
@@ -328,8 +326,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         # NOTE: Etherscan does not allow directory prefixes on the source ID.
         if self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
-            request_source_id = Path(source_id).name
-            contract_name = f"{request_source_id}:{self.contract_type.name or ''}"
+            contract_name = f"{source_id}:{self.contract_type.name or ''}"
         else:
             # When we have a flattened contract, we don't need to specify the file name
             # only the contract name
@@ -358,7 +355,7 @@ class SourceVerifier(ManagerAccessMixin):
 
     def _get_new_settings(self, version: str) -> dict:
         logger.warning(
-            "Settings missing from cached manifest. " "Attempting to re-calculate find settings."
+            "Settings missing from cached manifest. Attempting to re-calculate to find settings."
         )
 
         # Attempt to re-calculate settings.
