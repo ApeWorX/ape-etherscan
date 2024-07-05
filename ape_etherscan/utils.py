@@ -57,6 +57,6 @@ NETWORKS = {
     ],
     "scroll": [
         "mainnet",
-        "sepolia",
+        "testnet",
     ],
 }
