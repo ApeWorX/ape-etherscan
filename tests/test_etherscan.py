@@ -57,6 +57,8 @@ base_url_test = pytest.mark.parametrize(
         ("bsc", "testnet-fork", "testnet.bscscan.com"),
         ("gnosis", "mainnet", "gnosisscan.io"),
         ("gnosis", "mainnet-fork", "gnosisscan.io"),
+        ("scroll", "mainnet", "scrollscan.io"),
+        ("scroll", "sepolia", "sepolia.scrollscan.io"),
     ],
 )
 

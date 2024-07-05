@@ -12,6 +12,7 @@ The following blockchain explorers are supported in this plugin:
 - [Basescan](https://basescan.org) for Base networks.
 - [Bscscan](https://bscscan.com) for Binance-Smart-Chain networks.
 - [Blastscan](https://blastscan.io) for Blast networks.
+- [Scrollscan](https://scrollscan.com) for Scroll networks.
 
 ## Dependencies
 
