@@ -429,12 +429,15 @@ class AccountClient(_APIClient):
             page = self._get_page_of_normal_transactions(
                 page_num, start_block, end_block, offset=offset, sort=sort
             )
-
-            if len(page):
+            new_items = len(page)
+            if new_items:
                 yield from page
 
-            last_page_results = len(page)
+            last_page_results = new_items
             page_num += 1
+            if new_items <= 0:
+                # No more items. Break now to avoid 500 errors.
+                break
 
     def _get_page_of_normal_transactions(
         self,
@@ -456,10 +459,11 @@ class AccountClient(_APIClient):
         }
         result = self._get(params=params)
 
-        if not isinstance(result.value, list):
-            raise UnhandledResultError(result, result.value)
+        value = result.value or []
+        if not isinstance(value, list):
+            raise UnhandledResultError(result, value)
 
-        return result.value
+        return value
 
 
 class ClientFactory:

@@ -161,3 +161,15 @@ from ape import project
 
 spork_contract_type = project.dependencies["Spork"]["etherscan"].Spork
 ```
+
+# Querying Accounts
+
+Etherscan offers a query-provider plugin for account data.
+Query account transactions from Etherscan using the following syntax:
+
+```python
+from ape import chain
+
+history = chain.history["vitalik.eth"]
+result = history.query("*", engine_to_use="etherscan")
+```
