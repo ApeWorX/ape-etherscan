@@ -280,7 +280,7 @@ class MockEtherscanBackend:
             },
             "scroll": {
                 "mainnet": com_url("scrollscan"),
-                "sepolia": com_testnet_url("sepolia", "scrollscan"),
+                "testnet": com_testnet_url("testnet", "scrollscan"),
             },
         }
 
