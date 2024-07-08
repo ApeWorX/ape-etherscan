@@ -171,5 +171,8 @@ Query account transactions from Etherscan using the following syntax:
 from ape import chain
 
 history = chain.history["vitalik.eth"]
-result = history.query("*", engine_to_use="etherscan")
+
+# NOTE: Also showing how you can use `start_nonce=` and `stop_nonce=`
+#   to limit the history.
+result = history.query("*", start_nonce=1000, stop_nonce=1001, engine_to_use="etherscan")
 ```
