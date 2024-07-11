@@ -12,6 +12,7 @@ extras_require = {
         "ape-optimism",  # Needed for Optimism integration
         "ape-polygon",  # Needed for Polygon integration
         "ape-polygon-zkevm",  # Needed for Polygon ZkEVM integration
+        "ape-scroll",  # Needed for Scroll networks integration
         "ape-infura",  # Needed for live network tests
         "ape-solidity",  # Needed for contract verification tests
         "pytest>=6.0",  # Core testing package
@@ -22,11 +23,11 @@ extras_require = {
     ],
     "lint": [
         "black>=24.4.2,<25",  # auto-formatter and linter
-        "mypy>=1.10.0,<2",  # Static type analyzer
+        "mypy>=1.10.1,<2",  # Static type analyzer
         "types-requests>=2.28.7",  # Needed due to mypy typeshed
         "types-setuptools",  # Needed due to mypy typeshed
         "types-PyYAML",  # Needed due to mypy typeshed
-        "flake8>=7.0.0,<8",  # Style linter
+        "flake8>=7.1.0,<8",  # Style linter
         "flake8-breakpoint>=1.1.0,<2",  # Detect breakpoints left in code
         "flake8-print>=5.0.0,<6",  # Detect print statements left in code
         "isort>=5.13.2,<6",  # Import sorting linter
@@ -80,7 +81,7 @@ setup(
     url="https://github.com/ApeWorX/ape-etherscan",
     include_package_data=True,
     install_requires=[
-        "eth-ape>=0.8.2,<0.9",
+        "eth-ape>=0.8.8,<0.9",
         "ethpm_types",  # Use same version as eth-ape
         "requests",  # Use same version as eth-ape
         "yarl",  # Use same version as eth-ape

@@ -107,6 +107,12 @@ def get_etherscan_uri(
         return (
             "https://blastscan.io" if network_name == "mainnet" else "https://sepolia.blastscan.io"
         )
+    elif ecosystem_name == "scroll":
+        return (
+            "https://scrollscan.com"
+            if network_name == "mainnet"
+            else f"https://{network_name}.scrollscan.com"
+        )
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -184,6 +190,12 @@ def get_etherscan_api_uri(
             "https://api.blastscan.io/api"
             if network_name == "mainnet"
             else "https://api-sepolia.blastscan.io/api"
+        )
+    elif ecosystem_name == "scroll":
+        return (
+            "https://api.scrollscan.com/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.scrollscan.com/api"
         )
 
     raise UnsupportedEcosystemError(ecosystem_name)
@@ -422,12 +434,15 @@ class AccountClient(_APIClient):
             page = self._get_page_of_normal_transactions(
                 page_num, start_block, end_block, offset=offset, sort=sort
             )
-
-            if len(page):
+            new_items = len(page)
+            if new_items:
                 yield from page
 
-            last_page_results = len(page)
+            last_page_results = new_items
             page_num += 1
+            if new_items <= 0:
+                # No more items. Break now to avoid 500 errors.
+                break
 
     def _get_page_of_normal_transactions(
         self,
@@ -449,10 +464,11 @@ class AccountClient(_APIClient):
         }
         result = self._get(params=params)
 
-        if not isinstance(result.value, list):
-            raise UnhandledResultError(result, result.value)
+        value = result.value or []
+        if not isinstance(value, list):
+            raise UnhandledResultError(result, value)
 
-        return result.value
+        return value
 
 
 class ClientFactory:

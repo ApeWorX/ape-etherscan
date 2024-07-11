@@ -42,9 +42,7 @@ _SPDX_ID_TO_API_CODE = {
     "busl-1.1": 14,
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
-
-ECOSYSTEMS_VERIFY_USING_JSON = ("ethereum", "base", "blast")
-# TODO: Check them all - I think that they've released this feature undocumented across all networks
+ECOSYSTEMS_VERIFY_USING_JSON = ("arbitrum", "base", "blast", "ethereum")
 
 
 class LicenseType(Enum):
@@ -348,8 +346,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         # NOTE: Etherscan does not allow directory prefixes on the source ID.
         if self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
-            request_source_id = Path(source_id).name
-            contract_name = f"{request_source_id}:{self.contract_type.name or ''}"
+            contract_name = f"{source_id}:{self.contract_type.name or ''}"
         else:
             # When we have a flattened contract, we don't need to specify the file name
             # only the contract name
@@ -379,7 +376,7 @@ class SourceVerifier(ManagerAccessMixin):
 
     def _get_new_settings(self, version: str) -> dict:
         logger.warning(
-            "Settings missing from cached manifest. " "Attempting to re-calculate find settings."
+            "Settings missing from cached manifest. Attempting to re-calculate to find settings."
         )
 
         # Attempt to re-calculate settings.

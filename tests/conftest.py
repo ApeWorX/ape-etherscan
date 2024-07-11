@@ -58,7 +58,10 @@ def standard_input_json(library):
                 },
                 "tests/contracts/subcontracts/foo.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
             },
-            "remappings": ["@bar=tests/contracts/.cache/bar/local"],
+            "remappings": [
+                "@bar=tests/contracts/.cache/bar/local",
+                "bar=tests/contracts/.cache/bar/local",
+            ],
         },
         "libraryname1": "MyLib",
         "libraryaddress1": library.address,
@@ -275,6 +278,10 @@ class MockEtherscanBackend:
             "gnosis": {
                 "mainnet": url("gnosisscan"),
             },
+            "scroll": {
+                "mainnet": com_url("scrollscan"),
+                "testnet": com_testnet_url("testnet", "scrollscan"),
+            },
         }
 
     def set_network(self, ecosystem: str, network: str):
@@ -490,7 +497,7 @@ def get_base_verification_params():
             "codeformat": "solidity-standard-json-input",
             "constructorArguements": ctor_args,
             "contractaddress": address,
-            "contractname": "foo.sol:foo",
+            "contractname": "tests/contracts/subcontracts/foo.sol:foo",
             "evmversion": None,
             "licenseType": LicenseType.AGLP_3.value,
             "module": "contract",
@@ -527,7 +534,7 @@ def verification_params_with_ctor_args(
         "codeformat": "solidity-standard-json-input",
         "constructorArguements": constructor_arguments,
         "contractaddress": address_to_verify_with_ctor_args,
-        "contractname": "foo.sol:fooWithConstructor",
+        "contractname": "tests/contracts/subcontracts/foo.sol:fooWithConstructor",
         "evmversion": None,
         "licenseType": LicenseType.AGLP_3.value,
         "module": "contract",

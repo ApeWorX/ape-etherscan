@@ -10,6 +10,7 @@ API_KEY_ENV_KEY_MAP = {
     "optimism": "OPTIMISTIC_ETHERSCAN_API_KEY",
     "polygon": "POLYGONSCAN_API_KEY",
     "polygon-zkevm": "POLYGON_ZKEVM_ETHERSCAN_API_KEY",
+    "scroll": "SCROLLSCAN_API_KEY",
 }
 NETWORKS = {
     "arbitrum": [
@@ -53,5 +54,9 @@ NETWORKS = {
     "polygon-zkevm": [
         "mainnet",
         "cardona",
+    ],
+    "scroll": [
+        "mainnet",
+        "testnet",
     ],
 }

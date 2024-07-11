@@ -12,6 +12,7 @@ The following blockchain explorers are supported in this plugin:
 - [Basescan](https://basescan.org) for Base networks.
 - [Bscscan](https://bscscan.com) for Binance-Smart-Chain networks.
 - [Blastscan](https://blastscan.io) for Blast networks.
+- [Scrollscan](https://scrollscan.com) for Scroll networks.
 
 ## Dependencies
 
@@ -127,7 +128,7 @@ networks:
     - name: apechain
       chain_id: 31337
 
-geth:
+node:
   ethereum:
     apechain:
       uri: http://localhost:8545
@@ -159,4 +160,19 @@ Then, access contract types from the dependency in your code:
 from ape import project
 
 spork_contract_type = project.dependencies["Spork"]["etherscan"].Spork
+```
+
+# Querying Accounts
+
+Etherscan offers a query-provider plugin for account data.
+Query account transactions from Etherscan using the following syntax:
+
+```python
+from ape import chain
+
+history = chain.history["vitalik.eth"]
+
+# NOTE: Also showing how you can use `start_nonce=` and `stop_nonce=`
+#   to limit the history.
+result = history.query("*", start_nonce=1000, stop_nonce=1001, engine_to_use="etherscan")
 ```
