@@ -13,7 +13,11 @@ from ape.utils import ManagerAccessMixin, cached_property
 from ethpm_types import Compiler, ContractType
 
 from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
-from ape_etherscan.exceptions import ContractVerificationError, EtherscanResponseError
+from ape_etherscan.exceptions import (
+    ContractVerificationError,
+    EtherscanResponseError,
+    IncompatibleCompilerSettingsError,
+)
 
 DEFAULT_OPTIMIZATION_RUNS = 200
 _SPDX_ID_TO_API_CODE = {
@@ -38,7 +42,6 @@ _SPDX_ID_TO_API_CODE = {
     "busl-1.1": 14,
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
-
 ECOSYSTEMS_VERIFY_USING_JSON = ("arbitrum", "base", "blast", "ethereum")
 
 
@@ -169,6 +172,11 @@ class LicenseType(Enum):
         return cls.NO_LICENSE
 
 
+class VerificationApproach(Enum):
+    STANDARD_JSON = "STANDARD_JSON"
+    FLATTEN = "FLATTEN"
+
+
 class SourceVerifier(ManagerAccessMixin):
     def __init__(
         self,
@@ -276,34 +284,40 @@ class SourceVerifier(ManagerAccessMixin):
         # Build a default one and hope for the best.
         return Compiler(name=self.compiler_name, contractType=[self.contract_name], version="")
 
-    def attempt_verification(self):
+    def attempt_verification(
+        self, compiler: Optional[Compiler] = None, approach: Optional[VerificationApproach] = None
+    ):
         """
         Attempt to verify the source code.
         If the bytecode is already verified, Etherscan will use the existing bytecode
         and this method will still succeed.
 
+        Args:
+            compiler (ethpm_types.Compiler): Optionally provide the compiler. Defaults to
+              looking it up from Ape.
+            approach (VerificationApproach): The approach to use when verifying. Defaults
+              to figuring it out from settings.
+
         Raises:
             :class:`~ape_etherscan.exceptions.ContractVerificationError`: - When fails
               to validate the contract.
         """
-
         version = str(self.compiler.version)
-
-        compiler = self.compiler
+        compiler = compiler or self.compiler
         valid = True
         settings = {}
         if compiler:
-            settings = self.compiler.settings or {}
+            settings = compiler.settings or {}
             output_contracts = settings.get("outputSelection", {})
-            for contract_id in self.compiler.contractTypes or []:
+            for contract_id in compiler.contractTypes or []:
                 parts = contract_id.split(":")
+                cname = None
                 if len(parts) == 2:
                     _, cname = parts
-
-                else:
+                elif len(parts) == 1:
                     cname = parts[0]
 
-                if cname not in output_contracts:
+                if not cname or cname not in output_contracts:
                     valid = False
                     break
 
@@ -313,11 +327,17 @@ class SourceVerifier(ManagerAccessMixin):
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
-        source_id = self.contract_type.source_id
-        standard_input_json = self._get_standard_input_json(source_id, **settings)
+        via_ir = settings.get("viaIR", settings.get("via_ir", False))
+        source_id = self.contract_type.source_id or ""
+        standard_input_json = self._get_standard_input_json(
+            source_id, approach=approach, **settings
+        )
         evm_version = settings.get("evmVersion")
         license_code = self.license_code
         license_code_value = license_code.value if license_code else None
+
+        if "sourceCode" in standard_input_json and via_ir:
+            raise IncompatibleCompilerSettingsError(compiler.name, "viaIR", via_ir)
 
         if logger.level == LogLevel.DEBUG:
             logger.debug("Dumping standard JSON output:\n")
@@ -342,6 +362,7 @@ class SourceVerifier(ManagerAccessMixin):
                 constructor_arguments=self.constructor_arguments,
                 evm_version=evm_version,
                 license_type=license_code_value,
+                via_ir=via_ir,
             )
         except EtherscanResponseError as err:
             if "source code already verified" in str(err):
@@ -367,7 +388,9 @@ class SourceVerifier(ManagerAccessMixin):
         # Hack to allow any Version object work.
         return {str(v): s for v, s in all_settings.items() if str(v) == version}[version]
 
-    def _get_standard_input_json(self, source_id: str, **settings) -> dict:
+    def _get_standard_input_json(
+        self, source_id: str, approach: Optional[VerificationApproach] = None, **settings
+    ) -> dict:
         source_path = self.local_project.sources.lookup(source_id)
         compiler = self.compiler_manager.registered_compilers[source_path.suffix]
         sources = {source_id: {"content": source_path.read_text()}}
@@ -392,7 +415,10 @@ class SourceVerifier(ManagerAccessMixin):
             # libraries are handled below.
             settings.pop("libraries")
 
-        if self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
+        if approach is VerificationApproach.STANDARD_JSON or (
+            approach is None
+            and self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON
+        ):
             # Use standard input json format
             data = {
                 "language": compiler.name.capitalize(),
