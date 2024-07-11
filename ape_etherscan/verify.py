@@ -327,7 +327,7 @@ class SourceVerifier(ManagerAccessMixin):
         optimizer = settings.get("optimizer", {})
         optimized = optimizer.get("enabled", False)
         runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
-        viaIR = settings.get("viaIR", settings.get("via_ir", False))
+        via_ir = settings.get("viaIR", settings.get("via_ir", False))
         source_id = self.contract_type.source_id or ""
         standard_input_json = self._get_standard_input_json(
             source_id, approach=approach, **settings
@@ -336,8 +336,8 @@ class SourceVerifier(ManagerAccessMixin):
         license_code = self.license_code
         license_code_value = license_code.value if license_code else None
 
-        if "sourceCode" in standard_input_json and viaIR:
-            raise IncompatibleCompilerSettingsError(compiler.name, "viaIR", viaIR)
+        if "sourceCode" in standard_input_json and via_ir:
+            raise IncompatibleCompilerSettingsError(compiler.name, "viaIR", via_ir)
 
         if logger.level == LogLevel.DEBUG:
             logger.debug("Dumping standard JSON output:\n")
@@ -362,7 +362,7 @@ class SourceVerifier(ManagerAccessMixin):
                 constructor_arguments=self.constructor_arguments,
                 evm_version=evm_version,
                 license_type=license_code_value,
-                via_ir=viaIR,
+                via_ir=via_ir,
             )
         except EtherscanResponseError as err:
             if "source code already verified" in str(err):
