@@ -60,7 +60,6 @@ def standard_input_json(library):
             },
             "remappings": [
                 "@bar=tests/contracts/.cache/bar/local",
-                "bar=tests/contracts/.cache/bar/local",
             ],
         },
         "libraryname1": "MyLib",
