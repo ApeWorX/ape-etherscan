@@ -255,7 +255,7 @@ class MockEtherscanBackend:
             },
             "polygon": {
                 "mainnet": com_url("polygonscan"),
-                "amoy": com_testnet_url("testnet", "polygonscan"),
+                "amoy": com_testnet_url("amoy", "polygonscan"),
             },
             "base": {
                 "sepolia": org_testnet_url("sepolia", "basescan"),

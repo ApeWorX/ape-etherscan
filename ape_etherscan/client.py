@@ -167,7 +167,7 @@ def get_etherscan_api_uri(
         return (
             "https://api.polygonscan.com/api"
             if network_name == "mainnet"
-            else "https://api-testnet.polygonscan.com/api"
+            else "https://api-amoy.polygonscan.com/api"
         )
     elif ecosystem_name == "avalanche":
         return (
