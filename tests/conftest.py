@@ -296,6 +296,8 @@ class MockEtherscanBackend:
     ):
         if isinstance(return_value, (str, dict)):
             return_value = self.get_mock_response(return_value)
+        elif isinstance(return_value, list):
+            return_value = self.get_mock_response({"result": return_value})
 
         def handler(self, method, base_uri, params=None, data=None, headers=None):
             actual_params = params if method.lower() == "get" else data
@@ -455,7 +457,7 @@ class MockEtherscanBackend:
             # Mock wasn't set.
             response_data = {**kwargs}
 
-        assert isinstance(response_data, dict)
+        assert isinstance(response_data, (list, dict))
         return self._get_mock_response(response_data=response_data, **kwargs)
 
     def _get_mock_response(

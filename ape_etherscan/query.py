@@ -2,7 +2,7 @@ from collections.abc import Iterator
 from typing import Optional
 
 from ape.api import PluginConfig, QueryAPI, QueryType, ReceiptAPI
-from ape.api.query import AccountTransactionQuery, ContractCreationQuery
+from ape.api.query import AccountTransactionQuery, ContractCreation, ContractCreationQuery
 from ape.exceptions import QueryEngineError
 from ape.utils import singledispatchmethod
 
@@ -121,7 +121,9 @@ class EtherscanQueryEngine(QueryAPI):
                 yield receipt
 
     @perform_query.register
-    def get_contract_creation_receipt(self, query: ContractCreationQuery) -> Iterator[ReceiptAPI]:
+    def get_contract_creation_receipt(
+        self, query: ContractCreationQuery
+    ) -> Iterator[ContractCreation]:
         client = self._client_factory.get_contract_client(query.contract)
         creation_data = client.get_creation_data()
         if len(creation_data) == 0:
@@ -129,4 +131,11 @@ class EtherscanQueryEngine(QueryAPI):
         elif len(creation_data) != 1:
             raise ValueError("Expecting single creation data.")
 
-        yield self.chain_manager.get_receipt(creation_data[0].txHash)
+        receipt = self.chain_manager.get_receipt(creation_data[0].txHash)
+        yield ContractCreation(
+            txn_hash=receipt.txn_hash,
+            block=receipt.block_number,
+            deployer=receipt.sender,
+            # factory is not implemented by this query provider
+            factory=None,
+        )
