@@ -42,7 +42,7 @@ _SPDX_ID_TO_API_CODE = {
     "busl-1.1": 14,
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
-ECOSYSTEMS_VERIFY_USING_JSON = ("arbitrum", "base", "blast", "ethereum")
+ECOSYSTEMS_VERIFY_USING_JSON = ("arbitrum", "base", "blast", "ethereum", "polygon")
 
 
 class LicenseType(Enum):
