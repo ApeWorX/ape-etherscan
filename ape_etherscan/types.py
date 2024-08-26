@@ -21,18 +21,18 @@ class EtherscanInstance:
 
 
 class SourceCodeResponse(BaseModel):
-    abi: list = Field([], alias="ABI")
-    name: str = Field("unknown", alias="ContractName")
-    source_code: str = Field("", alias="SourceCode")
-    compiler_version: str = Field("", alias="CompilerVersion")
-    optimization_used: bool = Field(True, alias="OptimizationUsed")
-    optimization_runs: int = Field(200, alias="Runs")
-    evm_version: str = Field("Default", alias="EVMVersion")
-    library: str = Field("", alias="Library")
-    license_type: str = Field("", alias="LicenseType")
+    abi: list = Field(default=[], alias="ABI")
+    name: str = Field(default="unknown", alias="ContractName")
+    source_code: str = Field(default="", alias="SourceCode")
+    compiler_version: str = Field(default="", alias="CompilerVersion")
+    optimization_used: bool = Field(default=True, alias="OptimizationUsed")
+    optimization_runs: int = Field(default=200, alias="Runs")
+    evm_version: str = Field(default="Default", alias="EVMVersion")
+    library: str = Field(default="", alias="Library")
+    license_type: str = Field(default="", alias="LicenseType")
     proxy: bool = Field(False, alias="Proxy")
-    implementation: str = Field("", alias="Implementation")
-    swarm_source: str = Field("", alias="SwarmSource")
+    implementation: str = Field(default="", alias="Implementation")
+    swarm_source: str = Field(default="", alias="SwarmSource")
 
     @field_validator("optimization_used", "proxy", mode="before")
     @classmethod
