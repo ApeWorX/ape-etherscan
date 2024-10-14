@@ -21,18 +21,28 @@ from ape_etherscan.verify import SourceVerifier
 
 
 class Etherscan(ExplorerAPI):
+    """
+    The explorer API implemention for Etherscan.
+    """
+
     @property
     def _config(self) -> PluginConfig:
         return self.config_manager.get_config("etherscan")
 
     @property
     def etherscan_uri(self):
+        """
+        The base URL of the explorer.
+        """
         return get_etherscan_uri(
             self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
         )
 
     @property
     def etherscan_api_uri(self):
+        """
+        The base URL for the API service.
+        """
         return get_etherscan_api_uri(
             self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
         )
@@ -55,6 +65,16 @@ class Etherscan(ExplorerAPI):
         )
 
     def get_manifest(self, address: AddressType) -> Optional[PackageManifest]:
+        """
+        Get a package manifest.
+
+        Args:
+            address (AddressType): The address of a contract.
+
+        Returns:
+            ethpm_types.PackageManifest | None: None when contract is not
+            published.
+        """
         try:
             response = self._get_source_code(address)
         except ContractNotVerifiedError:
