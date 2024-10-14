@@ -28,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install .[doc]
 
-    - name: Ape Docs
+    - name: Ape Etherscan Docs
       uses: apeworx/sphinx-ape@main
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
