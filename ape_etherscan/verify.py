@@ -174,10 +174,21 @@ class LicenseType(Enum):
 
 class VerificationApproach(Enum):
     STANDARD_JSON = "STANDARD_JSON"
+    """
+    The standard input JSON approach.
+    """
+
     FLATTEN = "FLATTEN"
+    """
+    The flattened contract approach.
+    """
 
 
 class SourceVerifier(ManagerAccessMixin):
+    """
+    A class for verifying contract sources.
+    """
+
     def __init__(
         self,
         address: AddressType,
@@ -198,22 +209,37 @@ class SourceVerifier(ManagerAccessMixin):
 
     @cached_property
     def contract(self) -> ContractInstance:
+        """
+        The ape contract instance to verify.
+        """
         return self.chain_manager.contracts.instance_at(self.address)
 
     @property
     def contract_type(self) -> ContractType:
+        """
+        The ethpm-types ContractType to verify.
+        """
         return self.contract.contract_type
 
     @property
     def contract_name(self) -> str:
+        """
+        The name of the contract.
+        """
         return self.contract.contract_type.name or ""
 
     @property
     def source_path(self) -> Path:
+        """
+        The path to the contract, locally.
+        """
         return self.project.path / (self.contract_type.source_id or "")
 
     @property
     def ext(self) -> str:
+        """
+        The source path extension.
+        """
         return self.source_path.suffix
 
     @cached_property

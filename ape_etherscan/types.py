@@ -30,7 +30,7 @@ class SourceCodeResponse(BaseModel):
     evm_version: str = Field(default="Default", alias="EVMVersion")
     library: str = Field(default="", alias="Library")
     license_type: str = Field(default="", alias="LicenseType")
-    proxy: bool = Field(False, alias="Proxy")
+    proxy: bool = Field(default=False, alias="Proxy")
     implementation: str = Field(default="", alias="Implementation")
     swarm_source: str = Field(default="", alias="SwarmSource")
 
