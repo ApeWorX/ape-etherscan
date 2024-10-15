@@ -40,7 +40,7 @@ python3 setup.py install
 
 ## Quick Usage
 
-## Set up the environment
+### Set up the environment
 
 Specify API keys as environment variables. You could put them in your shell's config like `~/.profile`
 or use a tool like [direnv](https://direnv.net/) and store them locally in `.envrc`.
@@ -58,7 +58,7 @@ export POLYGON_ZKEVM_ETHERSCAN_API_KEY=SAMPLE_KEY
 export BASESCAN_API_KEY=SAMPLE_KEY
 ```
 
-## Transaction URLs
+### Transaction URLs
 
 When you have this plugin installed, Etherscan explorer URLs appear in CLI output.
 
@@ -67,7 +67,7 @@ INFO: Submitted 0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a96
 etherscan URL: https://rinkeby.etherscan.io/tx/0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a9646
 ```
 
-## Contract Types
+### Contract Types
 
 The `ape-etherscan` plugin also assists in fetching `contract_types`.
 Use the `Contract` top-level construct to create contract instances.
@@ -88,7 +88,7 @@ The return value from `Contract` is a `ContractInstance`, so it is connected to 
 **NOTE**: Vyper contracts from Etherscan always return the name `Vyper_contract`.
 However, if the plugin detects that the contract type has a method named `symbol`, it will use the return value from that call instead.
 
-## Contract Verification
+### Contract Verification
 
 Use the `ape-etherscan` plugin to publish and verify your contracts.
 Contract verification associates a contract type from Ape with an Ethereum address on Etherscan.
@@ -117,7 +117,7 @@ For those networks, the corresponding compiler plugin's `flatten` functionality 
 
 **NOTE**: You must set an Etherscan API key environment variable to use the publishing feature.
 
-## Custom Networks
+### Custom Networks
 
 If you would like to use ape-etherscan with your [custom network configuration](https://docs.apeworx.io/ape/stable/userguides/networks.html#custom-network-connection), you can use the same network identifier you used to configure it.
 For instance, with a custom Ethereum network called "apechain" your configuration might look something like this:
@@ -141,7 +141,7 @@ etherscan:
       api_uri: https://api.custom.scan/api
 ```
 
-## Dependencies
+### Dependencies
 
 You can use dependencies from Etherscan in your projects.
 Configure them like this:
@@ -162,7 +162,7 @@ from ape import project
 spork_contract_type = project.dependencies["Spork"]["etherscan"].Spork
 ```
 
-# Querying Accounts
+### Querying Accounts
 
 Etherscan offers a query-provider plugin for account data.
 Query account transactions from Etherscan using the following syntax:
