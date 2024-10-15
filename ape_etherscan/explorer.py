@@ -72,7 +72,7 @@ class Etherscan(ExplorerAPI):
             address (AddressType): The address of a contract.
 
         Returns:
-            ethpm_types.PackageManifest | None: None when contract is not
+            ethpm_types.PackageManifest | None: None when the contract is not
             published.
         """
         try:
