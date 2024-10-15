@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="lime" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Quick Start - ape-etherscan documentation</title><link rel="shortcut icon" href="../_static/favicon.ico"/><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Dependency" href="../methoddocs/dependency.html" /><link rel="prev" title="&lt;no title&gt;" href="../index.html" />
+      <link rel="canonical" href="ape-etherscan/userguides/quickstart.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=83eaa723" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/>
+<meta property="og:url" content="ape-etherscan/userguides/quickstart.html"/>
+<meta property="og:title" content="Quick Start"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      <img class="light-logo" src="../_static/logo_grey.svg" alt="ape-etherscan" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/logo_green.svg" alt="ape-etherscan" height="28" loading="lazy" />
+      <strong>ape-etherscan</strong>
+    </a>
+    <div class="sy-head-nav" id="HeadNav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="HeadNav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2 -translate-x-2"></span>
+          <span class="hamburger_3 -translate-x-1"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">User Guides</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#querying-accounts">Querying Accounts</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Python Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../methoddocs/dependency.html">Dependency</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../methoddocs/exceptions.html">Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../methoddocs/explorer.html">Explorer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../methoddocs/verify.html">Verify</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#">Quick Start</a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#via-pip">via <code class="docutils literal notranslate"><span class="pre">pip</span></code></a></li>
+<li><a class="reference internal" href="#via-setuptools">via <code class="docutils literal notranslate"><span class="pre">setuptools</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#quick-usage">Quick Usage</a></li>
+<li><a class="reference internal" href="#set-up-the-environment">Set up the environment</a></li>
+<li><a class="reference internal" href="#transaction-urls">Transaction URLs</a></li>
+<li><a class="reference internal" href="#contract-types">Contract Types</a></li>
+<li><a class="reference internal" href="#contract-verification">Contract Verification</a></li>
+<li><a class="reference internal" href="#custom-networks">Custom Networks</a></li>
+<li><a class="reference internal" href="#id1">Dependencies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#querying-accounts">Querying Accounts</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">ape-etherscan</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Quick Start</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
+<p>The following blockchain explorers are supported in this plugin:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://etherscan.io/">Etherscan</a> for Ethereum networks.</p></li>
+<li><p><a class="reference external" href="https://ftmscan.com">Ftmscan</a> for Fantom networks.</p></li>
+<li><p><a class="reference external" href="https://arbiscan.io">Arbiscan</a> for Arbitrum networks.</p></li>
+<li><p><a class="reference external" href="https://optimistic.etherscan.io">Optimistic Etherscan</a> for Optimism networks.</p></li>
+<li><p><a class="reference external" href="https://polygonscan.com">Polygonscan</a> for Polygon networks.</p></li>
+<li><p><a class="reference external" href="https://zkevm.polygonscan.com">Polygonscan ZkEVM</a> for Polygon ZkEVM networks.</p></li>
+<li><p><a class="reference external" href="https://snowtrace.io">Snowtrace</a> for Avalanche networks.</p></li>
+<li><p><a class="reference external" href="https://basescan.org">Basescan</a> for Base networks.</p></li>
+<li><p><a class="reference external" href="https://bscscan.com">Bscscan</a> for Binance-Smart-Chain networks.</p></li>
+<li><p><a class="reference external" href="https://blastscan.io">Blastscan</a> for Blast networks.</p></li>
+<li><p><a class="reference external" href="https://scrollscan.com">Scrollscan</a> for Scroll networks.</p></li>
+</ul>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.python.org/downloads">python3</a> version 3.9 up to 3.12.</p></li>
+</ul>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<section id="via-pip">
+<h3>via <code class="docutils literal notranslate"><span class="pre">pip</span></code><a class="headerlink" href="#via-pip" title="Link to this heading"></a></h3>
+<p>You can install the latest release via <a class="reference external" href="https://pypi.org/project/pip/"><code class="docutils literal notranslate"><span class="pre">pip</span></code></a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pip<span class="w"> </span>install<span class="w"> </span>ape-etherscan
+</span></pre></div>
+</div>
+</section>
+<section id="via-setuptools">
+<h3>via <code class="docutils literal notranslate"><span class="pre">setuptools</span></code><a class="headerlink" href="#via-setuptools" title="Link to this heading"></a></h3>
+<p>You can clone the repository and use <a class="reference external" href="https://github.com/pypa/setuptools"><code class="docutils literal notranslate"><span class="pre">setuptools</span></code></a> for the most up-to-date version:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ApeWorX/ape-etherscan.git
+</span><span data-line="2"><span class="nb">cd</span><span class="w"> </span>ape-etherscan
+</span><span data-line="3">python3<span class="w"> </span>setup.py<span class="w"> </span>install
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="quick-usage">
+<h2>Quick Usage<a class="headerlink" href="#quick-usage" title="Link to this heading"></a></h2>
+</section>
+<section id="set-up-the-environment">
+<h2>Set up the environment<a class="headerlink" href="#set-up-the-environment" title="Link to this heading"></a></h2>
+<p>Specify API keys as environment variables. You could put them in your shell’s config like <code class="docutils literal notranslate"><span class="pre">~/.profile</span></code>
+or use a tool like <a class="reference external" href="https://direnv.net/">direnv</a> and store them locally in <code class="docutils literal notranslate"><span class="pre">.envrc</span></code>.</p>
+<p>You can also specify multiple comma-separated keys, a random key will be chosen for each request.
+This could be useful if you hit API rate limits.</p>
+<p>You can obtain an API key by registering with Etherscan and visiting <a class="reference external" href="https://etherscan.io/myapikey">this page</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nb">export</span><span class="w"> </span><span class="nv">ETHERSCAN_API_KEY</span><span class="o">=</span>SAMPLE_KEY
+</span><span data-line="2"><span class="nb">export</span><span class="w"> </span><span class="nv">FTMSCAN_API_KEY</span><span class="o">=</span>SAMPLE_KEY
+</span><span data-line="3"><span class="nb">export</span><span class="w"> </span><span class="nv">ARBISCAN_API_KEY</span><span class="o">=</span>SAMPLE_KEY
+</span><span data-line="4"><span class="nb">export</span><span class="w"> </span><span class="nv">POLYGON_ZKEVM_ETHERSCAN_API_KEY</span><span class="o">=</span>SAMPLE_KEY
+</span><span data-line="5"><span class="nb">export</span><span class="w"> </span><span class="nv">BASESCAN_API_KEY</span><span class="o">=</span>SAMPLE_KEY
+</span></pre></div>
+</div>
+</section>
+<section id="transaction-urls">
+<h2>Transaction URLs<a class="headerlink" href="#transaction-urls" title="Link to this heading"></a></h2>
+<p>When you have this plugin installed, Etherscan explorer URLs appear in CLI output.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">INFO:<span class="w"> </span>Submitted<span class="w"> </span>0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a9646
+</span><span data-line="2">etherscan<span class="w"> </span>URL:<span class="w"> </span>https://rinkeby.etherscan.io/tx/0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a9646
+</span></pre></div>
+</div>
+</section>
+<section id="contract-types">
+<h2>Contract Types<a class="headerlink" href="#contract-types" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ape-etherscan</span></code> plugin also assists in fetching <code class="docutils literal notranslate"><span class="pre">contract_types</span></code>.
+Use the <code class="docutils literal notranslate"><span class="pre">Contract</span></code> top-level construct to create contract instances.
+When the explorer plugin locates a contract type for a given address, the <code class="docutils literal notranslate"><span class="pre">Contract</span></code> return-value uses that contract type.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">accounts</span><span class="p">,</span> <span class="n">Contract</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">contract</span> <span class="o">=</span> <span class="n">Contract</span><span class="p">(</span><span class="s2">&quot;0x55a8a39bc9694714e2874c1ce77aa1e599461e18&quot;</span><span class="p">)</span>
+</span><span data-line="4"><span class="n">receipt</span> <span class="o">=</span> <span class="n">contract</span><span class="o">.</span><span class="n">call_mutable_method</span><span class="p">(</span><span class="s2">&quot;arg0&quot;</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">accounts</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;acct&quot;</span><span class="p">))</span>
+</span></pre></div>
+</div>
+<p>The first line <code class="docutils literal notranslate"><span class="pre">contract</span> <span class="pre">=</span> <span class="pre">Contract(&quot;0x55a8a39bc9694714e2874c1ce77aa1e599461e18&quot;)</span></code> checks if ape has a cached contract-type for the address <code class="docutils literal notranslate"><span class="pre">0x55a8a39bc9694714e2874c1ce77aa1e599461e18</span></code>.
+If it does not find a cached contract type, it uses an explorer plugin to attempt to find one.
+If found, the contract type is then cached to disk and in memory for the active session so that subsequent invocations don’t require HTTP calls.
+The return value from <code class="docutils literal notranslate"><span class="pre">Contract</span></code> is a <code class="docutils literal notranslate"><span class="pre">ContractInstance</span></code>, so it is connected to your active provider and ready for transactions.</p>
+<p><strong>NOTE</strong>: Vyper contracts from Etherscan always return the name <code class="docutils literal notranslate"><span class="pre">Vyper_contract</span></code>.
+However, if the plugin detects that the contract type has a method named <code class="docutils literal notranslate"><span class="pre">symbol</span></code>, it will use the return value from that call instead.</p>
+</section>
+<section id="contract-verification">
+<h2>Contract Verification<a class="headerlink" href="#contract-verification" title="Link to this heading"></a></h2>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">ape-etherscan</span></code> plugin to publish and verify your contracts.
+Contract verification associates a contract type from Ape with an Ethereum address on Etherscan.
+Learn more about Etherscan verification <a class="reference external" href="https://info.etherscan.com/types-of-contract-verification/">here</a>.</p>
+<p>To verify contract in Ape, you can set the <code class="docutils literal notranslate"><span class="pre">publish</span></code> key to <code class="docutils literal notranslate"><span class="pre">True</span></code> when deploying:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">accounts</span><span class="p">,</span> <span class="n">project</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">account</span> <span class="o">=</span> <span class="n">accounts</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;testnetacct&quot;</span><span class="p">)</span>
+</span><span data-line="4"><span class="n">account</span><span class="o">.</span><span class="n">deploy</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">MyContract</span><span class="p">,</span> <span class="n">publish</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>You can also use the explorer class directly to publish at a later time:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">networks</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">etherscan</span> <span class="o">=</span> <span class="n">networks</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">explorer</span>
+</span><span data-line="4"><span class="n">etherscan</span><span class="o">.</span><span class="n">publish_contract</span><span class="p">(</span><span class="s2">&quot;0x55a8a39bc9694714e2874c1ce77aa1e599461e18&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Not every network’s explorer supports multi-file verification.
+For those networks, the corresponding compiler plugin’s <code class="docutils literal notranslate"><span class="pre">flatten</span></code> functionality is invoked, in order to verify the contract as a single file.</p>
+<p><strong>NOTE</strong>: You must set an Etherscan API key environment variable to use the publishing feature.</p>
+</section>
+<section id="custom-networks">
+<h2>Custom Networks<a class="headerlink" href="#custom-networks" title="Link to this heading"></a></h2>
+<p>If you would like to use ape-etherscan with your <a class="reference external" href="https://docs.apeworx.io/ape/stable/userguides/networks.html#custom-network-connection">custom network configuration</a>, you can use the same network identifier you used to configure it.
+For instance, with a custom Ethereum network called “apechain” your configuration might look something like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nt">networks</span><span class="p">:</span>
+</span><span data-line="2"><span class="w">  </span><span class="nt">custom</span><span class="p">:</span>
+</span><span data-line="3"><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apechain</span>
+</span><span data-line="4"><span class="w">      </span><span class="nt">chain_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">31337</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="nt">node</span><span class="p">:</span>
+</span><span data-line="7"><span class="w">  </span><span class="nt">ethereum</span><span class="p">:</span>
+</span><span data-line="8"><span class="w">    </span><span class="nt">apechain</span><span class="p">:</span>
+</span><span data-line="9"><span class="w">      </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://localhost:8545</span>
+</span><span data-line="10">
+</span><span data-line="11"><span class="nt">etherscan</span><span class="p">:</span>
+</span><span data-line="12"><span class="w">  </span><span class="nt">ethereum</span><span class="p">:</span>
+</span><span data-line="13"><span class="w">    </span><span class="nt">rate_limit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15</span>
+</span><span data-line="14"><span class="w">    </span><span class="nt">apechain</span><span class="p">:</span>
+</span><span data-line="15"><span class="w">      </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://custom.scan</span>
+</span><span data-line="16"><span class="w">      </span><span class="nt">api_uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://api.custom.scan/api</span>
+</span></pre></div>
+</div>
+</section>
+<section id="id1">
+<h2>Dependencies<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>You can use dependencies from Etherscan in your projects.
+Configure them like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nt">dependencies</span><span class="p">:</span>
+</span><span data-line="2"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Spork</span>
+</span><span data-line="3"><span class="w">    </span><span class="nt">etherscan</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;0xb624FdE1a972B1C89eC1dAD691442d5E8E891469&quot;</span>
+</span><span data-line="4"><span class="w">    </span><span class="nt">ecosystem</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ethereum</span>
+</span><span data-line="5"><span class="w">    </span><span class="nt">network</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mainnet</span>
+</span></pre></div>
+</div>
+<p>Then, access contract types from the dependency in your code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">project</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">spork_contract_type</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="s2">&quot;Spork&quot;</span><span class="p">][</span><span class="s2">&quot;etherscan&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">Spork</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="querying-accounts">
+<h1>Querying Accounts<a class="headerlink" href="#querying-accounts" title="Link to this heading"></a></h1>
+<p>Etherscan offers a query-provider plugin for account data.
+Query account transactions from Etherscan using the following syntax:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">chain</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">history</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;vitalik.eth&quot;</span><span class="p">]</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="c1"># NOTE: Also showing how you can use `start_nonce=` and `stop_nonce=`</span>
+</span><span data-line="6"><span class="c1">#   to limit the history.</span>
+</span><span data-line="7"><span class="n">result</span> <span class="o">=</span> <span class="n">history</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">start_nonce</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">stop_nonce</span><span class="o">=</span><span class="mi">1001</span><span class="p">,</span> <span class="n">engine_to_use</span><span class="o">=</span><span class="s2">&quot;etherscan&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="../index.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Home</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="../methoddocs/dependency.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Dependency</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, ApeWorX LTD</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-domain="docs.apeworx.io" defer="defer" src="https://plausible.io/js/script.js"></script>
+      <script src="../_static/shibuya.js?v=e2e99575"></script></body>
+</html>

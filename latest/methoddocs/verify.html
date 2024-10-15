@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="lime" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Verify - ape-etherscan documentation</title><link rel="shortcut icon" href="../_static/favicon.ico"/><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Explorer" href="explorer.html" />
+      <link rel="canonical" href="ape-etherscan/methoddocs/verify.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=83eaa723" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/>
+<meta property="og:url" content="ape-etherscan/methoddocs/verify.html"/>
+<meta property="og:title" content="Verify"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      <img class="light-logo" src="../_static/logo_grey.svg" alt="ape-etherscan" height="28" loading="lazy" />
+      <img class="dark-logo" src="../_static/logo_green.svg" alt="ape-etherscan" height="28" loading="lazy" />
+      <strong>ape-etherscan</strong>
+    </a>
+    <div class="sy-head-nav" id="HeadNav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="HeadNav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2 -translate-x-2"></span>
+          <span class="hamburger_3 -translate-x-1"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">User Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../userguides/quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../userguides/quickstart.html#querying-accounts">Querying Accounts</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Python Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dependency.html">Dependency</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exceptions.html">Exceptions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explorer.html">Explorer</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Verify</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType"><code class="docutils literal notranslate"><span class="pre">LicenseType</span></code></a><ul>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.AGLP_3"><code class="docutils literal notranslate">AGLP_3</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.APACHE"><code class="docutils literal notranslate">APACHE</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.BSD_2_CLAUSE"><code class="docutils literal notranslate">BSD_2_CLAUSE</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.BSD_3_CLAUSE"><code class="docutils literal notranslate">BSD_3_CLAUSE</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.BUSL_1_1"><code class="docutils literal notranslate">BUSL_1_1</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.GPL_2"><code class="docutils literal notranslate">GPL_2</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.GPL_3"><code class="docutils literal notranslate">GPL_3</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.LGLP_2_1"><code class="docutils literal notranslate">LGLP_2_1</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.LGLP_3"><code class="docutils literal notranslate">LGLP_3</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.MIT"><code class="docutils literal notranslate">MIT</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.MPL_2"><code class="docutils literal notranslate">MPL_2</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.NO_LICENSE"><code class="docutils literal notranslate">NO_LICENSE</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.OSL_3"><code class="docutils literal notranslate">OSL_3</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.UNLICENSE"><code class="docutils literal notranslate">UNLICENSE</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.LicenseType.from_spdx_id"><code class="docutils literal notranslate">from_spdx_id()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier"><code class="docutils literal notranslate"><span class="pre">SourceVerifier</span></code></a><ul>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier.attempt_verification"><code class="docutils literal notranslate">attempt_verification()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier.constructor_arguments"><code class="docutils literal notranslate">constructor_arguments</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier.contract"><code class="docutils literal notranslate">contract</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier.contract_name"><code class="docutils literal notranslate">contract_name</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier.contract_type"><code class="docutils literal notranslate">contract_type</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier.ext"><code class="docutils literal notranslate">ext</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier.license_code"><code class="docutils literal notranslate">license_code</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.SourceVerifier.source_path"><code class="docutils literal notranslate">source_path</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ape_etherscan.verify.VerificationApproach"><code class="docutils literal notranslate"><span class="pre">VerificationApproach</span></code></a><ul>
+<li><a class="reference internal" href="#ape_etherscan.verify.VerificationApproach.FLATTEN"><code class="docutils literal notranslate">FLATTEN</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.verify.VerificationApproach.STANDARD_JSON"><code class="docutils literal notranslate">STANDARD_JSON</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">ape-etherscan</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Verify</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="module-ape_etherscan.verify">
+<span id="verify"></span><h1>Verify<a class="headerlink" href="#module-ape_etherscan.verify" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ape_etherscan.verify.</span></span><span class="sig-name descname"><span class="pre">LicenseType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.verify.LicenseType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p><a class="reference external" href="https://etherscan.io/contract-license-types">https://etherscan.io/contract-license-types</a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.AGLP_3">
+<span class="sig-name descname"><span class="pre">AGLP_3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">13</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.AGLP_3" title="Link to this definition"></a></dt>
+<dd><p>When a modified version is used to provide a service over a network, the complete
+source code of the modified version must be made available.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/agpl-3.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/agpl-3.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.APACHE">
+<span class="sig-name descname"><span class="pre">APACHE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.APACHE" title="Link to this definition"></a></dt>
+<dd><p>Requires preservation of copyright and license notices.  Licensed works, modifications,
+and larger works may be distributed under different terms and without source code.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/apache-2.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/apache-2.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.BSD_2_CLAUSE">
+<span class="sig-name descname"><span class="pre">BSD_2_CLAUSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.BSD_2_CLAUSE" title="Link to this definition"></a></dt>
+<dd><p>Licensed works, modifications, and larger works may be distributed under different
+terms and without source code.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsd-2-clause.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsd-2-clause.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.BSD_3_CLAUSE">
+<span class="sig-name descname"><span class="pre">BSD_3_CLAUSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.BSD_3_CLAUSE" title="Link to this definition"></a></dt>
+<dd><p>Licensed works, modifications, and larger works may be distributed under different
+terms and without source code. The name of the project or its contributors may not
+be used to promote derived products without written consent.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsd-3-clause.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsd-3-clause.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.BUSL_1_1">
+<span class="sig-name descname"><span class="pre">BUSL_1_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.BUSL_1_1" title="Link to this definition"></a></dt>
+<dd><p>The BSL is structured to allow free and open usage for many use cases, and only requires
+a commercial license by those who make production use of the software, which is typically
+indicative of an environment that is delivering significant value to a business.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsl-1.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/bsl-1.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.GPL_2">
+<span class="sig-name descname"><span class="pre">GPL_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.GPL_2" title="Link to this definition"></a></dt>
+<dd><p>The source code of derived works must be made available under the same license.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/gpl-2.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/gpl-2.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.GPL_3">
+<span class="sig-name descname"><span class="pre">GPL_3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.GPL_3" title="Link to this definition"></a></dt>
+<dd><p>When distributing derived works, the source code of the work must be made available
+under the same license and contributors provide an express grant of patent rights.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/gpl-3.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/gpl-3.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.LGLP_2_1">
+<span class="sig-name descname"><span class="pre">LGLP_2_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.LGLP_2_1" title="Link to this definition"></a></dt>
+<dd><p>Derived works must be licensed under the same license, but works that only link
+to it do not fall under this restriction.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/lgpl-3.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/lgpl-3.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.LGLP_3">
+<span class="sig-name descname"><span class="pre">LGLP_3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.LGLP_3" title="Link to this definition"></a></dt>
+<dd><p>When distributing derived works, the source code of the work must be made available
+under the same license and contributors provide an express grant of patent rights
+with exceptions for a larger works using provided interfaces.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/lgpl-3.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/lgpl-3.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.MIT">
+<span class="sig-name descname"><span class="pre">MIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.MIT" title="Link to this definition"></a></dt>
+<dd><p>Licensed works, modifications, and larger works may be distributed
+under different terms and without source code.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/mit.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/mit.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.MPL_2">
+<span class="sig-name descname"><span class="pre">MPL_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.MPL_2" title="Link to this definition"></a></dt>
+<dd><p>Source code must be made available of licensed/modified files, but not additional files.
+Copyright and license notices must be preserved. Contributors grant patent rights.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/mpl-2.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/mpl-2.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.NO_LICENSE">
+<span class="sig-name descname"><span class="pre">NO_LICENSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.NO_LICENSE" title="Link to this definition"></a></dt>
+<dd><p>Nobody else can copy, distribute, or modify your work without risk of
+take-downs, shake-downs, or litigation.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/no-permission.md">https://github.com/github/choosealicense.com/blob/gh-pages/no-permission.md</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.OSL_3">
+<span class="sig-name descname"><span class="pre">OSL_3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.OSL_3" title="Link to this definition"></a></dt>
+<dd><p>Does not require reciprocal licensing on linked works.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/osl-3.0.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/osl-3.0.txt</a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.UNLICENSE">
+<span class="sig-name descname"><span class="pre">UNLICENSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ape_etherscan.verify.LicenseType.UNLICENSE" title="Link to this definition"></a></dt>
+<dd><p>Unlicensed works, modifications, and larger works may be distributed
+under different terms and without source code.
+<a class="reference external" href="https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/unlicense.txt">https://github.com/github/choosealicense.com/blob/gh-pages/_licenses/unlicense.txt</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ape_etherscan.verify.LicenseType.from_spdx_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_spdx_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spdx_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ape_etherscan.verify.LicenseType" title="ape_etherscan.verify.LicenseType"><span class="pre">LicenseType</span></a></span></span><a class="headerlink" href="#ape_etherscan.verify.LicenseType.from_spdx_id" title="Link to this definition"></a></dt>
+<dd><p>Create an instance using the SPDX Identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spdx_id</strong> (<em>str</em>) – e.g. <code class="docutils literal notranslate"><span class="pre">&quot;//</span> <span class="pre">SPDX-License-Identifier:</span> <span class="pre">MIT&quot;</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">LicenseType</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ape_etherscan.verify.</span></span><span class="sig-name descname"><span class="pre">SourceVerifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">ChecksumAddress</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_AddressValidator</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_factory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClientFactory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ProjectManager</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ManagerAccessMixin</span></code></p>
+<p>A class for verifying contract sources.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier.attempt_verification">
+<span class="sig-name descname"><span class="pre">attempt_verification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Compiler</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approach</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ape_etherscan.verify.VerificationApproach" title="ape_etherscan.verify.VerificationApproach"><span class="pre">VerificationApproach</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier.attempt_verification" title="Link to this definition"></a></dt>
+<dd><p>Attempt to verify the source code.
+If the bytecode is already verified, Etherscan will use the existing bytecode
+and this method will still succeed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compiler</strong> (<em>ethpm_types.Compiler</em>) – Optionally provide the compiler. Defaults to
+looking it up from Ape.</p></li>
+<li><p><strong>approach</strong> (<a class="reference internal" href="#ape_etherscan.verify.VerificationApproach" title="ape_etherscan.verify.VerificationApproach"><em>VerificationApproach</em></a>) – The approach to use when verifying. Defaults
+to figuring it out from settings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="exceptions.html#ape_etherscan.exceptions.ContractVerificationError" title="ape_etherscan.exceptions.ContractVerificationError"><strong>ContractVerificationError</strong></a> – <ul class="simple">
+<li><p>When fails
+    to validate the contract.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier.constructor_arguments">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">constructor_arguments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier.constructor_arguments" title="Link to this definition"></a></dt>
+<dd><p>The arguments used when deploying the contract.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier.contract">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">contract</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ContractInstance</span></em><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier.contract" title="Link to this definition"></a></dt>
+<dd><p>The ape contract instance to verify.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier.contract_name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">contract_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier.contract_name" title="Link to this definition"></a></dt>
+<dd><p>The name of the contract.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier.contract_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">contract_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ContractType</span></em><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier.contract_type" title="Link to this definition"></a></dt>
+<dd><p>The ethpm-types ContractType to verify.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier.ext">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ext</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier.ext" title="Link to this definition"></a></dt>
+<dd><p>The source path extension.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier.license_code">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">license_code</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ape_etherscan.verify.LicenseType" title="ape_etherscan.verify.LicenseType"><span class="pre">LicenseType</span></a></em><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier.license_code" title="Link to this definition"></a></dt>
+<dd><p>The license type used in the code.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ape_etherscan.verify.SourceVerifier.source_path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">source_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span></em><a class="headerlink" href="#ape_etherscan.verify.SourceVerifier.source_path" title="Link to this definition"></a></dt>
+<dd><p>The path to the contract, locally.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ape_etherscan.verify.VerificationApproach">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ape_etherscan.verify.</span></span><span class="sig-name descname"><span class="pre">VerificationApproach</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.verify.VerificationApproach" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.VerificationApproach.FLATTEN">
+<span class="sig-name descname"><span class="pre">FLATTEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'FLATTEN'</span></em><a class="headerlink" href="#ape_etherscan.verify.VerificationApproach.FLATTEN" title="Link to this definition"></a></dt>
+<dd><p>The flattened contract approach.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ape_etherscan.verify.VerificationApproach.STANDARD_JSON">
+<span class="sig-name descname"><span class="pre">STANDARD_JSON</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'STANDARD_JSON'</span></em><a class="headerlink" href="#ape_etherscan.verify.VerificationApproach.STANDARD_JSON" title="Link to this definition"></a></dt>
+<dd><p>The standard input JSON approach.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="explorer.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Explorer</div></div>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, ApeWorX LTD</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script data-domain="docs.apeworx.io" defer="defer" src="https://plausible.io/js/script.js"></script>
+      <script src="../_static/shibuya.js?v=e2e99575"></script></body>
+</html>
