@@ -52,6 +52,7 @@ def get_etherscan_uri(
         )
 
     elif ecosystem_name == "avalanche":
+        # TODO: In 0.9, change this to `snowscan` since that is Etherscan's official.
         return (
             "https://snowtrace.io" if network_name == "mainnet" else "https://testnet.snowtrace.io"
         )

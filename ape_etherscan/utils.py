@@ -6,6 +6,7 @@ API_KEY_ENV_KEY_MAP = {
     "blast": "BLASTSCAN_API_KEY",
     "bsc": "BSCSCAN_API_KEY",
     "bttc": "BTTCSCAN_API_KEY",
+    "celo": "CELOSCAN_API_KEY",
     "ethereum": "ETHERSCAN_API_KEY",
     "fantom": "FTMSCAN_API_KEY",
     "fraxtal": "FRAXSCAN_API_KEY",
