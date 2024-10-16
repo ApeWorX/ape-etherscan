@@ -2,17 +2,26 @@
 
 The following blockchain explorers are supported in this plugin:
 
-- [Etherscan](https://etherscan.io/) for Ethereum networks.
-- [Ftmscan](https://ftmscan.com) for Fantom networks.
-- [Arbiscan](https://arbiscan.io) for Arbitrum networks.
-- [Optimistic Etherscan](https://optimistic.etherscan.io) for Optimism networks.
-- [Polygonscan](https://polygonscan.com) for Polygon networks.
-- [Polygonscan ZkEVM](https://zkevm.polygonscan.com) for Polygon ZkEVM networks.
-- [Snowtrace](https://snowtrace.io) for Avalanche networks.
-- [Basescan](https://basescan.org) for Base networks.
-- [Bscscan](https://bscscan.com) for Binance-Smart-Chain networks.
-- [Blastscan](https://blastscan.io) for Blast networks.
-- [Scrollscan](https://scrollscan.com) for Scroll networks.
+| Network Name        | Explorer Link                                           |
+| ------------------- | ------------------------------------------------------- |
+| Arbitrum            | [Arbiscan](https://arbiscan.io)                         |
+| Avalanche           | [Snowtrace](https://snowtrace.io)                       |
+| Base                | [Basescan](https://basescan.org)                        |
+| Binance Smart Chain | [Bscscan](https://bscscan.com)                          |
+| Bittorrent          | [BTTCscan](https://bttcscan.com)                        |
+| Blast               | [Blastscan](https://blastscan.io)                       |
+| Celo                | [Celoscan](https://celoscan.com)                        |
+| Ethereum            | [Etherscan](https://etherscan.io/)                      |
+| Fantom              | [Ftmscan](https://ftmscan.com)                          |
+| Fraxtal             | [Fraxscan](https://fraxscan.com)                        |
+| Gnosis              | [Gnosisscan](https://gnosisscan.io)                     |
+| Kroma               | [Kromascan](https://kromascan.com)                      |
+| Moonbeam            | [Moonscan](https://moonscan.io)                         |
+| Optimism            | [Optimistic Etherscan](https://optimistic.etherscan.io) |
+| Polygon             | [Polygonscan](https://polygonscan.com)                  |
+| Polygon ZkEVM       | [Polygonscan ZkEVM](https://zkevm.polygonscan.com)      |
+| Scroll              | [Scrollscan](https://scrollscan.com)                    |
+| Unichain            | [Uniscan](https://sepolia.uniscan.xyz)                  |
 
 ## Dependencies
 
@@ -40,7 +49,7 @@ python3 setup.py install
 
 ## Quick Usage
 
-## Set up the environment
+### Set up the environment
 
 Specify API keys as environment variables. You could put them in your shell's config like `~/.profile`
 or use a tool like [direnv](https://direnv.net/) and store them locally in `.envrc`.
@@ -58,7 +67,7 @@ export POLYGON_ZKEVM_ETHERSCAN_API_KEY=SAMPLE_KEY
 export BASESCAN_API_KEY=SAMPLE_KEY
 ```
 
-## Transaction URLs
+### Transaction URLs
 
 When you have this plugin installed, Etherscan explorer URLs appear in CLI output.
 
@@ -67,7 +76,7 @@ INFO: Submitted 0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a96
 etherscan URL: https://rinkeby.etherscan.io/tx/0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a9646
 ```
 
-## Contract Types
+### Contract Types
 
 The `ape-etherscan` plugin also assists in fetching `contract_types`.
 Use the `Contract` top-level construct to create contract instances.
@@ -88,7 +97,7 @@ The return value from `Contract` is a `ContractInstance`, so it is connected to 
 **NOTE**: Vyper contracts from Etherscan always return the name `Vyper_contract`.
 However, if the plugin detects that the contract type has a method named `symbol`, it will use the return value from that call instead.
 
-## Contract Verification
+### Contract Verification
 
 Use the `ape-etherscan` plugin to publish and verify your contracts.
 Contract verification associates a contract type from Ape with an Ethereum address on Etherscan.
@@ -117,7 +126,7 @@ For those networks, the corresponding compiler plugin's `flatten` functionality 
 
 **NOTE**: You must set an Etherscan API key environment variable to use the publishing feature.
 
-## Custom Networks
+### Custom Networks
 
 If you would like to use ape-etherscan with your [custom network configuration](https://docs.apeworx.io/ape/stable/userguides/networks.html#custom-network-connection), you can use the same network identifier you used to configure it.
 For instance, with a custom Ethereum network called "apechain" your configuration might look something like this:
@@ -141,7 +150,7 @@ etherscan:
       api_uri: https://api.custom.scan/api
 ```
 
-## Dependencies
+### Dependencies
 
 You can use dependencies from Etherscan in your projects.
 Configure them like this:
@@ -162,7 +171,7 @@ from ape import project
 spork_contract_type = project.dependencies["Spork"]["etherscan"].Spork
 ```
 
-# Querying Accounts
+### Querying Accounts
 
 Etherscan offers a query-provider plugin for account data.
 Query account transactions from Etherscan using the following syntax:

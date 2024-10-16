@@ -42,7 +42,27 @@ _SPDX_ID_TO_API_CODE = {
     "busl-1.1": 14,
 }
 _SPDX_ID_KEY = "SPDX-License-Identifier: "
-ECOSYSTEMS_VERIFY_USING_JSON = ("arbitrum", "base", "blast", "ethereum", "polygon")
+
+# IN 0.9, can add avalanche once we switch to snowscan.
+ECOSYSTEMS_VERIFY_USING_JSON = (
+    "arbitrum",
+    "base",
+    "blast",
+    "bsc",
+    "bttc",
+    "celo",
+    "ethereum",
+    "fantom",
+    "fraxtal",
+    "gnosis",
+    "kroma",
+    "moonbeam",
+    "optimism",
+    "polygon",
+    "polygon-zkevm",
+    "scroll",
+    "unichain",
+)
 
 
 class LicenseType(Enum):
