@@ -2,26 +2,26 @@
 
 The following blockchain explorers are supported in this plugin:
 
-| Network Name               | Explorer Link                                                |
-|----------------------------|--------------------------------------------------------------|
-| Arbitrum                   | [Arbiscan](https://arbiscan.io)                              |
-| Avalanche                  | [Snowtrace](https://snowtrace.io)                            |
-| Base                       | [Basescan](https://basescan.org)                             |
-| Binance Smart Chain        | [Bscscan](https://bscscan.com)                               |
-| Bittorrent                 | [BTTCscan](https://bttcscan.com)                             |
-| Blast                      | [Blastscan](https://blastscan.io)                            |
-| Celo                       | [Celoscan](https://celoscan.com)                             |
-| Ethereum                   | [Etherscan](https://etherscan.io/)                           |
-| Fantom                     | [Ftmscan](https://ftmscan.com)                               |
-| Fraxtal                    | [Fraxscan](https://fraxscan.com)                             |
-| Gnosis                     | [Gnosisscan](https://gnosisscan.io)                          |
-| Kroma                      | [Kromascan](https://kromascan.com)                           |
-| Moonbeam                   | [Moonscan](https://moonscan.io)                              |
-| Optimism                   | [Optimistic Etherscan](https://optimistic.etherscan.io)      |
-| Polygon                    | [Polygonscan](https://polygonscan.com)                       |
-| Polygon ZkEVM              | [Polygonscan ZkEVM](https://zkevm.polygonscan.com)           |
-| Scroll                     | [Scrollscan](https://scrollscan.com)                         |
-| Unichain                   | [Uniscan](https://sepolia.uniscan.xyz)                       |
+| Network Name        | Explorer Link                                           |
+| ------------------- | ------------------------------------------------------- |
+| Arbitrum            | [Arbiscan](https://arbiscan.io)                         |
+| Avalanche           | [Snowtrace](https://snowtrace.io)                       |
+| Base                | [Basescan](https://basescan.org)                        |
+| Binance Smart Chain | [Bscscan](https://bscscan.com)                          |
+| Bittorrent          | [BTTCscan](https://bttcscan.com)                        |
+| Blast               | [Blastscan](https://blastscan.io)                       |
+| Celo                | [Celoscan](https://celoscan.com)                        |
+| Ethereum            | [Etherscan](https://etherscan.io/)                      |
+| Fantom              | [Ftmscan](https://ftmscan.com)                          |
+| Fraxtal             | [Fraxscan](https://fraxscan.com)                        |
+| Gnosis              | [Gnosisscan](https://gnosisscan.io)                     |
+| Kroma               | [Kromascan](https://kromascan.com)                      |
+| Moonbeam            | [Moonscan](https://moonscan.io)                         |
+| Optimism            | [Optimistic Etherscan](https://optimistic.etherscan.io) |
+| Polygon             | [Polygonscan](https://polygonscan.com)                  |
+| Polygon ZkEVM       | [Polygonscan ZkEVM](https://zkevm.polygonscan.com)      |
+| Scroll              | [Scrollscan](https://scrollscan.com)                    |
+| Unichain            | [Uniscan](https://sepolia.uniscan.xyz)                  |
 
 ## Dependencies
 
