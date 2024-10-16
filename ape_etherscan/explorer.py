@@ -22,7 +22,7 @@ from ape_etherscan.verify import SourceVerifier
 
 class Etherscan(ExplorerAPI):
     """
-    The explorer API implemention for Etherscan.
+    The explorer API implementation for Etherscan.
     """
 
     @property
