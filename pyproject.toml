@@ -21,6 +21,7 @@ include = '\.pyi?$'
 [tool.pytest.ini_options]
 addopts = """
     -p no:ape_test
+    -p no:pytest_ethereum
     --cov-branch
     --cov-report term
     --cov-report html

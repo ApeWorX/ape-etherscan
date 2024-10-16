@@ -232,22 +232,64 @@ class MockEtherscanBackend:
         testnet_url = get_url_f(testnet=True)
         com_url = get_url_f(tld="com")
         org_url = get_url_f(tld="org")
+        xyz_url = get_url_f(tld="xyz")
         com_testnet_url = get_url_f(testnet=True, tld="com")
         org_testnet_url = get_url_f(testnet=True, tld="org")
+        xyz_testnet_url = get_url_f(testnet=True, tld="xyz")
 
         return {
+            "arbitrum": {
+                "mainnet": url("arbiscan"),
+                "sepolia": testnet_url("sepolia", "arbiscan"),
+                "nova": testnet_url("nova", "arbiscan"),
+            },
+            "avalanche": {"mainnet": url("snowtrace"), "fuji": testnet_url("testnet", "snowtrace")},
+            "base": {
+                "sepolia": org_testnet_url("sepolia", "basescan"),
+                "mainnet": org_url("basescan"),
+            },
+            "blast": {
+                "sepolia": testnet_url("sepolia", "blastscan"),
+                "mainnet": url("blastscan"),
+            },
+            "bsc": {
+                "mainnet": com_url("bscscan"),
+                "testnet": com_testnet_url("testnet", "bscscan"),
+                "opbnb": com_testnet_url("opbnb", "bscscan"),
+                "opbnb-testnet": com_testnet_url("opbnb-testnet", "bscscan"),
+            },
+            "bttc": {
+                "mainnet": com_url("bttcscan"),
+                "donau": com_testnet_url("testnet", "bttcscan"),
+            },
+            "celo": {
+                "mainnet": com_url("celoscan"),
+                "alfajores": com_testnet_url("alfajores", "celoscan"),
+            },
             "ethereum": {
                 "mainnet": url("etherscan"),
                 "holesky": testnet_url("holesky", "etherscan"),
                 "sepolia": testnet_url("sepolia", "etherscan"),
             },
-            "arbitrum": {
-                "mainnet": url("arbiscan"),
-                "sepolia": testnet_url("sepolia", "arbiscan"),
-            },
             "fantom": {
                 "opera": com_url("ftmscan"),
                 "testnet": com_testnet_url("testnet", "ftmscan"),
+            },
+            "fraxtal": {
+                "mainnet": com_url("fraxscan"),
+                "holesky": com_testnet_url("holesky", "fraxscan"),
+            },
+            "gnosis": {
+                "mainnet": url("gnosisscan"),
+            },
+            "kroma": {
+                "mainnet": com_url("kromascan"),
+                "sepolia": com_testnet_url("sepolia", "kromascan"),
+            },
+            "moonbeam": {
+                "mainnet": url("moonscan"),
+                "moonbase": testnet_url("moonbase", "moonscan"),
+                "moonriver": testnet_url("moonriver", "moonscan"),
             },
             "optimism": {
                 "mainnet": testnet_url("optimistic", "etherscan"),
@@ -257,34 +299,27 @@ class MockEtherscanBackend:
                 "mainnet": com_url("polygonscan"),
                 "amoy": com_testnet_url("amoy", "polygonscan"),
             },
-            "base": {
-                "sepolia": org_testnet_url("sepolia", "basescan"),
-                "mainnet": org_url("basescan"),
-            },
-            "blast": {
-                "sepolia": testnet_url("sepolia", "blastscan"),
-                "mainnet": url("blastscan"),
-            },
             "polygon-zkevm": {
                 "mainnet": com_testnet_url("zkevm", "polygonscan"),
                 "cardona": com_testnet_url("cardona-zkevm", "polygonscan"),
             },
-            "avalanche": {"mainnet": url("snowtrace"), "fuji": testnet_url("testnet", "snowtrace")},
-            "bsc": {
-                "mainnet": com_url("bscscan"),
-                "testnet": com_testnet_url("testnet", "bscscan"),
-            },
-            "gnosis": {
-                "mainnet": url("gnosisscan"),
-            },
             "scroll": {
                 "mainnet": com_url("scrollscan"),
+                "sepolia": com_testnet_url("sepolia", "scrollscan"),
                 "testnet": com_testnet_url("testnet", "scrollscan"),
+            },
+            "unichain": {
+                "mainnet": xyz_url("uniscan"),
+                "sepolia": xyz_testnet_url("sepolia", "uniscan"),
             },
         }
 
     def set_network(self, ecosystem: str, network: str):
-        self.expected_base_uri = self.expected_uri_map[ecosystem][network.replace("-fork", "")]
+        key = network.replace("-fork", "")
+        if ecosystem not in self.expected_uri_map or key not in self.expected_uri_map[ecosystem]:
+            pytest.fail(f"Add {ecosystem}:{key} to the MockbBackend API map (check conftest.py)!")
+
+        self.expected_base_uri = self.expected_uri_map[ecosystem][key]
 
     def add_handler(
         self,

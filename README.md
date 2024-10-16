@@ -2,17 +2,26 @@
 
 The following blockchain explorers are supported in this plugin:
 
-- [Etherscan](https://etherscan.io/) for Ethereum networks.
-- [Ftmscan](https://ftmscan.com) for Fantom networks.
-- [Arbiscan](https://arbiscan.io) for Arbitrum networks.
-- [Optimistic Etherscan](https://optimistic.etherscan.io) for Optimism networks.
-- [Polygonscan](https://polygonscan.com) for Polygon networks.
-- [Polygonscan ZkEVM](https://zkevm.polygonscan.com) for Polygon ZkEVM networks.
-- [Snowtrace](https://snowtrace.io) for Avalanche networks.
-- [Basescan](https://basescan.org) for Base networks.
-- [Bscscan](https://bscscan.com) for Binance-Smart-Chain networks.
-- [Blastscan](https://blastscan.io) for Blast networks.
-- [Scrollscan](https://scrollscan.com) for Scroll networks.
+| Network Name               | Explorer Link                                                |
+|----------------------------|--------------------------------------------------------------|
+| Arbitrum                   | [Arbiscan](https://arbiscan.io)                              |
+| Avalanche                  | [Snowtrace](https://snowtrace.io)                            |
+| Base                       | [Basescan](https://basescan.org)                             |
+| Binance Smart Chain        | [Bscscan](https://bscscan.com)                               |
+| Bittorrent                 | [BTTCscan](https://bttcscan.com)                             |
+| Blast                      | [Blastscan](https://blastscan.io)                            |
+| Celo                       | [Celoscan](https://celoscan.com)                             |
+| Ethereum                   | [Etherscan](https://etherscan.io/)                           |
+| Fantom                     | [Ftmscan](https://ftmscan.com)                               |
+| Fraxtal                    | [Fraxscan](https://fraxscan.com)                             |
+| Gnosis                     | [Gnosisscan](https://gnosisscan.io)                          |
+| Kroma                      | [Kromascan](https://kromascan.com)                           |
+| Moonbeam                   | [Moonscan](https://moonscan.io)                              |
+| Optimism                   | [Optimistic Etherscan](https://optimistic.etherscan.io)      |
+| Polygon                    | [Polygonscan](https://polygonscan.com)                       |
+| Polygon ZkEVM              | [Polygonscan ZkEVM](https://zkevm.polygonscan.com)           |
+| Scroll                     | [Scrollscan](https://scrollscan.com)                         |
+| Unichain                   | [Uniscan](https://sepolia.uniscan.xyz)                       |
 
 ## Dependencies
 

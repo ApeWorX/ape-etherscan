@@ -28,15 +28,22 @@ class EcosystemConfig(PluginConfig):
 
 class EtherscanConfig(PluginConfig):
     model_config = SettingsConfigDict(extra="allow")
+
     arbitrum: EcosystemConfig = EcosystemConfig()
     avalanche: EcosystemConfig = EcosystemConfig()
     base: EcosystemConfig = EcosystemConfig()
     blast: EcosystemConfig = EcosystemConfig()
     bsc: EcosystemConfig = EcosystemConfig()
+    bttc: EcosystemConfig = EcosystemConfig()
+    celo: EcosystemConfig = EcosystemConfig()
     ethereum: EcosystemConfig = EcosystemConfig()
     fantom: EcosystemConfig = EcosystemConfig()
+    fraxtal: EcosystemConfig = EcosystemConfig()
     gnosis: EcosystemConfig = EcosystemConfig()
+    kroma: EcosystemConfig = EcosystemConfig()
+    moonbeam: EcosystemConfig = EcosystemConfig()
     optimism: EcosystemConfig = EcosystemConfig()
     polygon: EcosystemConfig = EcosystemConfig()
     polygon_zkevm: EcosystemConfig = EcosystemConfig()
     scroll: EcosystemConfig = EcosystemConfig()
+    unichain: EcosystemConfig = EcosystemConfig()

@@ -18,7 +18,6 @@ from ape_etherscan.exceptions import (
     IncompatibleCompilerSettingsError,
     UnhandledResultError,
     UnsupportedEcosystemError,
-    UnsupportedNetworkError,
 )
 from ape_etherscan.types import (
     ContractCreationResponse,
@@ -45,73 +44,131 @@ def get_etherscan_uri(
     if network_conf and hasattr(network_conf, "uri"):
         return str(network_conf.uri)
 
-    if ecosystem_name == "ethereum":
+    if ecosystem_name == "arbitrum":
         return (
-            f"https://{network_name}.etherscan.io"
-            if network_name != "mainnet"
-            else "https://etherscan.io"
+            "https://arbiscan.io"
+            if network_name == "mainnet"
+            else f"https://{network_name}.arbiscan.io"
+        )
+
+    elif ecosystem_name == "avalanche":
+        return (
+            "https://snowtrace.io" if network_name == "mainnet" else "https://testnet.snowtrace.io"
+        )
+
+    elif ecosystem_name == "base":
+        return (
+            "https://basescan.org"
+            if network_name == "mainnet"
+            else f"https://{network_name}.basescan.org"
+        )
+
+    elif ecosystem_name == "blast":
+        return (
+            "https://blastscan.io"
+            if network_name == "mainnet"
+            else f"https://{network_name}.blastscan.io"
+        )
+
+    elif ecosystem_name == "bsc":
+        return (
+            "https://bscscan.com"
+            if network_name == "mainnet"
+            else f"https://{network_name}.bscscan.com"
+        )
+
+    elif ecosystem_name == "bttc":
+        if network_name == "mainnet":
+            return "https://bttcscan.com"
+        elif network_name == "donau":
+            return "https://testnet.bttcscan.com"
+        else:
+            # NOTE: At time of writing, no other networks would hit this;
+            #   the intent is to be more future-proof.
+            return f"https://{network_name}.bttcscan.com"
+
+    elif ecosystem_name == "celo":
+        return (
+            "https://celoscan.io"
+            if network_name == "mainnet"
+            else f"https://{network_name}.celoscan.io"
+        )
+
+    elif ecosystem_name == "ethereum":
+        return (
+            "https://etherscan.io"
+            if network_name == "mainnet"
+            else f"https://{network_name}.etherscan.io"
         )
 
     elif ecosystem_name == "fantom":
         return (
-            f"https://{network_name}.ftmscan.com"
-            if network_name != "opera"
-            else "https://ftmscan.com"
+            "https://ftmscan.com"
+            if network_name == "opera"
+            else f"https://{network_name}.ftmscan.com"
         )
 
-    elif ecosystem_name == "arbitrum":
+    elif ecosystem_name == "fraxtal":
         return (
-            f"https://{network_name}.arbiscan.io"
-            if network_name != "mainnet"
-            else "https://arbiscan.io"
+            "https://fraxscan.com"
+            if network_name == "mainnet"
+            else f"https://{network_name}.fraxscan.com"
         )
+
+    elif ecosystem_name == "gnosis":
+        return (
+            "https://gnosisscan.io"
+            if network_name == "mainnet"
+            else f"https://{network_name}.gnosisscan.io"
+        )
+
+    elif ecosystem_name == "kroma":
+        return (
+            "https://kromascan.com"
+            if network_name == "mainnet"
+            else f"https://{network_name}.kromascan.com"
+        )
+
+    elif ecosystem_name == "moonbeam":
+        return (
+            "https://moonscan.io"
+            if network_name == "mainnet"
+            else f"https://{network_name}.moonscan.io"
+        )
+
     elif ecosystem_name == "optimism":
         return (
             "https://optimistic.etherscan.io"
             if network_name == "mainnet"
             else f"https://{network_name}-optimism.etherscan.io"
         )
-    elif ecosystem_name == "polygon-zkevm":
-        return (
-            "https://zkevm.polygonscan.com"
-            if network_name == "mainnet"
-            else "https://cardona-zkevm.polygonscan.com"
-        )
-    elif ecosystem_name == "base":
-        return (
-            f"https://{network_name}.basescan.org"
-            if network_name != "mainnet"
-            else "https://basescan.org"
-        )
+
     elif ecosystem_name == "polygon":
         return (
             "https://polygonscan.com"
             if network_name == "mainnet"
             else "https://amoy.polygonscan.com"
         )
-    elif ecosystem_name == "avalanche":
+
+    elif ecosystem_name == "polygon-zkevm":
         return (
-            "https://snowtrace.io" if network_name == "mainnet" else "https://testnet.snowtrace.io"
+            "https://zkevm.polygonscan.com"
+            if network_name == "mainnet"
+            else "https://cardona-zkevm.polygonscan.com"
         )
-    elif ecosystem_name == "bsc":
-        return (
-            f"https://{network_name}.bscscan.com"
-            if network_name != "mainnet"
-            else "https://bscscan.com"
-        )
-    elif ecosystem_name == "gnosis":
-        if network_name == "mainnet":
-            return "https://gnosisscan.io"
-        raise UnsupportedNetworkError(ecosystem_name, network_name)
-    elif ecosystem_name == "blast":
-        return (
-            "https://blastscan.io" if network_name == "mainnet" else "https://sepolia.blastscan.io"
-        )
+
     elif ecosystem_name == "scroll":
         return (
             "https://scrollscan.com"
             if network_name == "mainnet"
             else f"https://{network_name}.scrollscan.com"
+        )
+
+    elif ecosystem_name == "unichain":
+        return (
+            "https://uniscan.xyz"
+            if network_name == "mainnet"
+            else f"https://{network_name}.uniscan.xyz"
         )
 
     raise UnsupportedEcosystemError(ecosystem_name)
@@ -125,77 +182,133 @@ def get_etherscan_api_uri(
     if network_conf and hasattr(network_conf, "api_uri"):
         return str(network_conf.api_uri)
 
-    if ecosystem_name == "ethereum":
+    if ecosystem_name == "arbitrum":
         return (
-            f"https://api-{network_name}.etherscan.io/api"
-            if network_name != "mainnet"
-            else "https://api.etherscan.io/api"
+            "https://api.arbiscan.io/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.arbiscan.io/api"
         )
 
-    elif ecosystem_name == "fantom":
-        return (
-            f"https://api-{network_name}.ftmscan.com/api"
-            if network_name != "opera"
-            else "https://api.ftmscan.com/api"
-        )
-
-    elif ecosystem_name == "arbitrum":
-        return (
-            f"https://api-{network_name}.arbiscan.io/api"
-            if network_name != "mainnet"
-            else "https://api.arbiscan.io/api"
-        )
-    elif ecosystem_name == "optimism":
-        return (
-            "https://api-optimistic.etherscan.io/api"
-            if network_name == "mainnet"
-            else f"https://api-{network_name}-optimistic.etherscan.io/api"
-        )
-    elif ecosystem_name == "polygon-zkevm":
-        return (
-            "https://api-zkevm.polygonscan.com/api"
-            if network_name == "mainnet"
-            else "https://api-cardona-zkevm.polygonscan.com/api"
-        )
-    elif ecosystem_name == "base":
-        return (
-            f"https://api-{network_name}.basescan.org/api"
-            if network_name != "mainnet"
-            else "https://api.basescan.org/api"
-        )
-    elif ecosystem_name == "polygon":
-        return (
-            "https://api.polygonscan.com/api"
-            if network_name == "mainnet"
-            else "https://api-amoy.polygonscan.com/api"
-        )
     elif ecosystem_name == "avalanche":
         return (
             "https://api.snowtrace.io/api"
             if network_name == "mainnet"
             else "https://api-testnet.snowtrace.io/api"
         )
-    elif ecosystem_name == "bsc":
+
+    elif ecosystem_name == "base":
         return (
-            f"https://api-{network_name}.bscscan.com/api"
-            if network_name != "mainnet"
-            else "https://api.bscscan.com/api"
+            "https://api.basescan.org/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.basescan.org/api"
         )
-    elif ecosystem_name == "gnosis":
-        if network_name == "mainnet":
-            return "https://api.gnosisscan.io/api"
-        raise UnsupportedNetworkError(ecosystem_name, network_name)
+
     elif ecosystem_name == "blast":
         return (
             "https://api.blastscan.io/api"
             if network_name == "mainnet"
             else "https://api-sepolia.blastscan.io/api"
         )
+
+    elif ecosystem_name == "bsc":
+        return (
+            "https://api.bscscan.com/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.bscscan.com/api"
+        )
+
+    elif ecosystem_name == "bttc":
+        if network_name == "mainnet":
+            return "https://api.bttcscan.com/api"
+        elif network_name == "donau":
+            return "https://api-testnet.bttcscan.com/api"
+        else:
+            # NOTE: At time of writing, no other networks would hit this;
+            #   the intent is to be more future-proof.
+            return f"https://api-{network_name}.bttcscan.com/api"
+
+    elif ecosystem_name == "celo":
+        return (
+            "https://api.celoscan.com/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.celoscan.com/api"
+        )
+
+    elif ecosystem_name == "ethereum":
+        return (
+            "https://api.etherscan.io/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.etherscan.io/api"
+        )
+
+    elif ecosystem_name == "fantom":
+        return (
+            "https://api.ftmscan.com/api"
+            if network_name == "opera"
+            else f"https://api-{network_name}.ftmscan.com/api"
+        )
+
+    elif ecosystem_name == "fraxtal":
+        return (
+            "https://api.fraxscan.com/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.fraxscan.com/api"
+        )
+
+    elif ecosystem_name == "gnosis":
+        return (
+            "https://api.gnosisscan.io/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.gnosisscan.io/api"
+        )
+
+    elif ecosystem_name == "kroma":
+        return (
+            "https://api.kromascan.com/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.kromascan.com/api"
+        )
+
+    elif ecosystem_name == "moonbeam":
+        return (
+            "https://api.moonscan.io/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.moonscan.io/api"
+        )
+
+    elif ecosystem_name == "optimism":
+        return (
+            "https://api-optimistic.etherscan.io/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}-optimistic.etherscan.io/api"
+        )
+
+    elif ecosystem_name == "polygon":
+        return (
+            "https://api.polygonscan.com/api"
+            if network_name == "mainnet"
+            else "https://api-amoy.polygonscan.com/api"
+        )
+
+    elif ecosystem_name == "polygon-zkevm":
+        return (
+            "https://api-zkevm.polygonscan.com/api"
+            if network_name == "mainnet"
+            else "https://api-cardona-zkevm.polygonscan.com/api"
+        )
+
     elif ecosystem_name == "scroll":
         return (
             "https://api.scrollscan.com/api"
             if network_name == "mainnet"
             else f"https://api-{network_name}.scrollscan.com/api"
+        )
+
+    elif ecosystem_name == "unichain":
+        return (
+            "https://api.uniscan.xyz/api"
+            if network_name == "mainnet"
+            else f"https://api-{network_name}.uniscan.xyz/api"
         )
 
     raise UnsupportedEcosystemError(ecosystem_name)
