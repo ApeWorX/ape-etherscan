@@ -60,7 +60,6 @@ data-aria-dark="Switch to auto color mode">
         <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">User Guides</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#querying-accounts">Querying Accounts</a></li>
 </ul>
 <p class="caption" role="heading" aria-level="3"><span class="caption-text">Python Reference</span></p>
 <ul>
@@ -80,23 +79,22 @@ data-aria-dark="Switch to auto color mode">
       <i class="i-lucide close"></i>
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
-<li><a class="reference internal" href="#">Quick Start</a><ul>
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li><a class="reference internal" href="#installation">Installation</a><ul>
 <li><a class="reference internal" href="#via-pip">via <code class="docutils literal notranslate"><span class="pre">pip</span></code></a></li>
 <li><a class="reference internal" href="#via-setuptools">via <code class="docutils literal notranslate"><span class="pre">setuptools</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#quick-usage">Quick Usage</a></li>
+<li><a class="reference internal" href="#quick-usage">Quick Usage</a><ul>
 <li><a class="reference internal" href="#set-up-the-environment">Set up the environment</a></li>
 <li><a class="reference internal" href="#transaction-urls">Transaction URLs</a></li>
 <li><a class="reference internal" href="#contract-types">Contract Types</a></li>
 <li><a class="reference internal" href="#contract-verification">Contract Verification</a></li>
 <li><a class="reference internal" href="#custom-networks">Custom Networks</a></li>
 <li><a class="reference internal" href="#id1">Dependencies</a></li>
+<li><a class="reference internal" href="#querying-accounts">Querying Accounts</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#querying-accounts">Querying Accounts</a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
@@ -129,19 +127,71 @@ data-aria-dark="Switch to auto color mode">
           <section id="quick-start">
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
 <p>The following blockchain explorers are supported in this plugin:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://etherscan.io/">Etherscan</a> for Ethereum networks.</p></li>
-<li><p><a class="reference external" href="https://ftmscan.com">Ftmscan</a> for Fantom networks.</p></li>
-<li><p><a class="reference external" href="https://arbiscan.io">Arbiscan</a> for Arbitrum networks.</p></li>
-<li><p><a class="reference external" href="https://optimistic.etherscan.io">Optimistic Etherscan</a> for Optimism networks.</p></li>
-<li><p><a class="reference external" href="https://polygonscan.com">Polygonscan</a> for Polygon networks.</p></li>
-<li><p><a class="reference external" href="https://zkevm.polygonscan.com">Polygonscan ZkEVM</a> for Polygon ZkEVM networks.</p></li>
-<li><p><a class="reference external" href="https://snowtrace.io">Snowtrace</a> for Avalanche networks.</p></li>
-<li><p><a class="reference external" href="https://basescan.org">Basescan</a> for Base networks.</p></li>
-<li><p><a class="reference external" href="https://bscscan.com">Bscscan</a> for Binance-Smart-Chain networks.</p></li>
-<li><p><a class="reference external" href="https://blastscan.io">Blastscan</a> for Blast networks.</p></li>
-<li><p><a class="reference external" href="https://scrollscan.com">Scrollscan</a> for Scroll networks.</p></li>
-</ul>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Network Name</p></th>
+<th class="head"><p>Explorer Link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Arbitrum</p></td>
+<td><p><a class="reference external" href="https://arbiscan.io">Arbiscan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Avalanche</p></td>
+<td><p><a class="reference external" href="https://snowtrace.io">Snowtrace</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Base</p></td>
+<td><p><a class="reference external" href="https://basescan.org">Basescan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Binance Smart Chain</p></td>
+<td><p><a class="reference external" href="https://bscscan.com">Bscscan</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Bittorrent</p></td>
+<td><p><a class="reference external" href="https://bttcscan.com">BTTCscan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Blast</p></td>
+<td><p><a class="reference external" href="https://blastscan.io">Blastscan</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Celo</p></td>
+<td><p><a class="reference external" href="https://celoscan.com">Celoscan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Ethereum</p></td>
+<td><p><a class="reference external" href="https://etherscan.io/">Etherscan</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Fantom</p></td>
+<td><p><a class="reference external" href="https://ftmscan.com">Ftmscan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Fraxtal</p></td>
+<td><p><a class="reference external" href="https://fraxscan.com">Fraxscan</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Gnosis</p></td>
+<td><p><a class="reference external" href="https://gnosisscan.io">Gnosisscan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Kroma</p></td>
+<td><p><a class="reference external" href="https://kromascan.com">Kromascan</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Moonbeam</p></td>
+<td><p><a class="reference external" href="https://moonscan.io">Moonscan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Optimism</p></td>
+<td><p><a class="reference external" href="https://optimistic.etherscan.io">Optimistic Etherscan</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Polygon</p></td>
+<td><p><a class="reference external" href="https://polygonscan.com">Polygonscan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Polygon ZkEVM</p></td>
+<td><p><a class="reference external" href="https://zkevm.polygonscan.com">Polygonscan ZkEVM</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Scroll</p></td>
+<td><p><a class="reference external" href="https://scrollscan.com">Scrollscan</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Unichain</p></td>
+<td><p><a class="reference external" href="https://sepolia.uniscan.xyz">Uniscan</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <section id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h2>
 <ul class="simple">
@@ -169,9 +219,8 @@ data-aria-dark="Switch to auto color mode">
 </section>
 <section id="quick-usage">
 <h2>Quick Usage<a class="headerlink" href="#quick-usage" title="Link to this heading"></a></h2>
-</section>
 <section id="set-up-the-environment">
-<h2>Set up the environment<a class="headerlink" href="#set-up-the-environment" title="Link to this heading"></a></h2>
+<h3>Set up the environment<a class="headerlink" href="#set-up-the-environment" title="Link to this heading"></a></h3>
 <p>Specify API keys as environment variables. You could put them in your shell’s config like <code class="docutils literal notranslate"><span class="pre">~/.profile</span></code>
 or use a tool like <a class="reference external" href="https://direnv.net/">direnv</a> and store them locally in <code class="docutils literal notranslate"><span class="pre">.envrc</span></code>.</p>
 <p>You can also specify multiple comma-separated keys, a random key will be chosen for each request.
@@ -186,7 +235,7 @@ This could be useful if you hit API rate limits.</p>
 </div>
 </section>
 <section id="transaction-urls">
-<h2>Transaction URLs<a class="headerlink" href="#transaction-urls" title="Link to this heading"></a></h2>
+<h3>Transaction URLs<a class="headerlink" href="#transaction-urls" title="Link to this heading"></a></h3>
 <p>When you have this plugin installed, Etherscan explorer URLs appear in CLI output.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">INFO:<span class="w"> </span>Submitted<span class="w"> </span>0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a9646
 </span><span data-line="2">etherscan<span class="w"> </span>URL:<span class="w"> </span>https://rinkeby.etherscan.io/tx/0x123321123321123321123321123aaaadaaaee4b2aaa07901b80716cc357a9646
@@ -194,7 +243,7 @@ This could be useful if you hit API rate limits.</p>
 </div>
 </section>
 <section id="contract-types">
-<h2>Contract Types<a class="headerlink" href="#contract-types" title="Link to this heading"></a></h2>
+<h3>Contract Types<a class="headerlink" href="#contract-types" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">ape-etherscan</span></code> plugin also assists in fetching <code class="docutils literal notranslate"><span class="pre">contract_types</span></code>.
 Use the <code class="docutils literal notranslate"><span class="pre">Contract</span></code> top-level construct to create contract instances.
 When the explorer plugin locates a contract type for a given address, the <code class="docutils literal notranslate"><span class="pre">Contract</span></code> return-value uses that contract type.</p>
@@ -212,7 +261,7 @@ The return value from <code class="docutils literal notranslate"><span class="pr
 However, if the plugin detects that the contract type has a method named <code class="docutils literal notranslate"><span class="pre">symbol</span></code>, it will use the return value from that call instead.</p>
 </section>
 <section id="contract-verification">
-<h2>Contract Verification<a class="headerlink" href="#contract-verification" title="Link to this heading"></a></h2>
+<h3>Contract Verification<a class="headerlink" href="#contract-verification" title="Link to this heading"></a></h3>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">ape-etherscan</span></code> plugin to publish and verify your contracts.
 Contract verification associates a contract type from Ape with an Ethereum address on Etherscan.
 Learn more about Etherscan verification <a class="reference external" href="https://info.etherscan.com/types-of-contract-verification/">here</a>.</p>
@@ -235,7 +284,7 @@ For those networks, the corresponding compiler plugin’s <code class="docutils 
 <p><strong>NOTE</strong>: You must set an Etherscan API key environment variable to use the publishing feature.</p>
 </section>
 <section id="custom-networks">
-<h2>Custom Networks<a class="headerlink" href="#custom-networks" title="Link to this heading"></a></h2>
+<h3>Custom Networks<a class="headerlink" href="#custom-networks" title="Link to this heading"></a></h3>
 <p>If you would like to use ape-etherscan with your <a class="reference external" href="https://docs.apeworx.io/ape/stable/userguides/networks.html#custom-network-connection">custom network configuration</a>, you can use the same network identifier you used to configure it.
 For instance, with a custom Ethereum network called “apechain” your configuration might look something like this:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nt">networks</span><span class="p">:</span>
@@ -258,7 +307,7 @@ For instance, with a custom Ethereum network called “apechain” your configur
 </div>
 </section>
 <section id="id1">
-<h2>Dependencies<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<h3>Dependencies<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>You can use dependencies from Etherscan in your projects.
 Configure them like this:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="nt">dependencies</span><span class="p">:</span>
@@ -275,9 +324,8 @@ Configure them like this:</p>
 </span></pre></div>
 </div>
 </section>
-</section>
 <section id="querying-accounts">
-<h1>Querying Accounts<a class="headerlink" href="#querying-accounts" title="Link to this heading"></a></h1>
+<h3>Querying Accounts<a class="headerlink" href="#querying-accounts" title="Link to this heading"></a></h3>
 <p>Etherscan offers a query-provider plugin for account data.
 Query account transactions from Etherscan using the following syntax:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">chain</span>
@@ -289,6 +337,8 @@ Query account transactions from Etherscan using the following syntax:</p>
 </span><span data-line="7"><span class="n">result</span> <span class="o">=</span> <span class="n">history</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">start_nonce</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">stop_nonce</span><span class="o">=</span><span class="mi">1001</span><span class="p">,</span> <span class="n">engine_to_use</span><span class="o">=</span><span class="s2">&quot;etherscan&quot;</span><span class="p">)</span>
 </span></pre></div>
 </div>
+</section>
+</section>
 </section>
 
         </article><button class="back-to-top" type="button">
