@@ -1,4 +1,4 @@
-# TODO: Remove in 0.9 and make this a calculated property.
+# TODO: (deprecated) Remove in 0.9 and make this a calculated property.
 API_KEY_ENV_KEY_MAP = {
     "arbitrum": "ARBISCAN_API_KEY",
     "avalanche": "SNOWTRACE_API_KEY",
@@ -20,11 +20,11 @@ API_KEY_ENV_KEY_MAP = {
     "unichain": "UNISCAN_API_KEY",
 }
 NETWORKS = {
-    "arbitrum": [
+    "arbitrum": {
         "mainnet",
         "sepolia",
         "nova",
-    ],
+    },
     "avalanche": [
         "mainnet",
         "fuji",
