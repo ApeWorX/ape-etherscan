@@ -1,12 +1,16 @@
 import json
 from typing import TYPE_CHECKING, Optional
 
+import requests
 from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
+from ape.utils import ZERO_ADDRESS
+
 from ethpm_types import Compiler, PackageManifest
 from ethpm_types.source import Source
+from evmchains import PUBLIC_CHAIN_META
 
 from ape_etherscan.client import (
     ClientFactory,
@@ -17,6 +21,7 @@ from ape_etherscan.client import (
 from ape_etherscan.exceptions import ContractNotVerifiedError
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.verify import SourceVerifier
+from ape_etherscan.utils import NETWORKS
 
 if TYPE_CHECKING:
     from ape.managers.project import ProjectManager
@@ -48,6 +53,26 @@ class Etherscan(ExplorerAPI):
         return get_etherscan_api_uri(
             self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
         )
+
+    @classmethod
+    def get_supported_chains(cls) -> list[dict]:
+        """
+        Get a list of chain data for all chains Etherscan supports.
+        https://docs.etherscan.io/contract-verification/supported-chains
+
+        Returns:
+            list[dict]
+        """
+        response = requests.get("https://api.etherscan.io/v2/chainlist")
+        response.raise_for_status()
+        data = response.json()
+        return data.get("result", [])
+
+    @classmethod
+    def supports_chain(cls, chain_id: int) -> bool:
+        chain_data = cls.get_supported_chains()
+        chain_ids = [int(c["chainid"]) for c in chain_data if "chainid" in c]
+        return chain_id in chain_ids
 
     def get_address_url(self, address: str) -> str:
         return f"{self.etherscan_uri}/address/{address}"
