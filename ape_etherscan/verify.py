@@ -2,22 +2,25 @@ import json
 import time
 from enum import Enum
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
-from ape.api import CompilerAPI
-from ape.contracts import ContractInstance
 from ape.logging import LogLevel, logger
-from ape.managers.project import ProjectManager
-from ape.types import AddressType
 from ape.utils import ManagerAccessMixin, cached_property
 from ethpm_types import Compiler, ContractType
 
-from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 from ape_etherscan.exceptions import (
     ContractVerificationError,
     EtherscanResponseError,
     IncompatibleCompilerSettingsError,
 )
+
+if TYPE_CHECKING:
+    from ape.api import CompilerAPI
+    from ape.contracts import ContractInstance
+    from ape.managers.project import ProjectManager
+    from ape.types import AddressType
+
+    from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 
 DEFAULT_OPTIMIZATION_RUNS = 200
 _SPDX_ID_TO_API_CODE = {
@@ -211,24 +214,24 @@ class SourceVerifier(ManagerAccessMixin):
 
     def __init__(
         self,
-        address: AddressType,
-        client_factory: ClientFactory,
-        project: Optional[ProjectManager] = None,
+        address: "AddressType",
+        client_factory: "ClientFactory",
+        project: Optional["ProjectManager"] = None,
     ):
         self.address = address
         self.client_factory = client_factory
         self.project = project or self.local_project
 
     @cached_property
-    def account_client(self) -> AccountClient:
+    def account_client(self) -> "AccountClient":
         return self.client_factory.get_account_client(str(self.address))
 
     @cached_property
-    def contract_client(self) -> ContractClient:
+    def contract_client(self) -> "ContractClient":
         return self.client_factory.get_contract_client(str(self.address))
 
     @cached_property
-    def contract(self) -> ContractInstance:
+    def contract(self) -> "ContractInstance":
         """
         The ape contract instance to verify.
         """
@@ -303,7 +306,7 @@ class SourceVerifier(ManagerAccessMixin):
         return LicenseType.from_spdx_id(spdx_id)
 
     @property
-    def compiler_api(self) -> CompilerAPI:
+    def compiler_api(self) -> "CompilerAPI":
         if compiler := self.compiler_manager.registered_compilers.get(self.ext):
             return compiler
 

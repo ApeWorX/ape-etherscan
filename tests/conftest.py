@@ -7,16 +7,14 @@ from io import StringIO
 from json import JSONDecodeError
 from pathlib import Path
 from tempfile import mkdtemp
-from typing import IO, Any, Optional, Union
+from typing import IO, TYPE_CHECKING, Any, Optional, Union
 from unittest.mock import MagicMock
 
 import _io  # type: ignore
 import ape
 import pytest
-from ape.api import ExplorerAPI
 from ape.exceptions import NetworkError
 from ape.logging import logger
-from ape.types import AddressType
 from ape.utils import cached_property
 from ape_solidity._utils import OUTPUT_SELECTION
 from requests import Response
@@ -25,6 +23,11 @@ from ape_etherscan import Etherscan
 from ape_etherscan.client import _APIClient
 from ape_etherscan.types import EtherscanResponse
 from ape_etherscan.verify import LicenseType
+
+if TYPE_CHECKING:
+    from ape.api import ExplorerAPI
+    from ape.types import AddressType
+
 
 DATA_FOLDER = Path(mkdtemp()).resolve()
 ape.config.DATA_FOLDER = DATA_FOLDER
@@ -168,7 +171,7 @@ def explorer(get_explorer):
 def get_explorer(mocker):
     def fn(
         ecosystem_name: str = "ethereum", network_name: str = "development", no_mock=False
-    ) -> ExplorerAPI:
+    ) -> "ExplorerAPI":
         try:
             ecosystem = ape.networks.get_ecosystem(ecosystem_name)
         except NetworkError:
@@ -446,7 +449,7 @@ class MockEtherscanBackend:
     def _expected_get_ct_params(self, address: str) -> dict:
         return {"module": "contract", "action": "getsourcecode", "address": address}
 
-    def setup_mock_account_transactions_response(self, address: AddressType, **overrides):
+    def setup_mock_account_transactions_response(self, address: "AddressType", **overrides):
         file_name = "get_account_transactions.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
         params = self.get_expected_account_txns_params(address)
@@ -460,7 +463,7 @@ class MockEtherscanBackend:
         return self._setup_account_response(params, response)
 
     def setup_mock_account_transactions_with_ctor_args_response(
-        self, address: AddressType, **overrides
+        self, address: "AddressType", **overrides
     ):
         file_name = "get_account_transactions_with_ctor_args.json"
         test_data_path = MOCK_RESPONSES_PATH / file_name
