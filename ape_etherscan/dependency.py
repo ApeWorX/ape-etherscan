@@ -1,13 +1,16 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ape.api.projects import DependencyAPI
 from ape.exceptions import ProjectError
-from ape.types import AddressType
-from ethpm_types import PackageManifest
 from hexbytes import HexBytes
 from pydantic import field_validator
 
-from .explorer import Etherscan
+from ape_etherscan.explorer import Etherscan
+
+if TYPE_CHECKING:
+    from ape.types import AddressType
+    from ethpm_types import PackageManifest
 
 
 class EtherscanDependency(DependencyAPI):
@@ -25,7 +28,7 @@ class EtherscanDependency(DependencyAPI):
         return f"{self.ecosystem}_{self.network}"
 
     @property
-    def address(self) -> AddressType:
+    def address(self) -> "AddressType":
         return self.network_manager.ethereum.decode_address(self.etherscan)
 
     @property
@@ -53,7 +56,7 @@ class EtherscanDependency(DependencyAPI):
         manifest = self._get_manifest()
         manifest.unpack_sources(destination)
 
-    def _get_manifest(self) -> PackageManifest:
+    def _get_manifest(self) -> "PackageManifest":
         ecosystem = self.network_manager.get_ecosystem(self.ecosystem)
         network = ecosystem.get_network(self.network)
 

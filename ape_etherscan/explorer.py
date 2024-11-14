@@ -1,10 +1,9 @@
 import json
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
-from ape.managers.project import ProjectManager
 from ape.types import AddressType, ContractType
 from ethpm_types import Compiler, PackageManifest
 from ethpm_types.source import Source
@@ -19,10 +18,13 @@ from ape_etherscan.exceptions import ContractNotVerifiedError
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.verify import SourceVerifier
 
+if TYPE_CHECKING:
+    from ape.managers.project import ProjectManager
+
 
 class Etherscan(ExplorerAPI):
     """
-    The explorer API implemention for Etherscan.
+    The explorer API implementation for Etherscan.
     """
 
     @property
