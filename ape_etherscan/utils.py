@@ -20,11 +20,11 @@ API_KEY_ENV_KEY_MAP = {
     "unichain": "UNISCAN_API_KEY",
 }
 NETWORKS = {
-    "arbitrum": {
+    "arbitrum": [
         "mainnet",
         "sepolia",
         "nova",
-    },
+    ],
     "avalanche": [
         "mainnet",
         "fuji",

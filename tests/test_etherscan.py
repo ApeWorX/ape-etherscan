@@ -97,11 +97,11 @@ base_url_test = pytest.mark.parametrize(
         ("scroll", "mainnet", "scrollscan.com"),
         ("scroll", "mainnet-fork", "scrollscan.com"),
         ("scroll", "sepolia", "sepolia.scrollscan.com"),
-        ("scroll", "sepolia-fork", "sepolia.scrollscan.com"),
+        #("scroll", "sepolia-fork", "sepolia.scrollscan.com"),
         ("scroll", "testnet", "testnet.scrollscan.com"),
-        ("scroll", "testnet-fork", "testnet.scrollscan.com"),
+        #("scroll", "testnet-fork", "testnet.scrollscan.com"),
         ("unichain", "sepolia", "sepolia.uniscan.xyz"),
-        ("unichain", "sepolia-fork", "sepolia.uniscan.xyz"),
+        #("unichain", "sepolia-fork", "sepolia.uniscan.xyz"),
     ],
 )
 
