@@ -6,11 +6,9 @@ from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
-from ape.utils import ZERO_ADDRESS
 
 from ethpm_types import Compiler, PackageManifest
 from ethpm_types.source import Source
-from evmchains import PUBLIC_CHAIN_META
 
 from ape_etherscan.client import (
     ClientFactory,
@@ -21,7 +19,6 @@ from ape_etherscan.client import (
 from ape_etherscan.exceptions import ContractNotVerifiedError
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.verify import SourceVerifier
-from ape_etherscan.utils import NETWORKS
 
 if TYPE_CHECKING:
     from ape.managers.project import ProjectManager
