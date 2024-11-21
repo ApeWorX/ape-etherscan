@@ -6,7 +6,6 @@ from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
-
 from ethpm_types import Compiler, PackageManifest
 from ethpm_types.source import Source
 
@@ -39,7 +38,10 @@ class Etherscan(ExplorerAPI):
         The base URL of the explorer.
         """
         return get_etherscan_uri(
-            self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
+            self._config,
+            self.network.ecosystem.name,
+            self.network.name.replace("-fork", ""),
+            self.network.chain_id,
         )
 
     @property
@@ -48,7 +50,10 @@ class Etherscan(ExplorerAPI):
         The base URL for the API service.
         """
         return get_etherscan_api_uri(
-            self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
+            self._config,
+            self.network.ecosystem.name,
+            self.network.name.replace("-fork", ""),
+            self.network.chain_id,
         )
 
     @classmethod

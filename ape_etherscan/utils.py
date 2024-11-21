@@ -94,7 +94,6 @@ NETWORKS = {
         "testnet",
     ],
     "unichain": [
-        "mainnet",
         "sepolia",
     ],
 }

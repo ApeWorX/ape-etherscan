@@ -227,7 +227,7 @@ class MockEtherscanBackend:
     def expected_uri_map(
         self,
     ) -> dict[str, dict[str, str]]:
-        def get_url_f(testnet: bool = False, tld: str = "io"):
+        def get_url_f(testnet: bool = False, tld: str = "io", chain_id=None):
             f_str = f"https://api-{{}}.{{}}.{tld}/api" if testnet else f"https://api.{{}}.{tld}/api"
             return f_str.format
 
@@ -235,10 +235,11 @@ class MockEtherscanBackend:
         testnet_url = get_url_f(testnet=True)
         com_url = get_url_f(tld="com")
         org_url = get_url_f(tld="org")
-        xyz_url = get_url_f(tld="xyz")
+        # xyz_url = get_url_f(tld="xyz")
         com_testnet_url = get_url_f(testnet=True, tld="com")
         org_testnet_url = get_url_f(testnet=True, tld="org")
         xyz_testnet_url = get_url_f(testnet=True, tld="xyz")
+        etherscan_chain_id_url = "https://api.etherscan.io/v2/api?chainid={}".format
 
         return {
             "arbitrum": {
@@ -312,8 +313,11 @@ class MockEtherscanBackend:
                 "testnet": com_testnet_url("testnet", "scrollscan"),
             },
             "unichain": {
-                "mainnet": xyz_url("uniscan"),
                 "sepolia": xyz_testnet_url("sepolia", "uniscan"),
+            },
+            "xai": {
+                "mainnet": etherscan_chain_id_url("660279"),
+                "sepolia": etherscan_chain_id_url("37714555429"),
             },
         }
 

@@ -23,6 +23,8 @@ EXPECTED_CONTRACT_NAME_MAP = {
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 PUBLISH_GUID = "123"
 
+
+# TODO: Uncomment commented out fork networks once Ape 0.8.21 is released.
 base_url_test = pytest.mark.parametrize(
     "ecosystem,network,url",
     [
@@ -49,13 +51,17 @@ base_url_test = pytest.mark.parametrize(
         ("bsc", "opbnb-testnet", "opbnb-testnet.bscscan.com"),
         ("bsc", "opbnb-testnet-fork", "opbnb-testnet.bscscan.com"),
         ("bttc", "mainnet", "bttcscan.com"),
-        ("bttc", "mainnet-fork", "bttcscan.com"),
+        # ("bttc", "mainnet-fork", "bttcscan.com"),
         ("bttc", "donau", "testnet.bttcscan.com"),
-        ("bttc", "donau-fork", "testnet.bttcscan.com"),
+        # ("bttc", "donau-fork", "testnet.bttcscan.com"),
         ("celo", "mainnet", "celoscan.io"),
-        ("celo", "mainnet-fork", "celoscan.io"),
+        # ("celo", "mainnet-fork", "celoscan.io"),
         ("celo", "alfajores", "alfajores.celoscan.io"),
-        ("celo", "alfajores-fork", "alfajores.celoscan.io"),
+        # ("celo", "alfajores-fork", "alfajores.celoscan.io"),
+        ("cronos", "mainnet", "https://cronoscan.com"),
+        # ("cronos", "mainnet-fork", "cronoscan.com"),
+        ("cronos-zkevm", "mainnet", "cronoscan.com"),
+        # ("cronos-zkevm", "mainnet-fork", "cronoscan.com"),
         ("ethereum", "mainnet", "etherscan.io"),
         ("ethereum", "mainnet-fork", "etherscan.io"),
         ("ethereum", "holesky", "holesky.etherscan.io"),
@@ -67,21 +73,21 @@ base_url_test = pytest.mark.parametrize(
         ("fantom", "testnet", "testnet.ftmscan.com"),
         ("fantom", "testnet-fork", "testnet.ftmscan.com"),
         ("fraxtal", "mainnet", "fraxscan.com"),
-        ("fraxtal", "mainnet-fork", "fraxscan.com"),
+        # ("fraxtal", "mainnet-fork", "fraxscan.com"),
         ("fraxtal", "holesky", "holesky.fraxscan.com"),
-        ("fraxtal", "holesky-fork", "holesky.fraxscan.com"),
+        # ("fraxtal", "holesky-fork", "holesky.fraxscan.com"),
         ("gnosis", "mainnet", "gnosisscan.io"),
         ("gnosis", "mainnet-fork", "gnosisscan.io"),
         ("kroma", "mainnet", "kromascan.com"),
-        ("kroma", "mainnet-fork", "kromascan.com"),
+        # ("kroma", "mainnet-fork", "kromascan.com"),
         ("kroma", "sepolia", "sepolia.kromascan.com"),
-        ("kroma", "sepolia-fork", "sepolia.kromascan.com"),
+        # ("kroma", "sepolia-fork", "sepolia.kromascan.com"),
         ("moonbeam", "mainnet", "moonscan.io"),
         ("moonbeam", "mainnet-fork", "moonscan.io"),
         ("moonbeam", "moonbase", "moonbase.moonscan.io"),
-        ("moonbeam", "moonbase-fork", "moonbase.moonscan.io"),
+        # ("moonbeam", "moonbase-fork", "moonbase.moonscan.io"),
         ("moonbeam", "moonriver", "moonriver.moonscan.io"),
-        ("moonbeam", "moonriver-fork", "moonriver.moonscan.io"),
+        # ("moonbeam", "moonriver-fork", "moonriver.moonscan.io"),
         ("optimism", "mainnet", "optimistic.etherscan.io"),
         ("optimism", "mainnet-fork", "optimistic.etherscan.io"),
         ("optimism", "sepolia", "sepolia-optimism.etherscan.io"),
@@ -95,13 +101,17 @@ base_url_test = pytest.mark.parametrize(
         ("polygon-zkevm", "cardona", "cardona-zkevm.polygonscan.com"),
         ("polygon-zkevm", "cardona-fork", "cardona-zkevm.polygonscan.com"),
         ("scroll", "mainnet", "scrollscan.com"),
-        ("scroll", "mainnet-fork", "scrollscan.com"),
+        # ("scroll", "mainnet-fork", "scrollscan.com"),
         ("scroll", "sepolia", "sepolia.scrollscan.com"),
-        #("scroll", "sepolia-fork", "sepolia.scrollscan.com"),
+        # ("scroll", "sepolia-fork", "sepolia.scrollscan.com"),
         ("scroll", "testnet", "testnet.scrollscan.com"),
-        #("scroll", "testnet-fork", "testnet.scrollscan.com"),
+        # ("scroll", "testnet-fork", "testnet.scrollscan.com"),
         ("unichain", "sepolia", "sepolia.uniscan.xyz"),
-        #("unichain", "sepolia-fork", "sepolia.uniscan.xyz"),
+        # ("unichain", "sepolia-fork", "sepolia.uniscan.xyz"),
+        ("xai", "mainnet", "https://xaiscan.io"),
+        # ("xai", "mainnet-fork", "https://xaiscan.io"),
+        ("xai", "sepolia", "https://sepolia.xaiscan.io"),
+        # ("xai", "sepolia-fork", "https://sepolia.xaiscan.io"),
     ],
 )
 
@@ -327,7 +337,7 @@ def _acct_tx_overrides(contract, args=None):
     if suffix.startswith("0x"):
         suffix = suffix[2:]
 
-    # Include construcor aguments!
+    # Include constructor arguments!
     ct = contract.contract_type
     prefix = ct.deployment_bytecode.bytecode
     code = f"{prefix}{suffix}"
