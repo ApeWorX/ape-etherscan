@@ -1,10 +1,4 @@
-from ape_etherscan import NETWORKS
+from ape_etherscan.client import get_supported_chains
 
 # Every supported ecosystem / network combo as `[("ecosystem", "network") ... ]`
-ecosystems_and_networks = [
-    p
-    for plist in [
-        [(e, n) for n in nets] + [(e, f"{n}-fork") for n in nets] for e, nets in NETWORKS.items()
-    ]
-    for p in plist
-]
+chain_ids = [c["chainid"] for c in get_supported_chains()]

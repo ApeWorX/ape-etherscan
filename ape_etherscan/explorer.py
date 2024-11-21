@@ -1,7 +1,6 @@
 import json
 from typing import TYPE_CHECKING, Optional
 
-import requests
 from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
@@ -14,6 +13,7 @@ from ape_etherscan.client import (
     SourceCodeResponse,
     get_etherscan_api_uri,
     get_etherscan_uri,
+    get_supported_chains,
 )
 from ape_etherscan.exceptions import ContractNotVerifiedError
 from ape_etherscan.types import EtherscanInstance
@@ -65,10 +65,7 @@ class Etherscan(ExplorerAPI):
         Returns:
             list[dict]
         """
-        response = requests.get("https://api.etherscan.io/v2/chainlist")
-        response.raise_for_status()
-        data = response.json()
-        return data.get("result", [])
+        return get_supported_chains()
 
     @classmethod
     def supports_chain(cls, chain_id: int) -> bool:

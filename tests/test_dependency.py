@@ -15,7 +15,7 @@ from ape_etherscan.dependency import EtherscanDependency
 def test_dependency(mock_backend, verification_type, expected_name, contract_address):
     ecosystem = "ethereum"
     network = "mainnet"
-    mock_backend.set_network(ecosystem, network)
+    mock_backend.set_network(1)
     mock_backend.setup_mock_get_contract_type_response(f"get_contract_response_{verification_type}")
 
     dependency = EtherscanDependency(
@@ -33,7 +33,7 @@ def test_dependency(mock_backend, verification_type, expected_name, contract_add
 
 
 def test_dependency_not_verified(mock_backend):
-    mock_backend.set_network("ethereum", "mainnet")
+    mock_backend.set_network(1)
     mock_backend.setup_mock_get_contract_type_response("get_contract_response_not_verified")
     dependency = EtherscanDependency(
         name="Apes",

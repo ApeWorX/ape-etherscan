@@ -33,6 +33,7 @@ class EtherscanQueryEngine(QueryAPI):
             self._config,
             self.provider.network.ecosystem.name,
             self.provider.network.name.replace("-fork", ""),
+            self.provider.network.chain_id,
         )
 
     @property
@@ -41,6 +42,7 @@ class EtherscanQueryEngine(QueryAPI):
             self._config,
             self.provider.network.ecosystem.name,
             self.provider.network.name.replace("-fork", ""),
+            self.provider.network.chain_id,
         )
 
     @singledispatchmethod

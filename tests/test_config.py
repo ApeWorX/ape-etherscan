@@ -1,20 +1,6 @@
-import pytest
-
-from ._utils import ecosystems_and_networks
-
-network_ecosystems = pytest.mark.parametrize(
-    "ecosystem,network",
-    ecosystems_and_networks,
-)
-
-
-@network_ecosystems
-def test_no_config(account, ecosystem, network, get_explorer, project):
+def test_no_config(account, get_explorer, project):
     """Test default behavior"""
     with project.temp_config(name="ape-etherscan-test"):
-        explorer = get_explorer(ecosystem, network)
-        assert explorer.network.name == network
-        assert explorer.network.ecosystem.name == ecosystem
         assert account.query_manager.engines["etherscan"].rate_limit == 5
 
         engine = account.query_manager.engines["etherscan"]
