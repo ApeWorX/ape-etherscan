@@ -168,7 +168,10 @@ def get_explorer():
     def fn(chain_id: int) -> "ExplorerAPI":
         for ecosystem in ape.networks.ecosystems.values():
             for network in ecosystem.networks.values():
-                if int(network.chain_id) != int(chain_id):
+                if network.is_dev:
+                    continue
+
+                elif int(network.chain_id) != int(chain_id):
                     continue
 
                 # Found.

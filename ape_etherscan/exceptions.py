@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any, Union
 from ape.exceptions import ApeException
 from requests import Response
 
-from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
+from ape_etherscan.utils import ETHERSCAN_API_KEY_NAME
 
 if TYPE_CHECKING:
     from ape_etherscan.types import EtherscanResponse, ResponseValue
@@ -74,9 +74,8 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
 
     def __init__(self, response: Union[Response, "EtherscanResponse"], ecosystem: str):
         message = "Etherscan API server rate limit exceeded."
-        api_key_name = API_KEY_ENV_KEY_MAP[ecosystem]
-        if not os.environ.get(api_key_name):
-            message = f"{message}. Try setting {api_key_name}'."
+        if not os.environ.get(ETHERSCAN_API_KEY_NAME):
+            message = f"{message}. Try setting {ETHERSCAN_API_KEY_NAME}'."
 
         super().__init__(response, message)
 

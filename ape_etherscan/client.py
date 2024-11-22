@@ -25,7 +25,7 @@ from ape_etherscan.types import (
     EtherscanResponse,
     SourceCodeResponse,
 )
-from ape_etherscan.utils import API_KEY_ENV_KEY_MAP
+from ape_etherscan.utils import ETHERSCAN_API_KEY_NAME
 
 if TYPE_CHECKING:
     from ape.api import PluginConfig
@@ -162,6 +162,10 @@ class _APIClient(ManagerAccessMixin):
         data: Optional[dict] = None,
     ) -> EtherscanResponse:
         headers = headers or self.DEFAULT_HEADERS
+        if not self._retries:
+            raise ValueError(f"Retries must be at least 1: {self._retries}")
+
+        response = None
         for i in range(self._retries):
             logger.debug(f"Request sent to {self._clean_uri}.")
             response = self.session.request(
@@ -178,7 +182,7 @@ class _APIClient(ManagerAccessMixin):
                 time.sleep(time_to_sleep)
                 continue
 
-            # Recieved a real response unrelated to rate limiting.
+            # Received a real response unrelated to rate limiting.
             if raise_on_exceptions:
                 response.raise_for_status()
             elif not 200 <= response.status_code < 300:
@@ -186,14 +190,14 @@ class _APIClient(ManagerAccessMixin):
 
             break
 
-        return EtherscanResponse(response, self._instance.ecosystem_name, raise_on_exceptions)
+        if response:
+            return EtherscanResponse(response, self._instance.ecosystem_name, raise_on_exceptions)
+        else:
+            # Not possible (I don't think); just for type-checking.
+            raise ValueError("No response.")
 
     def __authorize(self, params_or_data: Optional[dict] = None) -> Optional[dict]:
-        env_var_key = API_KEY_ENV_KEY_MAP.get(self._instance.ecosystem_name)
-        if not env_var_key:
-            return params_or_data
-
-        api_key = os.environ.get(env_var_key)
+        api_key = os.environ.get(ETHERSCAN_API_KEY_NAME)
         if api_key and (not params_or_data or "apikey" not in params_or_data):
             params_or_data = params_or_data or {}
             api_key = random.choice(api_key.split(","))
