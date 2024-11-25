@@ -1,7 +1,7 @@
 import json
 import re
 from dataclasses import dataclass
-from typing import Union
+from typing import Optional, Union
 
 from ape.utils import cached_property
 from ethpm_types import BaseModel
@@ -60,11 +60,16 @@ class SourceCodeResponse(BaseModel):
         return value
 
 
-@dataclass
-class ContractCreationResponse:
+class ContractCreationResponse(BaseModel):
     contractAddress: str
     contractCreator: str
     txHash: str
+
+    # Only appears on some networks for some reason.
+    blockNumber: Optional[int] = None
+    timestamp: Optional[int] = None
+    contractFactory: Optional[str] = None
+    creationBytecode: Optional[str] = None
 
 
 ResponseValue = Union[list, dict, str]

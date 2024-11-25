@@ -125,17 +125,26 @@ class EtherscanQueryEngine(QueryAPI):
         self, query: ContractCreationQuery
     ) -> Iterator[ContractCreation]:
         client = self._client_factory.get_contract_client(query.contract)
-        creation_data = client.get_creation_data()
-        if len(creation_data) == 0:
+        creation_data_list = client.get_creation_data()
+        if len(creation_data_list) == 0:
             return
-        elif len(creation_data) != 1:
+        elif len(creation_data_list) != 1:
             raise ValueError("Expecting single creation data.")
 
-        receipt = self.chain_manager.get_receipt(creation_data[0].txHash)
+        creation_data = creation_data_list[0]
+        if creation_data.blockNumber is None:
+            # Server has an older API implementation.
+            # Have to look-up.
+            receipt = self.chain_manager.get_receipt(creation_data.txHash)
+            block = receipt.block_number
+            deployer = receipt.sender
+        else:
+            block = creation_data.blockNumber
+            deployer = creation_data.contractCreator
+
         yield ContractCreation(
-            txn_hash=receipt.txn_hash,
-            block=receipt.block_number,
-            deployer=receipt.sender,
-            # factory is not implemented by this query provider
-            factory=None,
+            txn_hash=creation_data.txHash,
+            block=block,
+            deployer=deployer,
+            factory=creation_data.contractFactory or "",
         )
