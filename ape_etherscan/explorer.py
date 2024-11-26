@@ -13,6 +13,7 @@ from ape_etherscan.client import (
     SourceCodeResponse,
     get_etherscan_api_uri,
     get_etherscan_uri,
+    get_supported_chains,
 )
 from ape_etherscan.exceptions import ContractNotVerifiedError
 from ape_etherscan.types import EtherscanInstance
@@ -37,7 +38,10 @@ class Etherscan(ExplorerAPI):
         The base URL of the explorer.
         """
         return get_etherscan_uri(
-            self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
+            self._config,
+            self.network.ecosystem.name,
+            self.network.name.replace("-fork", ""),
+            self.network.chain_id,
         )
 
     @property
@@ -46,8 +50,28 @@ class Etherscan(ExplorerAPI):
         The base URL for the API service.
         """
         return get_etherscan_api_uri(
-            self._config, self.network.ecosystem.name, self.network.name.replace("-fork", "")
+            self._config,
+            self.network.ecosystem.name,
+            self.network.name.replace("-fork", ""),
+            self.network.chain_id,
         )
+
+    @classmethod
+    def get_supported_chains(cls) -> list[dict]:
+        """
+        Get a list of chain data for all chains Etherscan supports.
+        https://docs.etherscan.io/contract-verification/supported-chains
+
+        Returns:
+            list[dict]
+        """
+        return get_supported_chains()
+
+    @classmethod
+    def supports_chain(cls, chain_id: int) -> bool:
+        chain_data = cls.get_supported_chains()
+        chain_ids = [int(c["chainid"]) for c in chain_data if "chainid" in c]
+        return chain_id in chain_ids
 
     def get_address_url(self, address: str) -> str:
         return f"{self.etherscan_uri}/address/{address}"

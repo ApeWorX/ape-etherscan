@@ -1,4 +1,5 @@
-# TODO: Remove in 0.9 and make this a calculated property.
+ETHERSCAN_API_KEY_NAME = "ETHERSCAN_API_KEY"
+# TODO: (deprecated) Remove in 0.9 - Only 1 key required for v2.
 API_KEY_ENV_KEY_MAP = {
     "arbitrum": "ARBISCAN_API_KEY",
     "avalanche": "SNOWTRACE_API_KEY",
@@ -7,7 +8,7 @@ API_KEY_ENV_KEY_MAP = {
     "bsc": "BSCSCAN_API_KEY",
     "bttc": "BTTCSCAN_API_KEY",
     "celo": "CELOSCAN_API_KEY",
-    "ethereum": "ETHERSCAN_API_KEY",
+    "ethereum": f"{ETHERSCAN_API_KEY_NAME}",
     "fantom": "FTMSCAN_API_KEY",
     "fraxtal": "FRAXSCAN_API_KEY",
     "gnosis": "GNOSISSCAN_API_KEY",
@@ -94,7 +95,6 @@ NETWORKS = {
         "testnet",
     ],
     "unichain": [
-        "mainnet",
         "sepolia",
     ],
 }

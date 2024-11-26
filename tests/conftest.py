@@ -13,13 +13,9 @@ from unittest.mock import MagicMock
 import _io  # type: ignore
 import ape
 import pytest
-from ape.exceptions import NetworkError
-from ape.logging import logger
-from ape.utils import cached_property
 from ape_solidity._utils import OUTPUT_SELECTION
 from requests import Response
 
-from ape_etherscan import Etherscan
 from ape_etherscan.client import _APIClient
 from ape_etherscan.types import EtherscanResponse
 from ape_etherscan.verify import LicenseType
@@ -164,36 +160,24 @@ def no_api_key():
 
 @pytest.fixture
 def explorer(get_explorer):
-    return get_explorer("ethereum", "mainnet")
+    return get_explorer(1)
 
 
 @pytest.fixture
-def get_explorer(mocker):
-    def fn(
-        ecosystem_name: str = "ethereum", network_name: str = "development", no_mock=False
-    ) -> "ExplorerAPI":
-        try:
-            ecosystem = ape.networks.get_ecosystem(ecosystem_name)
-        except NetworkError:
-            # Use mock
-            logger.warning(
-                f"Ecosystem 'ape-{ecosystem_name}' not installed; resorting to a mock ecosystem."
-            )
-            ecosystem = mocker.MagicMock()
-            ecosystem.name = ecosystem_name
-            network = mocker.MagicMock()
-            network.name = network_name
-            network.ecosystem = ecosystem
-            etherscan = ape.networks.get_ecosystem("ethereum").get_network("mainnet")
-            explorer = Etherscan.model_construct(name=etherscan.name, network=network)
-            network.explorer = explorer
-            explorer.network = network
-        else:
-            network = ecosystem.get_network(network_name)
-            explorer = network.explorer
-            assert explorer is not None
+def get_explorer():
+    def fn(chain_id: int) -> "ExplorerAPI":
+        for ecosystem in ape.networks.ecosystems.values():
+            for network in ecosystem.networks.values():
+                if network.is_dev:
+                    continue
 
-        return explorer
+                elif int(network.chain_id) != int(chain_id):
+                    continue
+
+                # Found.
+                return network.explorer
+
+        pytest.fail(f"No explorer found for '{chain_id}'.")
 
     return fn
 
@@ -218,111 +202,13 @@ class MockEtherscanBackend:
     def __init__(self, mocker, session, get_expected_account_txns_params, contract_address_map):
         self.mocker = mocker
         self.session = session
-        self.expected_base_uri = "https://api.etherscan.io/api"  # Default
+        self.expected_base_uri = "https://api.etherscan.io/v2/api?chainid=1"  # Default
         self.handlers = {"get": {}, "post": {}}
         self.get_expected_account_txns_params = get_expected_account_txns_params
         self.contract_address_map = contract_address_map
 
-    @cached_property
-    def expected_uri_map(
-        self,
-    ) -> dict[str, dict[str, str]]:
-        def get_url_f(testnet: bool = False, tld: str = "io"):
-            f_str = f"https://api-{{}}.{{}}.{tld}/api" if testnet else f"https://api.{{}}.{tld}/api"
-            return f_str.format
-
-        url = get_url_f()
-        testnet_url = get_url_f(testnet=True)
-        com_url = get_url_f(tld="com")
-        org_url = get_url_f(tld="org")
-        xyz_url = get_url_f(tld="xyz")
-        com_testnet_url = get_url_f(testnet=True, tld="com")
-        org_testnet_url = get_url_f(testnet=True, tld="org")
-        xyz_testnet_url = get_url_f(testnet=True, tld="xyz")
-
-        return {
-            "arbitrum": {
-                "mainnet": url("arbiscan"),
-                "sepolia": testnet_url("sepolia", "arbiscan"),
-                "nova": testnet_url("nova", "arbiscan"),
-            },
-            "avalanche": {"mainnet": url("snowtrace"), "fuji": testnet_url("testnet", "snowtrace")},
-            "base": {
-                "sepolia": org_testnet_url("sepolia", "basescan"),
-                "mainnet": org_url("basescan"),
-            },
-            "blast": {
-                "sepolia": testnet_url("sepolia", "blastscan"),
-                "mainnet": url("blastscan"),
-            },
-            "bsc": {
-                "mainnet": com_url("bscscan"),
-                "testnet": com_testnet_url("testnet", "bscscan"),
-                "opbnb": com_testnet_url("opbnb", "bscscan"),
-                "opbnb-testnet": com_testnet_url("opbnb-testnet", "bscscan"),
-            },
-            "bttc": {
-                "mainnet": com_url("bttcscan"),
-                "donau": com_testnet_url("testnet", "bttcscan"),
-            },
-            "celo": {
-                "mainnet": com_url("celoscan"),
-                "alfajores": com_testnet_url("alfajores", "celoscan"),
-            },
-            "ethereum": {
-                "mainnet": url("etherscan"),
-                "holesky": testnet_url("holesky", "etherscan"),
-                "sepolia": testnet_url("sepolia", "etherscan"),
-            },
-            "fantom": {
-                "opera": com_url("ftmscan"),
-                "testnet": com_testnet_url("testnet", "ftmscan"),
-            },
-            "fraxtal": {
-                "mainnet": com_url("fraxscan"),
-                "holesky": com_testnet_url("holesky", "fraxscan"),
-            },
-            "gnosis": {
-                "mainnet": url("gnosisscan"),
-            },
-            "kroma": {
-                "mainnet": com_url("kromascan"),
-                "sepolia": com_testnet_url("sepolia", "kromascan"),
-            },
-            "moonbeam": {
-                "mainnet": url("moonscan"),
-                "moonbase": testnet_url("moonbase", "moonscan"),
-                "moonriver": testnet_url("moonriver", "moonscan"),
-            },
-            "optimism": {
-                "mainnet": testnet_url("optimistic", "etherscan"),
-                "sepolia": testnet_url("sepolia-optimistic", "etherscan"),
-            },
-            "polygon": {
-                "mainnet": com_url("polygonscan"),
-                "amoy": com_testnet_url("amoy", "polygonscan"),
-            },
-            "polygon-zkevm": {
-                "mainnet": com_testnet_url("zkevm", "polygonscan"),
-                "cardona": com_testnet_url("cardona-zkevm", "polygonscan"),
-            },
-            "scroll": {
-                "mainnet": com_url("scrollscan"),
-                "sepolia": com_testnet_url("sepolia", "scrollscan"),
-                "testnet": com_testnet_url("testnet", "scrollscan"),
-            },
-            "unichain": {
-                "mainnet": xyz_url("uniscan"),
-                "sepolia": xyz_testnet_url("sepolia", "uniscan"),
-            },
-        }
-
-    def set_network(self, ecosystem: str, network: str):
-        key = network.replace("-fork", "")
-        if ecosystem not in self.expected_uri_map or key not in self.expected_uri_map[ecosystem]:
-            pytest.fail(f"Add {ecosystem}:{key} to the MockbBackend API map (check conftest.py)!")
-
-        self.expected_base_uri = self.expected_uri_map[ecosystem][key]
+    def set_network(self, chain_id: int):
+        self.expected_base_uri = f"https://api.etherscan.io/v2/api?chainid={chain_id}"
 
     def add_handler(
         self,
@@ -479,7 +365,7 @@ class MockEtherscanBackend:
 
     def _setup_account_response(self, params, response):
         self.add_handler("GET", "account", params, return_value=response)
-        self.set_network("ethereum", "mainnet")
+        self.set_network(1)
         return response
 
     def get_mock_response(

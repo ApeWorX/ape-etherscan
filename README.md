@@ -1,6 +1,6 @@
 # Quick Start
 
-The following blockchain explorers are supported in this plugin:
+The following is a subset of the supported blockchain explorers:
 
 | Network Name        | Explorer Link                                           |
 | ------------------- | ------------------------------------------------------- |
@@ -22,6 +22,8 @@ The following blockchain explorers are supported in this plugin:
 | Polygon ZkEVM       | [Polygonscan ZkEVM](https://zkevm.polygonscan.com)      |
 | Scroll              | [Scrollscan](https://scrollscan.com)                    |
 | Unichain            | [Uniscan](https://sepolia.uniscan.xyz)                  |
+
+To see the full list of networks supported by Etherscan, see Etherscan's [Supported Chains](https://docs.etherscan.io/contract-verification/supported-chains) guide.
 
 ## Dependencies
 

@@ -3,6 +3,7 @@ from collections.abc import Callable
 import pytest
 from ape.api.query import AccountTransactionQuery
 
+from ape_etherscan.client import get_supported_chains
 from ape_etherscan.exceptions import (
     EtherscanResponseError,
     EtherscanTooManyRequestsError,
@@ -10,7 +11,7 @@ from ape_etherscan.exceptions import (
 )
 from ape_etherscan.verify import SourceVerifier, VerificationApproach
 
-from ._utils import ecosystems_and_networks
+from ._utils import chain_ids
 
 # A map of each mock response to its contract name for testing `get_contract_type()`.
 EXPECTED_CONTRACT_NAME_MAP = {
@@ -23,86 +24,9 @@ EXPECTED_CONTRACT_NAME_MAP = {
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
 PUBLISH_GUID = "123"
 
+
 base_url_test = pytest.mark.parametrize(
-    "ecosystem,network,url",
-    [
-        ("arbitrum", "mainnet", "arbiscan.io"),
-        ("arbitrum", "mainnet-fork", "arbiscan.io"),
-        ("arbitrum", "sepolia", "sepolia.arbiscan.io"),
-        ("arbitrum", "sepolia-fork", "sepolia.arbiscan.io"),
-        ("arbitrum", "nova", "nova.arbiscan.io"),
-        ("arbitrum", "nova-fork", "nova.arbiscan.io"),
-        ("avalanche", "mainnet", "snowtrace.io"),
-        ("avalanche", "fuji", "testnet.snowtrace.io"),
-        ("base", "mainnet", "basescan.org"),
-        ("base", "sepolia", "sepolia.basescan.org"),
-        ("blast", "mainnet", "blastscan.io"),
-        ("blast", "mainnet-fork", "blastscan.io"),
-        ("blast", "sepolia", "sepolia.blastscan.io"),
-        ("blast", "sepolia-fork", "sepolia.blastscan.io"),
-        ("bsc", "mainnet", "bscscan.com"),
-        ("bsc", "mainnet-fork", "bscscan.com"),
-        ("bsc", "testnet", "testnet.bscscan.com"),
-        ("bsc", "testnet-fork", "testnet.bscscan.com"),
-        ("bsc", "opbnb", "opbnb.bscscan.com"),
-        ("bsc", "opbnb-fork", "opbnb.bscscan.com"),
-        ("bsc", "opbnb-testnet", "opbnb-testnet.bscscan.com"),
-        ("bsc", "opbnb-testnet-fork", "opbnb-testnet.bscscan.com"),
-        ("bttc", "mainnet", "bttcscan.com"),
-        ("bttc", "mainnet-fork", "bttcscan.com"),
-        ("bttc", "donau", "testnet.bttcscan.com"),
-        ("bttc", "donau-fork", "testnet.bttcscan.com"),
-        ("celo", "mainnet", "celoscan.io"),
-        ("celo", "mainnet-fork", "celoscan.io"),
-        ("celo", "alfajores", "alfajores.celoscan.io"),
-        ("celo", "alfajores-fork", "alfajores.celoscan.io"),
-        ("ethereum", "mainnet", "etherscan.io"),
-        ("ethereum", "mainnet-fork", "etherscan.io"),
-        ("ethereum", "holesky", "holesky.etherscan.io"),
-        ("ethereum", "holesky-fork", "holesky.etherscan.io"),
-        ("ethereum", "sepolia", "sepolia.etherscan.io"),
-        ("ethereum", "sepolia-fork", "sepolia.etherscan.io"),
-        ("fantom", "opera", "ftmscan.com"),
-        ("fantom", "opera-fork", "ftmscan.com"),
-        ("fantom", "testnet", "testnet.ftmscan.com"),
-        ("fantom", "testnet-fork", "testnet.ftmscan.com"),
-        ("fraxtal", "mainnet", "fraxscan.com"),
-        ("fraxtal", "mainnet-fork", "fraxscan.com"),
-        ("fraxtal", "holesky", "holesky.fraxscan.com"),
-        ("fraxtal", "holesky-fork", "holesky.fraxscan.com"),
-        ("gnosis", "mainnet", "gnosisscan.io"),
-        ("gnosis", "mainnet-fork", "gnosisscan.io"),
-        ("kroma", "mainnet", "kromascan.com"),
-        ("kroma", "mainnet-fork", "kromascan.com"),
-        ("kroma", "sepolia", "sepolia.kromascan.com"),
-        ("kroma", "sepolia-fork", "sepolia.kromascan.com"),
-        ("moonbeam", "mainnet", "moonscan.io"),
-        ("moonbeam", "mainnet-fork", "moonscan.io"),
-        ("moonbeam", "moonbase", "moonbase.moonscan.io"),
-        ("moonbeam", "moonbase-fork", "moonbase.moonscan.io"),
-        ("moonbeam", "moonriver", "moonriver.moonscan.io"),
-        ("moonbeam", "moonriver-fork", "moonriver.moonscan.io"),
-        ("optimism", "mainnet", "optimistic.etherscan.io"),
-        ("optimism", "mainnet-fork", "optimistic.etherscan.io"),
-        ("optimism", "sepolia", "sepolia-optimism.etherscan.io"),
-        ("optimism", "sepolia-fork", "sepolia-optimism.etherscan.io"),
-        ("polygon", "mainnet", "polygonscan.com"),
-        ("polygon", "mainnet-fork", "polygonscan.com"),
-        ("polygon", "amoy", "amoy.polygonscan.com"),
-        ("polygon", "amoy-fork", "amoy.polygonscan.com"),
-        ("polygon-zkevm", "mainnet", "zkevm.polygonscan.com"),
-        ("polygon-zkevm", "mainnet-fork", "zkevm.polygonscan.com"),
-        ("polygon-zkevm", "cardona", "cardona-zkevm.polygonscan.com"),
-        ("polygon-zkevm", "cardona-fork", "cardona-zkevm.polygonscan.com"),
-        ("scroll", "mainnet", "scrollscan.com"),
-        ("scroll", "mainnet-fork", "scrollscan.com"),
-        ("scroll", "sepolia", "sepolia.scrollscan.com"),
-        ("scroll", "sepolia-fork", "sepolia.scrollscan.com"),
-        ("scroll", "testnet", "testnet.scrollscan.com"),
-        ("scroll", "testnet-fork", "testnet.scrollscan.com"),
-        ("unichain", "sepolia", "sepolia.uniscan.xyz"),
-        ("unichain", "sepolia-fork", "sepolia.uniscan.xyz"),
-    ],
+    "chain_id,url", [(c["chainid"], c["blockexplorer"]) for c in get_supported_chains()]
 )
 
 
@@ -180,32 +104,27 @@ def setup_verification_test_with_ctor_args(
 
 
 @base_url_test
-def test_get_address_url(ecosystem, network, url, address, get_explorer):
-    expected = f"https://{url}/address/{address}"
-    explorer = get_explorer(ecosystem, network)
+def test_get_address_url(chain_id, url, address, get_explorer):
+    expected = f"{url}/address/{address}"
+    explorer = get_explorer(chain_id)
     actual = explorer.get_address_url(address)
     assert actual == expected
 
 
 @base_url_test
-def test_get_transaction_url(ecosystem, network, url, get_explorer):
-    expected = f"https://{url}/tx/{TRANSACTION}"
-    explorer = get_explorer(ecosystem, network)
+def test_get_transaction_url(chain_id, url, get_explorer):
+    expected = f"{url}/tx/{TRANSACTION}"
+    explorer = get_explorer(chain_id)
     actual = explorer.get_transaction_url(TRANSACTION)
     assert actual == expected
 
 
-@pytest.mark.parametrize("ecosystem,network", ecosystems_and_networks)
-def test_get_contract_type_ecosystems_and_networks(
-    mock_backend,
-    ecosystem,
-    network,
-    get_explorer,
-):
+@pytest.mark.parametrize("chain_id", chain_ids)
+def test_get_contract_type_ecosystems_and_networks(mock_backend, chain_id, get_explorer):
     # This test parametrizes getting contract types across ecosystem / network combos
-    mock_backend.set_network(ecosystem, network)
+    mock_backend.set_network(chain_id)
     response = mock_backend.setup_mock_get_contract_type_response("get_contract_response_flattened")
-    explorer = get_explorer(ecosystem, network)
+    explorer = get_explorer(chain_id)
     actual = explorer.get_contract_type(response.expected_address)
     contract_type_from_lowered_address = explorer.get_contract_type(
         response.expected_address.lower()
@@ -226,7 +145,7 @@ def test_get_contract_type_additional_types(mock_backend, file_name, explorer, c
     # NOTE: Purposely not merged with test above to avoid adding a new dimension
     #  to the parametrization.
     _ = connection  # Needed for symbol lookup
-    mock_backend.set_network("ethereum", "mainnet")
+    mock_backend.set_network(1)
     response = mock_backend.setup_mock_get_contract_type_response(file_name)
     actual = explorer.get_contract_type(response.expected_address).name
     expected = EXPECTED_CONTRACT_NAME_MAP[response.file_name]
@@ -327,7 +246,7 @@ def _acct_tx_overrides(contract, args=None):
     if suffix.startswith("0x"):
         suffix = suffix[2:]
 
-    # Include construcor aguments!
+    # Include constructor arguments!
     ct = contract.contract_type
     prefix = ct.deployment_bytecode.bytecode
     code = f"{prefix}{suffix}"
