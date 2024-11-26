@@ -530,7 +530,7 @@ class ContractClient(_APIClient):
         if not isinstance(items, list):
             raise ValueError("Expecting list.")
 
-        return [ContractCreationResponse(**item) for item in items]
+        return [ContractCreationResponse.model_validate(item) for item in items]
 
 
 class AccountClient(_APIClient):
