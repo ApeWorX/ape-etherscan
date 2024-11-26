@@ -85,8 +85,10 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_address_url"><code class="docutils literal notranslate">get_address_url()</span></code></a></li>
 <li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_contract_type"><code class="docutils literal notranslate">get_contract_type()</span></code></a></li>
 <li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_manifest"><code class="docutils literal notranslate">get_manifest()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_supported_chains"><code class="docutils literal notranslate">get_supported_chains()</span></code></a></li>
 <li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_transaction_url"><code class="docutils literal notranslate">get_transaction_url()</span></code></a></li>
 <li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.publish_contract"><code class="docutils literal notranslate">publish_contract()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.supports_chain"><code class="docutils literal notranslate">supports_chain()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -190,6 +192,18 @@ published.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.get_supported_chains">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_supported_chains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_supported_chains" title="Link to this definition"></a></dt>
+<dd><p>Get a list of chain data for all chains Etherscan supports.
+<a class="reference external" href="https://docs.etherscan.io/contract-verification/supported-chains">https://docs.etherscan.io/contract-verification/supported-chains</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.get_transaction_url">
 <span class="sig-name descname"><span class="pre">get_transaction_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transaction_hash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_transaction_url" title="Link to this definition"></a></dt>
 <dd><p>Get the transaction URL for the given transaction.</p>
@@ -213,6 +227,23 @@ published.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>address</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">AddressType</span></code>) – The address of the deployed contract.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.supports_chain">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.supports_chain" title="Link to this definition"></a></dt>
+<dd><p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> when the given chain ID is claimed to be
+supported by this explorer. Adhoc / custom networks rely on
+this feature to have automatic-explorer support. Explorer
+plugins should override this.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chain_id</strong> (<em>int</em>) – The chain ID to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
