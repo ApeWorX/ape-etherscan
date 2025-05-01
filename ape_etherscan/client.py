@@ -366,7 +366,7 @@ class ClientFactory:
         self._instance = instance
 
     @property
-    def has_api_key(self) -> bool:    
+    def has_api_key(self) -> bool:
         return ETHERSCAN_API_KEY_NAME in os.environ
 
     def get_contract_client(self, contract_address: str) -> ContractClient:

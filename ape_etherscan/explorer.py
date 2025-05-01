@@ -161,7 +161,7 @@ class Etherscan(ExplorerAPI):
                 self._warn_no_api_key = False
 
             return None
-            
+
         try:
             source_code = self._get_source_code(address)
         except ContractNotVerifiedError:
