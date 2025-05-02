@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import shutil
@@ -100,6 +101,15 @@ def make_source(base_dir: Path, name: str, content: str):
     source_file = base_dir / f"{name}.sol"
     source_file.touch()
     source_file.write_text(content)
+
+
+@pytest.fixture(scope="session")
+def supported_chain_ids(networks):
+    return [
+        net.chain_id
+        for net in itertools.chain(*(eco.networks.values() for eco in networks.ecosystems.values()))
+        if net.name != "local" and not net.name.endswith("-fork")
+    ]
 
 
 @pytest.fixture(scope="session")
