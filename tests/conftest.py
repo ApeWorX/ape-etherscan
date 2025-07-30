@@ -177,7 +177,9 @@ def get_explorer():
                 # Found.
                 return network.explorer
 
-        pytest.fail(f"No explorer found for '{chain_id}'.")
+        # NOTE: We don't support this chain yet (or don't include it in testing) if we can't find it
+        #       registered above, so xfail (expected failure) for now so we know to update later.
+        pytest.xfail(f"No explorer found for '{chain_id}'.")
 
     return fn
 
