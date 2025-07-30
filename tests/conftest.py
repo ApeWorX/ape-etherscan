@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from ape.types import AddressType
 
 
+# TODO: Refactor to using Ape's built-in temporary data folder feature
 DATA_FOLDER = Path(mkdtemp()).resolve()
 ape.config.DATA_FOLDER = DATA_FOLDER
 
@@ -67,8 +68,8 @@ def standard_input_json(library):
 
 
 @pytest.fixture(autouse=True)
-def connection(explorer):
-    with ape.networks.ethereum.mainnet.use_provider("infura") as provider:
+def connection(networks, explorer):
+    with networks.ethereum.mainnet.use_provider("infura") as provider:
         # TODO: Figure out why this is still needed sometimes,
         #   even after https://github.com/ApeWorX/ape/pull/2022
         if not provider.is_connected:
@@ -78,7 +79,7 @@ def connection(explorer):
 
 
 @pytest.fixture
-def mock_provider(mocker):
+def mock_provider(networks, mocker):
     @contextmanager
     def func(ecosystem_name="ethereum", network_name="mock"):
         mock_provider = mocker.MagicMock()
@@ -86,11 +87,11 @@ def mock_provider(mocker):
         mock_provider.network.name = network_name
         mock_provider.network.ecosystem = mocker.MagicMock()
         mock_provider.network.ecosystem.name = ecosystem_name
-        ape.networks.active_provider = mock_provider
+        networks.active_provider = mock_provider
 
         yield mock_provider
 
-        ape.networks.active_provider = None
+        networks.active_provider = None
 
     return func
 
@@ -99,11 +100,6 @@ def make_source(base_dir: Path, name: str, content: str):
     source_file = base_dir / f"{name}.sol"
     source_file.touch()
     source_file.write_text(content)
-
-
-@pytest.fixture(scope="session")
-def project():
-    return ape.project
 
 
 @pytest.fixture(scope="session")
@@ -123,8 +119,8 @@ def contract_address_map(address):
 
 
 @pytest.fixture(scope="session")
-def account():
-    return ape.accounts.test_accounts[0]
+def account(accounts):
+    return accounts[0]
 
 
 @pytest.fixture
@@ -145,8 +141,8 @@ def get_expected_account_txns_params():
 
 
 @pytest.fixture(scope="session")
-def fake_connection():
-    with ape.networks.ethereum.local.use_provider("test"):
+def fake_connection(networks):
+    with networks.ethereum.local.use_provider("test"):
         yield
 
 
@@ -164,9 +160,9 @@ def explorer(get_explorer):
 
 
 @pytest.fixture
-def get_explorer():
+def get_explorer(networks):
     def fn(chain_id: int) -> "ExplorerAPI":
-        for ecosystem in ape.networks.ecosystems.values():
+        for ecosystem in networks.ecosystems.values():
             for network in ecosystem.networks.values():
                 if network.is_dev:
                     continue
@@ -472,11 +468,6 @@ def verification_params_with_ctor_args(
 
 
 @pytest.fixture(scope="session")
-def chain():
-    return ape.chain
-
-
-@pytest.fixture(scope="session")
 def solidity(project):
     return project.compiler_manager.solidity
 
@@ -484,7 +475,7 @@ def solidity(project):
 @pytest.fixture(scope="session")
 def library(account, project, chain, solidity):
     lib = account.deploy(project.MyLib)
-    chain.contracts._local_contract_types[lib.address] = lib.contract_type
+    chain.contracts.cache_contract_type(lib.address, lib.contract_type)
     solidity.add_library(lib)
     return lib
 
@@ -501,17 +492,17 @@ def address_to_verify(contract_to_verify):
 
 
 @pytest.fixture(scope="session")
-def contract_to_verify_with_ctor_args(fake_connection, project, account):
+def contract_to_verify_with_ctor_args(chain, fake_connection, project, account):
     # Deploy the library first.
     library = account.deploy(project.MyLib)
-    ape.chain.contracts._local_contract_types[library.address] = library.contract_type
+    chain.contracts.cache_contract_type(library.address, library.contract_type)
 
     # Add the library to recompile contract `foo`.
     solidity = project.compiler_manager.solidity
     solidity.add_library(library)
 
     foo = project.fooWithConstructor.deploy(42, sender=account)
-    ape.chain.contracts._local_contract_types[address] = foo.contract_type
+    chain.contracts.cache_contract_type(foo.address, foo.contract_type)
     return foo
 
 
