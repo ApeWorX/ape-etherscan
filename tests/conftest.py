@@ -470,7 +470,7 @@ def verification_params_with_ctor_args(
     address_to_verify_with_ctor_args, library, standard_input_json, constructor_arguments
 ):
     json_data = standard_input_json.copy()
-    json_data["libraryaddress1"] = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    json_data["libraryaddress1"] = library.address
 
     return {
         "action": "verifysourcecode",
@@ -493,28 +493,47 @@ def solidity(project):
 
 
 @pytest.fixture(scope="session")
-def library(account, project, chain, solidity):
+def library(account, project, chain, fake_connection, solidity):
     lib = account.deploy(project.MyLib)
-    chain.contracts.cache_contract_type(lib.address, lib.contract_type)
+    chain.contracts.cache_contract_type(
+        lib.address,
+        lib.contract_type,
+        ecosystem_key="ethereum",
+        network_key="mainnet",
+    )
     solidity.add_library(lib)
     return lib
 
 
 @pytest.fixture(scope="session")
-def contract_to_verify(fake_connection, library, project, account):
+def contract_to_verify(account, project, chain, fake_connection, library):
     _ = library  # Ensure library is deployed first.
-    return project.foo.deploy(sender=account)
+    foo = project.foo.deploy(sender=account)
+    chain.contracts.cache_contract_type(
+        foo.address,
+        foo.contract_type,
+        ecosystem_key="ethereum",
+        network_key="mainnet",
+    )
+    return foo
 
 
 @pytest.fixture(scope="session")
-def address_to_verify(chain, contract_to_verify):
+def address_to_verify(contract_to_verify):
     return contract_to_verify.address
 
 
 @pytest.fixture(scope="session")
-def contract_to_verify_with_ctor_args(library, fake_connection, project, account):
+def contract_to_verify_with_ctor_args(account, project, chain, fake_connection, library):
     _ = library  # Ensure library is deployed first.
-    return project.fooWithConstructor.deploy(42, sender=account)
+    foo = project.fooWithConstructor.deploy(42, sender=account)
+    chain.contracts.cache_contract_type(
+        foo.address,
+        foo.contract_type,
+        ecosystem_key="ethereum",
+        network_key="mainnet",
+    )
+    return foo
 
 
 @pytest.fixture(scope="session")
