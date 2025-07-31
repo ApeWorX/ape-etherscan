@@ -212,6 +212,7 @@ class MockEtherscanBackend:
         self,
         method: str,
         module: str,
+        action: str,
         expected_params: dict,
         return_value: Optional[Any] = None,
         side_effect: Optional[Callable] = None,
@@ -260,7 +261,10 @@ class MockEtherscanBackend:
                 result = side_effect()
                 return result if isinstance(result, Response) else self.get_mock_response(result)
 
-        self.handlers[method.lower()][module] = handler
+        if module not in self.handlers[method.lower()]:
+            self.handlers[method.lower()][module] = {}
+
+        self.handlers[method.lower()][module][action] = handler
         self.session.request.side_effect = self.handle_request
 
     def handle_request(self, method, base_uri, timeout, headers=None, params=None, data=None):
@@ -273,19 +277,29 @@ class MockEtherscanBackend:
 
         if params:
             module = params.get("module")
+            action = params.get("action")
         elif data:
             module = data.get("module")
+            action = data.get("action")
         else:
             raise AssertionError("Expected either 'params' or 'data'.")
 
-        handler = self.handlers[method.lower()][module]
+        if not (handler := self.handlers[method.lower()].get(module, {}).get(action)):
+            raise AssertionError(f"No handler found for {method} {module}/{action}")
+
         return handler(self, method, base_uri, headers=headers, params=params, data=data)
 
     def setup_mock_get_contract_type_response(self, file_name: str):
         response = self._get_contract_type_response(file_name)
         address = self.contract_address_map[file_name]
         expected_params = self._expected_get_ct_params(address)
-        self.add_handler("GET", "contract", expected_params, return_value=response)
+        self.add_handler(
+            "GET",
+            "contract",
+            expected_params["action"],
+            expected_params,
+            return_value=response,
+        )
         response.expected_address = address
         return response
 
@@ -309,7 +323,13 @@ class MockEtherscanBackend:
                 return response
 
         throttler = ThrottleMock()
-        self.add_handler("GET", "contract", expected_params, side_effect=throttler.side_effect)
+        self.add_handler(
+            "GET",
+            "contract",
+            expected_params["action"],
+            expected_params,
+            side_effect=throttler.side_effect,
+        )
         response.expected_address = address
         return throttler, response
 
@@ -362,7 +382,7 @@ class MockEtherscanBackend:
         return self._setup_account_response(params, response)
 
     def _setup_account_response(self, params, response):
-        self.add_handler("GET", "account", params, return_value=response)
+        self.add_handler("GET", "account", params["action"], params, return_value=response)
         self.set_network(1)
         return response
 
@@ -487,23 +507,14 @@ def contract_to_verify(fake_connection, library, project, account):
 
 
 @pytest.fixture(scope="session")
-def address_to_verify(contract_to_verify):
-    return contract_to_verify
+def address_to_verify(chain, contract_to_verify):
+    return contract_to_verify.address
 
 
 @pytest.fixture(scope="session")
-def contract_to_verify_with_ctor_args(chain, fake_connection, project, account):
-    # Deploy the library first.
-    library = account.deploy(project.MyLib)
-    chain.contracts.cache_contract_type(library.address, library.contract_type)
-
-    # Add the library to recompile contract `foo`.
-    solidity = project.compiler_manager.solidity
-    solidity.add_library(library)
-
-    foo = project.fooWithConstructor.deploy(42, sender=account)
-    chain.contracts.cache_contract_type(foo.address, foo.contract_type)
-    return foo
+def contract_to_verify_with_ctor_args(library, fake_connection, project, account):
+    _ = library  # Ensure library is deployed first.
+    return project.fooWithConstructor.deploy(42, sender=account)
 
 
 @pytest.fixture(scope="session")
