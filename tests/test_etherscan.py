@@ -60,12 +60,19 @@ def setup_verification_test(
         mock_backend.setup_mock_account_transactions_response(
             address=contract_to_verify.address, **overrides
         )
-        mock_backend.add_handler("POST", "contract", params, return_value=PUBLISH_GUID)
+        mock_backend.add_handler(
+            "POST",
+            module="contract",
+            action="verifysourcecode",
+            expected_params=params,
+            return_value=PUBLISH_GUID,
+        )
         verification_tester = verification_tester_cls(found_handler, threshold=threshold)
         mock_backend.add_handler(
             "GET",
-            "contract",
-            {"guid": PUBLISH_GUID},
+            module="contract",
+            action="checkverifystatus",
+            expected_params={"guid": PUBLISH_GUID},
             side_effect=verification_tester.sim,
         )
         return verification_tester
@@ -89,12 +96,17 @@ def setup_verification_test_with_ctor_args(
             address=contract_to_verify_with_ctor_args.address, **overrides
         )
         mock_backend.add_handler(
-            "POST", "contract", verification_params_with_ctor_args, return_value=PUBLISH_GUID
+            "POST",
+            "contract",
+            "verifysourcecode",
+            verification_params_with_ctor_args,
+            return_value=PUBLISH_GUID,
         )
         verification_tester = verification_tester_cls(found_handler, threshold=threshold)
         mock_backend.add_handler(
             "GET",
             "contract",
+            "checkverifystatus",
             {"guid": PUBLISH_GUID},
             side_effect=verification_tester.sim,
         )
@@ -225,15 +237,14 @@ def test_publish_contract_with_ctor_args(
     assert caplog.records[-1].message == expected_verification_log_with_ctor_args
 
 
-def test_publish_contract_flatten_via_ir(mocker, address_to_verify):
+def test_publish_contract_flatten_via_ir(mocker, project, address_to_verify):
     client = mocker.MagicMock()
-    project = mocker.MagicMock()
+    source_verifier = SourceVerifier(address_to_verify, client, project=project)
 
     compiler = mocker.MagicMock()
     compiler.settings = {"viaIR": True, "outputSelection": {"Contract": []}}
     compiler.contractTypes = ["Contract"]
     compiler.name = "Solidity"
-    source_verifier = SourceVerifier(address_to_verify, client, project=project)
     expected = "Incompatible Solidity setting: 'viaIR=True'."
     with pytest.raises(IncompatibleCompilerSettingsError, match=expected):
         source_verifier.attempt_verification(

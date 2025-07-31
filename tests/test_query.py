@@ -17,7 +17,13 @@ def test_contract_creation_metadata_query(query_engine, mock_backend):
         "contractCreator": creator.lower(),
         "txHash": "0xd72cf25e4a5fe3677b6f9b2ae13771e02ad66f8d2419f333bb8bde3147bd4294",
     }
-    mock_backend.add_handler("GET", "contract", params, return_value=[creation_data])
+    mock_backend.add_handler(
+        "GET",
+        "contract",
+        params["action"],
+        params,
+        return_value=[creation_data],
+    )
 
     # Perform query.
     query = ContractCreationQuery(contract=address, columns=["*"])
@@ -35,7 +41,13 @@ def test_contract_creation_metadata_query(query_engine, mock_backend):
         "lalala": 123,
     }
     creation_data = {**creation_data, **extra_data}
-    mock_backend.add_handler("GET", "contract", params, return_value=[creation_data])
+    mock_backend.add_handler(
+        "GET",
+        "contract",
+        params["action"],
+        params,
+        return_value=[creation_data],
+    )
 
     # Perform query.
     query = ContractCreationQuery(contract=address, columns=["*"])

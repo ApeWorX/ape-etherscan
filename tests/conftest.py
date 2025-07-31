@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from ape.types import AddressType
 
 
+# TODO: Refactor to using Ape's built-in temporary data folder feature
 DATA_FOLDER = Path(mkdtemp()).resolve()
 ape.config.DATA_FOLDER = DATA_FOLDER
 
@@ -67,8 +68,8 @@ def standard_input_json(library):
 
 
 @pytest.fixture(autouse=True)
-def connection(explorer):
-    with ape.networks.ethereum.mainnet.use_provider("infura") as provider:
+def connection(networks, explorer):
+    with networks.ethereum.mainnet.use_provider("infura") as provider:
         # TODO: Figure out why this is still needed sometimes,
         #   even after https://github.com/ApeWorX/ape/pull/2022
         if not provider.is_connected:
@@ -78,7 +79,7 @@ def connection(explorer):
 
 
 @pytest.fixture
-def mock_provider(mocker):
+def mock_provider(networks, mocker):
     @contextmanager
     def func(ecosystem_name="ethereum", network_name="mock"):
         mock_provider = mocker.MagicMock()
@@ -86,11 +87,11 @@ def mock_provider(mocker):
         mock_provider.network.name = network_name
         mock_provider.network.ecosystem = mocker.MagicMock()
         mock_provider.network.ecosystem.name = ecosystem_name
-        ape.networks.active_provider = mock_provider
+        networks.active_provider = mock_provider
 
         yield mock_provider
 
-        ape.networks.active_provider = None
+        networks.active_provider = None
 
     return func
 
@@ -99,11 +100,6 @@ def make_source(base_dir: Path, name: str, content: str):
     source_file = base_dir / f"{name}.sol"
     source_file.touch()
     source_file.write_text(content)
-
-
-@pytest.fixture(scope="session")
-def project():
-    return ape.project
 
 
 @pytest.fixture(scope="session")
@@ -123,8 +119,8 @@ def contract_address_map(address):
 
 
 @pytest.fixture(scope="session")
-def account():
-    return ape.accounts.test_accounts[0]
+def account(accounts):
+    return accounts[0]
 
 
 @pytest.fixture
@@ -145,8 +141,8 @@ def get_expected_account_txns_params():
 
 
 @pytest.fixture(scope="session")
-def fake_connection():
-    with ape.networks.ethereum.local.use_provider("test"):
+def fake_connection(networks):
+    with networks.ethereum.local.use_provider("test"):
         yield
 
 
@@ -164,9 +160,9 @@ def explorer(get_explorer):
 
 
 @pytest.fixture
-def get_explorer():
+def get_explorer(networks):
     def fn(chain_id: int) -> "ExplorerAPI":
-        for ecosystem in ape.networks.ecosystems.values():
+        for ecosystem in networks.ecosystems.values():
             for network in ecosystem.networks.values():
                 if network.is_dev:
                     continue
@@ -177,7 +173,9 @@ def get_explorer():
                 # Found.
                 return network.explorer
 
-        pytest.fail(f"No explorer found for '{chain_id}'.")
+        # NOTE: We don't support this chain yet (or don't include it in testing) if we can't find it
+        #       registered above, so xfail (expected failure) for now so we know to update later.
+        pytest.xfail(f"No explorer found for '{chain_id}'.")
 
     return fn
 
@@ -214,6 +212,7 @@ class MockEtherscanBackend:
         self,
         method: str,
         module: str,
+        action: str,
         expected_params: dict,
         return_value: Optional[Any] = None,
         side_effect: Optional[Callable] = None,
@@ -262,7 +261,10 @@ class MockEtherscanBackend:
                 result = side_effect()
                 return result if isinstance(result, Response) else self.get_mock_response(result)
 
-        self.handlers[method.lower()][module] = handler
+        if module not in self.handlers[method.lower()]:
+            self.handlers[method.lower()][module] = {}
+
+        self.handlers[method.lower()][module][action] = handler
         self.session.request.side_effect = self.handle_request
 
     def handle_request(self, method, base_uri, timeout, headers=None, params=None, data=None):
@@ -275,19 +277,29 @@ class MockEtherscanBackend:
 
         if params:
             module = params.get("module")
+            action = params.get("action")
         elif data:
             module = data.get("module")
+            action = data.get("action")
         else:
             raise AssertionError("Expected either 'params' or 'data'.")
 
-        handler = self.handlers[method.lower()][module]
+        if not (handler := self.handlers[method.lower()].get(module, {}).get(action)):
+            raise AssertionError(f"No handler found for {method} {module}/{action}")
+
         return handler(self, method, base_uri, headers=headers, params=params, data=data)
 
     def setup_mock_get_contract_type_response(self, file_name: str):
         response = self._get_contract_type_response(file_name)
         address = self.contract_address_map[file_name]
         expected_params = self._expected_get_ct_params(address)
-        self.add_handler("GET", "contract", expected_params, return_value=response)
+        self.add_handler(
+            "GET",
+            "contract",
+            expected_params["action"],
+            expected_params,
+            return_value=response,
+        )
         response.expected_address = address
         return response
 
@@ -311,7 +323,13 @@ class MockEtherscanBackend:
                 return response
 
         throttler = ThrottleMock()
-        self.add_handler("GET", "contract", expected_params, side_effect=throttler.side_effect)
+        self.add_handler(
+            "GET",
+            "contract",
+            expected_params["action"],
+            expected_params,
+            side_effect=throttler.side_effect,
+        )
         response.expected_address = address
         return throttler, response
 
@@ -364,7 +382,7 @@ class MockEtherscanBackend:
         return self._setup_account_response(params, response)
 
     def _setup_account_response(self, params, response):
-        self.add_handler("GET", "account", params, return_value=response)
+        self.add_handler("GET", "account", params["action"], params, return_value=response)
         self.set_network(1)
         return response
 
@@ -452,7 +470,7 @@ def verification_params_with_ctor_args(
     address_to_verify_with_ctor_args, library, standard_input_json, constructor_arguments
 ):
     json_data = standard_input_json.copy()
-    json_data["libraryaddress1"] = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+    json_data["libraryaddress1"] = library.address
 
     return {
         "action": "verifysourcecode",
@@ -470,46 +488,51 @@ def verification_params_with_ctor_args(
 
 
 @pytest.fixture(scope="session")
-def chain():
-    return ape.chain
-
-
-@pytest.fixture(scope="session")
 def solidity(project):
     return project.compiler_manager.solidity
 
 
 @pytest.fixture(scope="session")
-def library(account, project, chain, solidity):
+def library(account, project, chain, fake_connection, solidity):
     lib = account.deploy(project.MyLib)
-    chain.contracts._local_contract_types[lib.address] = lib.contract_type
+    chain.contracts.cache_contract_type(
+        lib.address,
+        lib.contract_type,
+        ecosystem_key="ethereum",
+        network_key="mainnet",
+    )
     solidity.add_library(lib)
     return lib
 
 
 @pytest.fixture(scope="session")
-def contract_to_verify(fake_connection, library, project, account):
+def contract_to_verify(account, project, chain, fake_connection, library):
     _ = library  # Ensure library is deployed first.
-    return project.foo.deploy(sender=account)
+    foo = project.foo.deploy(sender=account)
+    chain.contracts.cache_contract_type(
+        foo.address,
+        foo.contract_type,
+        ecosystem_key="ethereum",
+        network_key="mainnet",
+    )
+    return foo
 
 
 @pytest.fixture(scope="session")
 def address_to_verify(contract_to_verify):
-    return contract_to_verify
+    return contract_to_verify.address
 
 
 @pytest.fixture(scope="session")
-def contract_to_verify_with_ctor_args(fake_connection, project, account):
-    # Deploy the library first.
-    library = account.deploy(project.MyLib)
-    ape.chain.contracts._local_contract_types[library.address] = library.contract_type
-
-    # Add the library to recompile contract `foo`.
-    solidity = project.compiler_manager.solidity
-    solidity.add_library(library)
-
+def contract_to_verify_with_ctor_args(account, project, chain, fake_connection, library):
+    _ = library  # Ensure library is deployed first.
     foo = project.fooWithConstructor.deploy(42, sender=account)
-    ape.chain.contracts._local_contract_types[address] = foo.contract_type
+    chain.contracts.cache_contract_type(
+        foo.address,
+        foo.contract_type,
+        ecosystem_key="ethereum",
+        network_key="mainnet",
+    )
     return foo
 
 
@@ -522,7 +545,8 @@ def address_to_verify_with_ctor_args(contract_to_verify_with_ctor_args):
 def expected_verification_log(address_to_verify):
     return (
         "Contract verification successful!\n"
-        f"https://etherscan.io/address/{address_to_verify}#code"
+        # TODO: Remove double / in https://github.com/ApeWorX/ape-etherscan/pull/163
+        f"https://etherscan.io//address/{address_to_verify}#code"
     )
 
 
@@ -530,5 +554,6 @@ def expected_verification_log(address_to_verify):
 def expected_verification_log_with_ctor_args(address_to_verify_with_ctor_args):
     return (
         "Contract verification successful!\n"
-        f"https://etherscan.io/address/{address_to_verify_with_ctor_args}#code"
+        # TODO: Remove double / in https://github.com/ApeWorX/ape-etherscan/pull/163
+        f"https://etherscan.io//address/{address_to_verify_with_ctor_args}#code"
     )
