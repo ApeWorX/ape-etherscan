@@ -237,15 +237,14 @@ def test_publish_contract_with_ctor_args(
     assert caplog.records[-1].message == expected_verification_log_with_ctor_args
 
 
-def test_publish_contract_flatten_via_ir(mocker, address_to_verify):
+def test_publish_contract_flatten_via_ir(mocker, project, address_to_verify):
     client = mocker.MagicMock()
-    project = mocker.MagicMock()
+    source_verifier = SourceVerifier(address_to_verify, client, project=project)
 
     compiler = mocker.MagicMock()
     compiler.settings = {"viaIR": True, "outputSelection": {"Contract": []}}
     compiler.contractTypes = ["Contract"]
     compiler.name = "Solidity"
-    source_verifier = SourceVerifier(address_to_verify, client, project=project)
     expected = "Incompatible Solidity setting: 'viaIR=True'."
     with pytest.raises(IncompatibleCompilerSettingsError, match=expected):
         source_verifier.attempt_verification(
