@@ -7,7 +7,7 @@
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=397bb51e" />
-    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=83eaa723" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=76b6f612" />
     <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@
       <img class="dark-logo" src="../_static/logo_green.svg" alt="ape-etherscan" height="28" loading="lazy" />
       <strong>ape-etherscan</strong>
     </a>
-    <div class="sy-head-nav" id="HeadNav">
+    <div class="sy-head-nav" id="head-nav">
       <nav class="sy-head-links"></nav>
       <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
   <input type="text" name="q" placeholder="Search" />
@@ -43,7 +43,7 @@ data-aria-auto="Switch to light color mode"
 data-aria-light="Switch to dark color mode"
 data-aria-dark="Switch to auto color mode">
 <i class="i-lucide theme-icon"></i>
-</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="HeadNav" aria-expanded="false">
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
         <div class="hamburger">
           <span class="hamburger_1"></span>
           <span class="hamburger_2 -translate-x-2"></span>
@@ -99,7 +99,8 @@ data-aria-dark="Switch to auto color mode">
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
   <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
-  <main class="sy-main w-full max-sm:max-w-full print:pt-6"><div class="sy-breadcrumbs" role="navigation">
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
   <div class="sy-breadcrumbs-inner flex items-center">
     <div class="md:hidden mr-3">
       <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
@@ -248,7 +249,7 @@ This could be useful if you hit API rate limits.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">ape-etherscan</span></code> plugin also assists in fetching <code class="docutils literal notranslate"><span class="pre">contract_types</span></code>.
 Use the <code class="docutils literal notranslate"><span class="pre">Contract</span></code> top-level construct to create contract instances.
 When the explorer plugin locates a contract type for a given address, the <code class="docutils literal notranslate"><span class="pre">Contract</span></code> return-value uses that contract type.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">accounts</span><span class="p">,</span> <span class="n">Contract</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">ape</span><span class="w"> </span><span class="kn">import</span> <span class="n">accounts</span><span class="p">,</span> <span class="n">Contract</span>
 </span><span data-line="2">
 </span><span data-line="3"><span class="n">contract</span> <span class="o">=</span> <span class="n">Contract</span><span class="p">(</span><span class="s2">&quot;0x55a8a39bc9694714e2874c1ce77aa1e599461e18&quot;</span><span class="p">)</span>
 </span><span data-line="4"><span class="n">receipt</span> <span class="o">=</span> <span class="n">contract</span><span class="o">.</span><span class="n">call_mutable_method</span><span class="p">(</span><span class="s2">&quot;arg0&quot;</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">accounts</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;acct&quot;</span><span class="p">))</span>
@@ -267,14 +268,14 @@ However, if the plugin detects that the contract type has a method named <code c
 Contract verification associates a contract type from Ape with an Ethereum address on Etherscan.
 Learn more about Etherscan verification <a class="reference external" href="https://info.etherscan.com/types-of-contract-verification/">here</a>.</p>
 <p>To verify contract in Ape, you can set the <code class="docutils literal notranslate"><span class="pre">publish</span></code> key to <code class="docutils literal notranslate"><span class="pre">True</span></code> when deploying:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">accounts</span><span class="p">,</span> <span class="n">project</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">ape</span><span class="w"> </span><span class="kn">import</span> <span class="n">accounts</span><span class="p">,</span> <span class="n">project</span>
 </span><span data-line="2">
 </span><span data-line="3"><span class="n">account</span> <span class="o">=</span> <span class="n">accounts</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;testnetacct&quot;</span><span class="p">)</span>
 </span><span data-line="4"><span class="n">account</span><span class="o">.</span><span class="n">deploy</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">MyContract</span><span class="p">,</span> <span class="n">publish</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></pre></div>
 </div>
 <p>You can also use the explorer class directly to publish at a later time:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">networks</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">ape</span><span class="w"> </span><span class="kn">import</span> <span class="n">networks</span>
 </span><span data-line="2">
 </span><span data-line="3"><span class="n">etherscan</span> <span class="o">=</span> <span class="n">networks</span><span class="o">.</span><span class="n">provider</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">explorer</span>
 </span><span data-line="4"><span class="n">etherscan</span><span class="o">.</span><span class="n">publish_contract</span><span class="p">(</span><span class="s2">&quot;0x55a8a39bc9694714e2874c1ce77aa1e599461e18&quot;</span><span class="p">)</span>
@@ -319,7 +320,7 @@ Configure them like this:</p>
 </span></pre></div>
 </div>
 <p>Then, access contract types from the dependency in your code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">project</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">ape</span><span class="w"> </span><span class="kn">import</span> <span class="n">project</span>
 </span><span data-line="2">
 </span><span data-line="3"><span class="n">spork_contract_type</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">dependencies</span><span class="p">[</span><span class="s2">&quot;Spork&quot;</span><span class="p">][</span><span class="s2">&quot;etherscan&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">Spork</span>
 </span></pre></div>
@@ -329,7 +330,7 @@ Configure them like this:</p>
 <h3>Querying Accounts<a class="headerlink" href="#querying-accounts" title="Link to this heading"></a></h3>
 <p>Etherscan offers a query-provider plugin for account data.
 Query account transactions from Etherscan using the following syntax:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ape</span> <span class="kn">import</span> <span class="n">chain</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">ape</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
 </span><span data-line="2">
 </span><span data-line="3"><span class="n">history</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="s2">&quot;vitalik.eth&quot;</span><span class="p">]</span>
 </span><span data-line="4">
@@ -385,8 +386,8 @@ Query account transactions from Etherscan using the following syntax:</p>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script data-domain="docs.apeworx.io" defer="defer" src="https://plausible.io/js/script.js"></script>
-      <script src="../_static/shibuya.js?v=e2e99575"></script></body>
+      <script src="../_static/shibuya.js?v=c477d091"></script></body>
 </html>
