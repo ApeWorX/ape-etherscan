@@ -545,7 +545,8 @@ def address_to_verify_with_ctor_args(contract_to_verify_with_ctor_args):
 def expected_verification_log(address_to_verify):
     return (
         "Contract verification successful!\n"
-        f"https://etherscan.io/address/{address_to_verify}#code"
+        # TODO: Remove double / in https://github.com/ApeWorX/ape-etherscan/pull/163
+        f"https://etherscan.io//address/{address_to_verify}#code"
     )
 
 
@@ -553,5 +554,6 @@ def expected_verification_log(address_to_verify):
 def expected_verification_log_with_ctor_args(address_to_verify_with_ctor_args):
     return (
         "Contract verification successful!\n"
-        f"https://etherscan.io/address/{address_to_verify_with_ctor_args}#code"
+        # TODO: Remove double / in https://github.com/ApeWorX/ape-etherscan/pull/163
+        f"https://etherscan.io//address/{address_to_verify_with_ctor_args}#code"
     )
