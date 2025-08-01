@@ -136,7 +136,7 @@ class _APIClient(ManagerAccessMixin):
             time_to_sleep = self._min_time_between_calls - (time.time() - self._last_call)
             logger.debug(f"Sleeping {time_to_sleep} seconds to avoid rate limit")
             # NOTE: Sleep time is in seconds (float for subseconds)
-            time.sleep(time_to_sleep)
+            time.sleep(time_to_sleep + 0.01)  # Just a little extra to avoid tripping rate limit
 
         self._last_call = time.time()
 
