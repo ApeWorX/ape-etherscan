@@ -132,7 +132,12 @@ def test_get_transaction_url(chain_id, url, get_explorer):
 
 
 @pytest.mark.parametrize("chain_id", chain_ids)
-def test_get_contract_type_ecosystems_and_networks(mock_backend, chain_id, get_explorer):
+def test_get_contract_type_ecosystems_and_networks(
+    mock_backend, chain_id, get_explorer, supported_chain_ids
+):
+    if chain_id not in supported_chain_ids:
+        pytest.skip()
+
     # This test parametrizes getting contract types across ecosystem / network combos
     mock_backend.set_network(chain_id)
     response = mock_backend.setup_mock_get_contract_type_response("get_contract_response_flattened")
