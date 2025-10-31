@@ -18,6 +18,7 @@ API_KEY_ENV_KEY_MAP = {
     "polygon": "POLYGONSCAN_API_KEY",
     "polygon-zkevm": "POLYGON_ZKEVM_ETHERSCAN_API_KEY",
     "scroll": "SCROLLSCAN_API_KEY",
+    "sonic": "SONICSCAN_API_KEY",
     "unichain": "UNISCAN_API_KEY",
 }
 NETWORKS = {
@@ -93,6 +94,10 @@ NETWORKS = {
         "mainnet",
         "sepolia",
         "testnet",
+    ],
+    "sonic": [
+        "mainnet",
+        "blaze",
     ],
     "unichain": [
         "sepolia",

@@ -21,6 +21,7 @@ The following is a subset of the supported blockchain explorers:
 | Polygon             | [Polygonscan](https://polygonscan.com)                  |
 | Polygon ZkEVM       | [Polygonscan ZkEVM](https://zkevm.polygonscan.com)      |
 | Scroll              | [Scrollscan](https://scrollscan.com)                    |
+| Sonic               | [Sonicscan](https://sonicscan.org)                      |
 | Unichain            | [Uniscan](https://sepolia.uniscan.xyz)                  |
 
 To see the full list of networks supported by Etherscan, see Etherscan's [Supported Chains](https://docs.etherscan.io/contract-verification/supported-chains) guide.

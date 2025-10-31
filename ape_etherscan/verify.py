@@ -64,6 +64,7 @@ ECOSYSTEMS_VERIFY_USING_JSON = (
     "polygon",
     "polygon-zkevm",
     "scroll",
+    "sonic",
     "unichain",
 )
 

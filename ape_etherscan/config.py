@@ -46,4 +46,5 @@ class EtherscanConfig(PluginConfig):
     polygon: EcosystemConfig = EcosystemConfig()
     polygon_zkevm: EcosystemConfig = EcosystemConfig()
     scroll: EcosystemConfig = EcosystemConfig()
+    sonic: EcosystemConfig = EcosystemConfig()
     unichain: EcosystemConfig = EcosystemConfig()
