@@ -1,9 +1,9 @@
 import os
 from typing import TYPE_CHECKING, Any, Union
 
-from ape.exceptions import ApeException
 from requests import Response
 
+from ape.exceptions import ApeException
 from ape_etherscan.utils import ETHERSCAN_API_KEY_NAME
 
 if TYPE_CHECKING:

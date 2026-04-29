@@ -1,3 +1,4 @@
+import _io  # type: ignore
 import json
 import os
 import shutil
@@ -10,12 +11,11 @@ from tempfile import mkdtemp
 from typing import IO, TYPE_CHECKING, Any, Optional, Union
 from unittest.mock import MagicMock
 
-import _io  # type: ignore
-import ape
 import pytest
 from ape_solidity._utils import OUTPUT_SELECTION
 from requests import Response
 
+import ape
 from ape_etherscan.client import _APIClient
 from ape_etherscan.types import EtherscanResponse
 from ape_etherscan.verify import LicenseType
@@ -56,7 +56,10 @@ def standard_input_json(library):
                     "": ["ast"],
                     "*": OUTPUT_SELECTION,
                 },
-                "tests/contracts/subcontracts/foo.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
+                "tests/contracts/subcontracts/foo.sol": {
+                    "": ["ast"],
+                    "*": OUTPUT_SELECTION,
+                },
             },
             "remappings": [
                 "@bar=tests/contracts/.cache/bar/local",
@@ -467,7 +470,10 @@ def constructor_arguments():
 
 @pytest.fixture(scope="session")
 def verification_params_with_ctor_args(
-    address_to_verify_with_ctor_args, library, standard_input_json, constructor_arguments
+    address_to_verify_with_ctor_args,
+    library,
+    standard_input_json,
+    constructor_arguments,
 ):
     json_data = standard_input_json.copy()
     json_data["libraryaddress1"] = library.address
@@ -544,8 +550,7 @@ def address_to_verify_with_ctor_args(contract_to_verify_with_ctor_args):
 @pytest.fixture(scope="session")
 def expected_verification_log(address_to_verify):
     return (
-        "Contract verification successful!\n"
-        f"https://etherscan.io/address/{address_to_verify}#code"
+        f"Contract verification successful!\nhttps://etherscan.io/address/{address_to_verify}#code"
     )
 
 

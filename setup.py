@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 from setuptools import find_packages, setup
 
 extras_require = {
@@ -22,17 +21,11 @@ extras_require = {
         "pytest-mock",  # Test mocker
     ],
     "lint": [
-        "black>=24.10.0,<25",  # auto-formatter and linter
+        "ruff>=0.12.0",  # Unified linter and formatter
         "mypy>=1.13.0,<2",  # Static type analyzer
         "types-requests>=2.28.7",  # Needed due to mypy typeshed
         "types-setuptools",  # Needed due to mypy typeshed
         "types-PyYAML",  # Needed due to mypy typeshed
-        "flake8>=7.1.1,<8",  # Style linter
-        "flake8-breakpoint>=1.1.0,<2",  # Detect breakpoints left in code
-        "flake8-print>=5.0.0,<6",  # Detect print statements left in code
-        "flake8-pydantic",  # For detecting issues with Pydantic models
-        "flake8-type-checking",  # Detect imports to move in/out of type-checking blocks
-        "isort>=5.13.2,<6",  # Import sorting linter
         "mdformat>=0.7.19",  # Auto-formatter for markdown
         "mdformat-gfm>=0.3.5",  # Needed for formatting GitHub-flavored markdown
         "mdformat-frontmatter>=0.4.1",  # Needed for frontmatters-style headers in issue templates

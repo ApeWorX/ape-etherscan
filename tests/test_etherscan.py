@@ -1,8 +1,8 @@
 from collections.abc import Callable
 
 import pytest
-from ape.api.query import AccountTransactionQuery
 
+from ape.api.query import AccountTransactionQuery
 from ape_etherscan.client import get_supported_chains
 from ape_etherscan.exceptions import (
     EtherscanResponseError,

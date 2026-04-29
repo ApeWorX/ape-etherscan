@@ -32,7 +32,15 @@ def test_config_uri(account, mock_provider, project):
     expected_api_uri = "https://api.monke.chain/api"
     custom_network_name = "monkechain"
     networks_conf = (
-        {"custom": [{"name": custom_network_name, "chain_id": 31337, "ecosystem": "ethereum"}]},
+        {
+            "custom": [
+                {
+                    "name": custom_network_name,
+                    "chain_id": 31337,
+                    "ecosystem": "ethereum",
+                }
+            ]
+        },
     )
 
     explorer_confg = {

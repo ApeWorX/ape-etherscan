@@ -16,6 +16,7 @@ The following is a subset of the supported blockchain explorers:
 | Fraxtal             | [Fraxscan](https://fraxscan.com)                        |
 | Gnosis              | [Gnosisscan](https://gnosisscan.io)                     |
 | Kroma               | [Kromascan](https://kromascan.com)                      |
+| Monad               | [Monadscan](https://monadscan.com)                      |
 | Moonbeam            | [Moonscan](https://moonscan.io)                         |
 | Optimism            | [Optimistic Etherscan](https://optimistic.etherscan.io) |
 | Polygon             | [Polygonscan](https://polygonscan.com)                  |

@@ -1,14 +1,18 @@
 import pytest
+
 from ape.exceptions import ProjectError
 from ape.utils import create_tempdir
-
 from ape_etherscan.dependency import EtherscanDependency
 
 
 @pytest.mark.parametrize(
     "verification_type,contract_address,expected_name",
     [
-        ("flattened", "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", "BoredApeYachtClub"),
+        (
+            "flattened",
+            "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+            "BoredApeYachtClub",
+        ),
         ("json", "0x000075Dc60EdE898f11b0d5C6cA31D7A6D050eeD", "LOVEYOU"),
     ],
 )

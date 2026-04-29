@@ -3,16 +3,16 @@ import os
 import random
 import time
 from collections.abc import Iterator
-from functools import lru_cache
+from functools import cache
 from io import StringIO
 from typing import TYPE_CHECKING, Optional
 
 import requests
-from ape.logging import logger
-from ape.utils import USER_AGENT, ManagerAccessMixin
 from requests import Session
 from yarl import URL
 
+from ape.logging import logger
+from ape.utils import USER_AGENT, ManagerAccessMixin
 from ape_etherscan.exceptions import (
     ContractNotVerifiedError,
     IncompatibleCompilerSettingsError,
@@ -29,7 +29,6 @@ from ape_etherscan.utils import ETHERSCAN_API_KEY_NAME
 
 if TYPE_CHECKING:
     from ape.api import PluginConfig
-
     from ape_etherscan.config import EtherscanConfig
 
 
@@ -41,7 +40,7 @@ def get_network_config(
     return None
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_supported_chains():
     response = requests.get("https://api.etherscan.io/v2/chainlist")
     response.raise_for_status()
@@ -50,7 +49,10 @@ def get_supported_chains():
 
 
 def get_etherscan_uri(
-    etherscan_config: "EtherscanConfig", ecosystem_name: str, network_name: str, chain_id: str
+    etherscan_config: "EtherscanConfig",
+    ecosystem_name: str,
+    network_name: str,
+    chain_id: str,
 ) -> str:
     # Look for explicitly configured Etherscan config
     network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
@@ -69,7 +71,10 @@ def get_etherscan_uri(
 
 
 def get_etherscan_api_uri(
-    etherscan_config: "EtherscanConfig", ecosystem_name: str, network_name: str, chain_id: int
+    etherscan_config: "EtherscanConfig",
+    ecosystem_name: str,
+    network_name: str,
+    chain_id: int,
 ) -> str:
     # Look for explicitly configured Etherscan config
     network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)

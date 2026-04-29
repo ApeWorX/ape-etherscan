@@ -2,10 +2,13 @@ from collections.abc import Iterator
 from typing import Optional
 
 from ape.api import PluginConfig, QueryAPI, QueryType, ReceiptAPI
-from ape.api.query import AccountTransactionQuery, ContractCreation, ContractCreationQuery
+from ape.api.query import (
+    AccountTransactionQuery,
+    ContractCreation,
+    ContractCreationQuery,
+)
 from ape.exceptions import QueryEngineError
 from ape.utils import singledispatchmethod
-
 from ape_etherscan.client import ClientFactory, get_etherscan_api_uri, get_etherscan_uri
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.utils import NETWORKS

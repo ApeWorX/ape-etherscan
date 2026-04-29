@@ -1,4 +1,5 @@
 import pytest
+
 from ape.api.query import ContractCreationQuery
 from ape.utils import ManagerAccessMixin
 

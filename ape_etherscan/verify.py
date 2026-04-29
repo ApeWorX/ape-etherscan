@@ -4,10 +4,10 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
-from ape.logging import LogLevel, logger
-from ape.utils import ManagerAccessMixin, cached_property
 from ethpm_types import Compiler, ContractType
 
+from ape.logging import LogLevel, logger
+from ape.utils import ManagerAccessMixin, cached_property
 from ape_etherscan.exceptions import (
     ContractVerificationError,
     EtherscanResponseError,
@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from ape.contracts import ContractInstance
     from ape.managers.project import ProjectManager
     from ape.types import AddressType
-
     from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 
 DEFAULT_OPTIMIZATION_RUNS = 200
@@ -59,6 +58,7 @@ ECOSYSTEMS_VERIFY_USING_JSON = (
     "fraxtal",
     "gnosis",
     "kroma",
+    "monad",
     "moonbeam",
     "optimism",
     "polygon",
@@ -335,7 +335,9 @@ class SourceVerifier(ManagerAccessMixin):
         return Compiler(name=self.compiler_name, contractType=[self.contract_name], version="")
 
     def attempt_verification(
-        self, compiler: Optional[Compiler] = None, approach: Optional[VerificationApproach] = None
+        self,
+        compiler: Optional[Compiler] = None,
+        approach: Optional[VerificationApproach] = None,
     ):
         """
         Attempt to verify the source code.
@@ -439,7 +441,10 @@ class SourceVerifier(ManagerAccessMixin):
         return {str(v): s for v, s in all_settings.items() if str(v) == version}[version]
 
     def _get_standard_input_json(
-        self, source_id: str, approach: Optional[VerificationApproach] = None, **settings
+        self,
+        source_id: str,
+        approach: Optional[VerificationApproach] = None,
+        **settings,
     ) -> dict:
         source_path = self.local_project.sources.lookup(source_id)
         compiler = self.compiler_manager.registered_compilers[source_path.suffix]

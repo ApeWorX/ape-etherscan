@@ -1,6 +1,6 @@
 import pytest
-from ape.utils import ManagerAccessMixin
 
+from ape.utils import ManagerAccessMixin
 from ape_etherscan.client import AccountClient
 from ape_etherscan.types import EtherscanInstance
 

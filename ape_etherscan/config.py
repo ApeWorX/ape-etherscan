@@ -1,8 +1,9 @@
 from typing import Optional
 
-from ape.api.config import PluginConfig
 from pydantic import AnyHttpUrl, model_validator
 from pydantic_settings import SettingsConfigDict
+
+from ape.api.config import PluginConfig
 
 
 class NetworkConfig(PluginConfig):
@@ -41,6 +42,7 @@ class EtherscanConfig(PluginConfig):
     fraxtal: EcosystemConfig = EcosystemConfig()
     gnosis: EcosystemConfig = EcosystemConfig()
     kroma: EcosystemConfig = EcosystemConfig()
+    monad: EcosystemConfig = EcosystemConfig()
     moonbeam: EcosystemConfig = EcosystemConfig()
     optimism: EcosystemConfig = EcosystemConfig()
     polygon: EcosystemConfig = EcosystemConfig()
