@@ -130,8 +130,8 @@ class _APIClient(ManagerAccessMixin):
 
     def _get(
         self,
-        params: Optional[dict] = None,
-        headers: Optional[dict[str, str]] = None,
+        params: dict | None = None,
+        headers: dict[str, str] | None = None,
         raise_on_exceptions: bool = True,
     ) -> EtherscanResponse:
         params = self.__authorize(params)
@@ -153,7 +153,7 @@ class _APIClient(ManagerAccessMixin):
         )
 
     def _post(
-        self, json_dict: Optional[dict] = None, headers: Optional[dict[str, str]] = None
+        self, json_dict: dict | None = None, headers: dict[str, str] | None = None
     ) -> EtherscanResponse:
         data = self.__authorize(json_dict)
         return self._request("POST", data=data, headers=headers)
@@ -162,9 +162,9 @@ class _APIClient(ManagerAccessMixin):
         self,
         method: str,
         raise_on_exceptions: bool = True,
-        headers: Optional[dict] = None,
-        params: Optional[dict] = None,
-        data: Optional[dict] = None,
+        headers: dict | None = None,
+        params: dict | None = None,
+        data: dict | None = None,
     ) -> EtherscanResponse:
         headers = headers or self.DEFAULT_HEADERS
         if not self._retries:
@@ -201,7 +201,7 @@ class _APIClient(ManagerAccessMixin):
             # Not possible (I don't think); just for type-checking.
             raise ValueError("No response.")
 
-    def __authorize(self, params_or_data: Optional[dict] = None) -> Optional[dict]:
+    def __authorize(self, params_or_data: dict | None = None) -> dict | None:
         api_key = os.environ.get(ETHERSCAN_API_KEY_NAME)
         if api_key and (not params_or_data or "apikey" not in params_or_data):
             params_or_data = params_or_data or {}
@@ -243,13 +243,13 @@ class ContractClient(_APIClient):
         self,
         standard_json_output: dict,
         compiler_version: str,
-        contract_name: Optional[str] = None,
+        contract_name: str | None = None,
         optimization_used: bool = False,
-        optimization_runs: Optional[int] = 200,
-        constructor_arguments: Optional[str] = None,
-        evm_version: Optional[str] = None,
-        license_type: Optional[int] = None,
-        libraries: Optional[dict[str, str]] = None,
+        optimization_runs: int | None = 200,
+        constructor_arguments: str | None = None,
+        evm_version: str | None = None,
+        license_type: int | None = None,
+        libraries: dict[str, str] | None = None,
         via_ir: bool = False,
     ) -> str:
         libraries = libraries or {}
@@ -318,8 +318,8 @@ class AccountClient(_APIClient):
 
     def get_all_normal_transactions(
         self,
-        start_block: Optional[int] = None,
-        end_block: Optional[int] = None,
+        start_block: int | None = None,
+        end_block: int | None = None,
         offset: int = 100,
         sort: str = "asc",
     ) -> Iterator[dict]:
@@ -342,8 +342,8 @@ class AccountClient(_APIClient):
     def _get_page_of_normal_transactions(
         self,
         page: int,
-        start_block: Optional[int] = None,
-        end_block: Optional[int] = None,
+        start_block: int | None = None,
+        end_block: int | None = None,
         offset: int = 100,
         sort: str = "asc",
     ) -> list[dict]:

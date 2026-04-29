@@ -226,10 +226,10 @@ class MockEtherscanBackend:
         module: str,
         action: str,
         expected_params: dict,
-        return_value: Optional[Any] = None,
-        side_effect: Optional[Callable] = None,
+        return_value: Any | None = None,
+        side_effect: Callable | None = None,
     ):
-        if isinstance(return_value, (str, dict)):
+        if isinstance(return_value, str | dict):
             return_value = self.get_mock_response(return_value)
         elif isinstance(return_value, list):
             return_value = self.get_mock_response({"result": return_value})
@@ -398,9 +398,7 @@ class MockEtherscanBackend:
         self.set_network(1)
         return response
 
-    def get_mock_response(
-        self, response_data: Optional[Union[IO, dict, str, MagicMock]] = None, **kwargs
-    ):
+    def get_mock_response(self, response_data: IO | dict | str | MagicMock | None = None, **kwargs):
         if isinstance(response_data, str):
             return self.get_mock_response({"result": response_data, **kwargs})
 
@@ -411,13 +409,13 @@ class MockEtherscanBackend:
             # Mock wasn't set.
             response_data = {**kwargs}
 
-        assert isinstance(response_data, (list, dict))
+        assert isinstance(response_data, list | dict)
         return self._get_mock_response(response_data=response_data, **kwargs)
 
     def _get_mock_response(
         self,
-        response_data: Optional[dict] = None,
-        response_text: Optional[str] = None,
+        response_data: dict | None = None,
+        response_text: str | None = None,
         *args,
         **kwargs,
     ):

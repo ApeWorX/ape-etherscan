@@ -90,7 +90,7 @@ class Etherscan(ExplorerAPI):
             )
         )
 
-    def get_manifest(self, address: AddressType) -> Optional[PackageManifest]:
+    def get_manifest(self, address: AddressType) -> PackageManifest | None:
         """
         Get a package manifest.
 
@@ -150,7 +150,7 @@ class Etherscan(ExplorerAPI):
         client = self._client_factory.get_contract_client(address)
         return client.get_source_code()
 
-    def get_contract_type(self, address: AddressType) -> Optional[ContractType]:
+    def get_contract_type(self, address: AddressType) -> ContractType | None:
         try:
             source_code = self._get_source_code(address)
         except ContractNotVerifiedError:

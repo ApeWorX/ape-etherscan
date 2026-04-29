@@ -336,8 +336,8 @@ class SourceVerifier(ManagerAccessMixin):
 
     def attempt_verification(
         self,
-        compiler: Optional[Compiler] = None,
-        approach: Optional[VerificationApproach] = None,
+        compiler: Compiler | None = None,
+        approach: VerificationApproach | None = None,
     ):
         """
         Attempt to verify the source code.
@@ -443,7 +443,7 @@ class SourceVerifier(ManagerAccessMixin):
     def _get_standard_input_json(
         self,
         source_id: str,
-        approach: Optional[VerificationApproach] = None,
+        approach: VerificationApproach | None = None,
         **settings,
     ) -> dict:
         source_path = self.local_project.sources.lookup(source_id)

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import AnyHttpUrl, model_validator
 from pydantic_settings import SettingsConfigDict
 
@@ -7,8 +5,8 @@ from ape.api.config import PluginConfig
 
 
 class NetworkConfig(PluginConfig):
-    uri: Optional[AnyHttpUrl] = None
-    api_uri: Optional[AnyHttpUrl] = None
+    uri: AnyHttpUrl | None = None
+    api_uri: AnyHttpUrl | None = None
 
 
 class EcosystemConfig(PluginConfig):
