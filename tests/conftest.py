@@ -71,23 +71,32 @@ def standard_input_json(library):
 
 
 @pytest.fixture(autouse=True)
-def connection(networks, explorer):
-    with networks.ethereum.mainnet.use_provider("infura") as provider:
-        # TODO: Figure out why this is still needed sometimes,
-        #   even after https://github.com/ApeWorX/ape/pull/2022
-        if not provider.is_connected:
-            provider.connect()
-
-        yield provider
+def connection(mocker, networks):
+    """
+    Stub the active provider so it appears as Ethereum mainnet without
+    opening a real RPC connection. The ``network`` attribute is the real
+    Ethereum mainnet object so things like ``decode_receipt`` and
+    ``decode_address`` work normally.
+    """
+    provider = mocker.MagicMock()
+    provider.network = networks.ethereum.mainnet
+    provider.chain_id = 1
+    provider.is_connected = True
+    saved = networks.active_provider
+    networks.active_provider = provider
+    yield provider
+    networks.active_provider = saved
 
 
 @pytest.fixture
 def mock_provider(networks, mocker):
     @contextmanager
-    def func(ecosystem_name="ethereum", network_name="mock"):
+    def func(ecosystem_name="ethereum", network_name="mock", chain_id=31337):
         mock_provider = mocker.MagicMock()
         mock_provider.network = mocker.MagicMock()
         mock_provider.network.name = network_name
+        mock_provider.network.chain_id = chain_id
+        mock_provider.chain_id = chain_id
         mock_provider.network.ecosystem = mocker.MagicMock()
         mock_provider.network.ecosystem.name = ecosystem_name
         networks.active_provider = mock_provider
