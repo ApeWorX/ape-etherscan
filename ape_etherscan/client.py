@@ -55,7 +55,7 @@ def get_etherscan_uri(
     # Look for explicitly configured Etherscan config
     network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
     if network_conf and hasattr(network_conf, "uri"):
-        return str(network_conf.uri).rstrip("/")  # NOTE: Displays wrong URI otherwise
+        return str(network_conf.uri).rstrip("/")
 
     chains = get_supported_chains()
     for chain in chains:
@@ -63,7 +63,7 @@ def get_etherscan_uri(
             continue
 
         # Found.
-        return chain["blockexplorer"].rstrip("/")  # NOTE: Displays wrong URI otherwise
+        return chain["blockexplorer"].rstrip("/")
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
@@ -74,7 +74,7 @@ def get_etherscan_api_uri(
     # Look for explicitly configured Etherscan config
     network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
     if network_conf and hasattr(network_conf, "api_uri"):
-        return str(network_conf.api_uri).rstrip("/")  # NOTE: Displays wrong URI otherwis
+        return str(network_conf.api_uri).rstrip("/")
 
     chains = get_supported_chains()
     for chain in chains:
@@ -82,7 +82,7 @@ def get_etherscan_api_uri(
             continue
 
         # Found.
-        return chain["apiurl"].rstrip("/")  # NOTE: Displays wrong URI otherwise
+        return chain["apiurl"].rstrip("/")
 
     raise UnsupportedEcosystemError(ecosystem_name)
 
