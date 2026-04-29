@@ -77,7 +77,7 @@ setup(
         "requests",  # Use same version as eth-ape
         "yarl",  # Use same version as eth-ape
     ],
-    python_requires=">=3.9,<4",
+    python_requires=">=3.10,<4",
     extras_require=extras_require,
     py_modules=["ape_etherscan"],
     license="Apache-2.0",
@@ -93,7 +93,6 @@ setup(
         "Operating System :: MacOS",
         "Operating System :: POSIX",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
