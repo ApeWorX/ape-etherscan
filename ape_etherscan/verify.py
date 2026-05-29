@@ -290,11 +290,19 @@ class SourceVerifier(ManagerAccessMixin):
                 f"Failed to find to deploy receipt for '{self.address}'"
             )
 
+        deployment_code = deploy_receipt["input"]
+
+        if code := self.contract_type.deployment_bytecode:
+            creation_code = code.bytecode or ""
+            ctor_args = extract_constructor_arguments_from_creation(deployment_code, creation_code)
+            if ctor_args is not None:
+                return ctor_args
+
+        # Fall back to the runtime-bytecode suffix approach (handles e.g. contracts
+        # with unlinked library placeholders in their creation bytecode).
         if code := self.contract_type.runtime_bytecode:
             runtime_code = code.bytecode or ""
-            deployment_code = deploy_receipt["input"]
-            ctor_args = extract_constructor_arguments(deployment_code, runtime_code)
-            return ctor_args
+            return extract_constructor_arguments(deployment_code, runtime_code)
         else:
             raise ContractVerificationError("Failed to find runtime bytecode.")
 
@@ -374,10 +382,18 @@ class SourceVerifier(ManagerAccessMixin):
         if not valid:
             settings = self._get_new_settings(version)
 
-        optimizer = settings.get("optimizer", {})
-        optimized = optimizer.get("enabled", False)
-        runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
-        via_ir = settings.get("viaIR", settings.get("via_ir", False))
+        is_vyper = self.compiler_name == "vyper"
+        if is_vyper:
+            # Vyper expresses optimization as ``optimize: "gas"|"codesize"|"none"|bool``.
+            optimize = settings.get("optimize", True)
+            optimized = optimize not in (False, None, "none")
+            runs = DEFAULT_OPTIMIZATION_RUNS
+            via_ir = False
+        else:
+            optimizer = settings.get("optimizer", {})
+            optimized = optimizer.get("enabled", False)
+            runs = optimizer.get("runs", DEFAULT_OPTIMIZATION_RUNS)
+            via_ir = settings.get("viaIR", settings.get("via_ir", False))
         source_id = self.contract_type.source_id or ""
         standard_input_json = self._get_standard_input_json(
             source_id, approach=approach, **settings
@@ -395,7 +411,7 @@ class SourceVerifier(ManagerAccessMixin):
             logger.debug(f"{standard_json}\n")
 
         # NOTE: Etherscan does not allow directory prefixes on the source ID.
-        if self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
+        if is_vyper or self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON:
             contract_name = f"{source_id}:{self.contract_type.name or ''}"
         else:
             # When we have a flattened contract, we don't need to specify the file name
@@ -413,6 +429,7 @@ class SourceVerifier(ManagerAccessMixin):
                 evm_version=evm_version,
                 license_type=license_code_value,
                 via_ir=via_ir,
+                language=self.compiler_name,
             )
         except EtherscanResponseError as err:
             if "source code already verified" in str(err):
@@ -436,7 +453,31 @@ class SourceVerifier(ManagerAccessMixin):
         )
 
         # Hack to allow any Version object work.
-        return {str(v): s for v, s in all_settings.items() if str(v) == version}[version]
+        version_settings = {str(v): s for v, s in all_settings.items() if str(v) == version}[
+            version
+        ]
+
+        if self.compiler_name == "vyper":
+            version_settings = self._unwrap_vyper_settings(version_settings)
+
+        return version_settings
+
+    def _unwrap_vyper_settings(self, version_settings: dict) -> dict:
+        if "outputSelection" in version_settings:
+            # Already a flat settings object (e.g. taken from the manifest).
+            return version_settings
+
+        groups = [group for group in version_settings.values() if isinstance(group, dict)]
+        if not groups:
+            return version_settings
+
+        # Prefer the settings group that actually compiles this contract's source.
+        source_id = self.contract_type.source_id or ""
+        for group in groups:
+            if source_id in (group.get("outputSelection") or {}):
+                return group
+
+        return groups[0]
 
     def _get_standard_input_json(
         self, source_id: str, approach: Optional[VerificationApproach] = None, **settings
@@ -465,9 +506,18 @@ class SourceVerifier(ManagerAccessMixin):
             # libraries are handled below.
             settings.pop("libraries")
 
-        if approach is VerificationApproach.STANDARD_JSON or (
-            approach is None
-            and self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON
+        is_vyper = compiler.name == "vyper"
+        if is_vyper:
+            settings.pop("search_paths", None)
+
+        # Etherscan only supports the standard-JSON format for Vyper.
+        if (
+            is_vyper
+            or approach is VerificationApproach.STANDARD_JSON
+            or (
+                approach is None
+                and self.provider.network.ecosystem.name in ECOSYSTEMS_VERIFY_USING_JSON
+            )
         ):
             # Use standard input json format
             data = {
@@ -543,6 +593,22 @@ class SourceVerifier(ManagerAccessMixin):
 
         else:
             raise ContractVerificationError("Timed out waiting for contract verification.")
+
+
+def _strip_0x(code: str) -> str:
+    return code[2:] if code.startswith("0x") else code
+
+
+def extract_constructor_arguments_from_creation(
+    creation_input: str, creation_bytecode: str
+) -> Optional[str]:
+    creation_input = _strip_0x(creation_input)
+    creation_bytecode = _strip_0x(creation_bytecode)
+    if not creation_bytecode or not creation_input.startswith(creation_bytecode):
+        return None
+
+    offset = len(creation_bytecode)
+    return creation_input[offset:]
 
 
 def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: str) -> str:

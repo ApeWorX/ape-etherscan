@@ -252,6 +252,24 @@ def test_publish_contract_flatten_via_ir(mocker, project, address_to_verify):
         )
 
 
+def test_unwrap_vyper_settings(mocker, project, address_to_verify):
+    client = mocker.MagicMock()
+    verifier = SourceVerifier(address_to_verify, client, project=project)
+    mocker.patch.object(
+        type(verifier),
+        "contract_type",
+        new_callable=mocker.PropertyMock,
+        return_value=mocker.MagicMock(source_id="contracts/AZPay.vy"),
+    )
+
+    group = {"optimize": "gas", "outputSelection": {"contracts/AZPay.vy": ["*"]}}
+    nested = {"gas%none": group}
+    assert verifier._unwrap_vyper_settings(nested) == group
+
+    # An already-flat settings object passes through unchanged.
+    assert verifier._unwrap_vyper_settings(group) == group
+
+
 def _acct_tx_overrides(contract, args=None):
     suffix = args or ""
     if suffix.startswith("0x"):
