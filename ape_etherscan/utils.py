@@ -13,6 +13,7 @@ API_KEY_ENV_KEY_MAP = {
     "fraxtal": "FRAXSCAN_API_KEY",
     "gnosis": "GNOSISSCAN_API_KEY",
     "kroma": "KROMASCAN_API_KEY",
+    "monad": "MONADSCAN_API_KEY",
     "moonbeam": "MOONSCAN_API_KEY",
     "optimism": "OPTIMISTIC_ETHERSCAN_API_KEY",
     "polygon": "POLYGONSCAN_API_KEY",
@@ -72,6 +73,10 @@ NETWORKS = {
     "kroma": [
         "mainnet",
         "sepolia",
+    ],
+    "monad": [
+        "mainnet",
+        "testnet",
     ],
     "moonbeam": [
         "mainnet",

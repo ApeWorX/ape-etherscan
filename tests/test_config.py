@@ -28,18 +28,13 @@ def test_config_uri(account, mock_provider, project):
     """
     Make sure URI parameter is used when configured
     """
-    expected_uri = "https://monke.chain/"
+    expected_uri = "https://monke.chain"
     expected_api_uri = "https://api.monke.chain/api"
     custom_network_name = "monkechain"
-    networks_conf = (
-        {"custom": [{"name": custom_network_name, "chain_id": 31337, "ecosystem": "ethereum"}]},
-    )
-
-    explorer_confg = {
+    explorer_conf = {
         "ethereum": {custom_network_name: {"uri": expected_uri, "api_uri": expected_api_uri}}
     }
-
-    with project.temp_config(networks=networks_conf, etherscan=explorer_confg):
+    with project.temp_config(etherscan=explorer_conf):
         with mock_provider("ethereum", "monkechain"):
             assert account.query_manager.engines["etherscan"].etherscan_uri == expected_uri
             assert account.query_manager.engines["etherscan"].etherscan_api_uri == expected_api_uri

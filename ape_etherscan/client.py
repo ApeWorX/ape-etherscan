@@ -3,16 +3,16 @@ import os
 import random
 import time
 from collections.abc import Iterator
-from functools import lru_cache
+from functools import cache
 from io import StringIO
 from typing import TYPE_CHECKING, Optional
 
 import requests
-from ape.logging import logger
-from ape.utils import USER_AGENT, ManagerAccessMixin
 from requests import Session
 from yarl import URL
 
+from ape.logging import logger
+from ape.utils import USER_AGENT, ManagerAccessMixin
 from ape_etherscan.exceptions import (
     ContractNotVerifiedError,
     IncompatibleCompilerSettingsError,
@@ -29,7 +29,6 @@ from ape_etherscan.utils import ETHERSCAN_API_KEY_NAME
 
 if TYPE_CHECKING:
     from ape.api import PluginConfig
-
     from ape_etherscan.config import EtherscanConfig
 
 
@@ -41,7 +40,7 @@ def get_network_config(
     return None
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_supported_chains():
     response = requests.get("https://api.etherscan.io/v2/chainlist")
     response.raise_for_status()
@@ -50,7 +49,10 @@ def get_supported_chains():
 
 
 def get_etherscan_uri(
-    etherscan_config: "EtherscanConfig", ecosystem_name: str, network_name: str, chain_id: str
+    etherscan_config: "EtherscanConfig",
+    ecosystem_name: str,
+    network_name: str,
+    chain_id: str,
 ) -> str:
     # Look for explicitly configured Etherscan config
     network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
@@ -69,7 +71,10 @@ def get_etherscan_uri(
 
 
 def get_etherscan_api_uri(
-    etherscan_config: "EtherscanConfig", ecosystem_name: str, network_name: str, chain_id: int
+    etherscan_config: "EtherscanConfig",
+    ecosystem_name: str,
+    network_name: str,
+    chain_id: int,
 ) -> str:
     # Look for explicitly configured Etherscan config
     network_conf = get_network_config(etherscan_config, ecosystem_name, network_name)
@@ -125,8 +130,8 @@ class _APIClient(ManagerAccessMixin):
 
     def _get(
         self,
-        params: Optional[dict] = None,
-        headers: Optional[dict[str, str]] = None,
+        params: dict | None = None,
+        headers: dict[str, str] | None = None,
         raise_on_exceptions: bool = True,
     ) -> EtherscanResponse:
         params = self.__authorize(params)
@@ -148,7 +153,7 @@ class _APIClient(ManagerAccessMixin):
         )
 
     def _post(
-        self, json_dict: Optional[dict] = None, headers: Optional[dict[str, str]] = None
+        self, json_dict: dict | None = None, headers: dict[str, str] | None = None
     ) -> EtherscanResponse:
         data = self.__authorize(json_dict)
         return self._request("POST", data=data, headers=headers)
@@ -157,9 +162,9 @@ class _APIClient(ManagerAccessMixin):
         self,
         method: str,
         raise_on_exceptions: bool = True,
-        headers: Optional[dict] = None,
-        params: Optional[dict] = None,
-        data: Optional[dict] = None,
+        headers: dict | None = None,
+        params: dict | None = None,
+        data: dict | None = None,
     ) -> EtherscanResponse:
         headers = headers or self.DEFAULT_HEADERS
         if not self._retries:
@@ -196,7 +201,7 @@ class _APIClient(ManagerAccessMixin):
             # Not possible (I don't think); just for type-checking.
             raise ValueError("No response.")
 
-    def __authorize(self, params_or_data: Optional[dict] = None) -> Optional[dict]:
+    def __authorize(self, params_or_data: dict | None = None) -> dict | None:
         api_key = os.environ.get(ETHERSCAN_API_KEY_NAME)
         if api_key and (not params_or_data or "apikey" not in params_or_data):
             params_or_data = params_or_data or {}
@@ -238,15 +243,15 @@ class ContractClient(_APIClient):
         self,
         standard_json_output: dict,
         compiler_version: str,
-        contract_name: Optional[str] = None,
+        contract_name: str | None = None,
         optimization_used: bool = False,
-        optimization_runs: Optional[int] = 200,
-        constructor_arguments: Optional[str] = None,
-        evm_version: Optional[str] = None,
-        license_type: Optional[int] = None,
-        libraries: Optional[dict[str, str]] = None,
+        optimization_runs: int | None = 200,
+        constructor_arguments: str | None = None,
+        evm_version: str | None = None,
+        license_type: int | None = None,
+        libraries: dict[str, str] | None = None,
         via_ir: bool = False,
-        language: Optional[str] = None,
+        language: str | None = None,
     ) -> str:
         libraries = libraries or {}
         if len(libraries) > 10:
@@ -326,8 +331,8 @@ class AccountClient(_APIClient):
 
     def get_all_normal_transactions(
         self,
-        start_block: Optional[int] = None,
-        end_block: Optional[int] = None,
+        start_block: int | None = None,
+        end_block: int | None = None,
         offset: int = 100,
         sort: str = "asc",
     ) -> Iterator[dict]:
@@ -350,8 +355,8 @@ class AccountClient(_APIClient):
     def _get_page_of_normal_transactions(
         self,
         page: int,
-        start_block: Optional[int] = None,
-        end_block: Optional[int] = None,
+        start_block: int | None = None,
+        end_block: int | None = None,
         offset: int = 100,
         sort: str = "asc",
     ) -> list[dict]:

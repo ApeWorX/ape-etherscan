@@ -1,13 +1,12 @@
-from typing import Optional
-
-from ape.api.config import PluginConfig
 from pydantic import AnyHttpUrl, model_validator
 from pydantic_settings import SettingsConfigDict
 
+from ape.api.config import PluginConfig
+
 
 class NetworkConfig(PluginConfig):
-    uri: Optional[AnyHttpUrl] = None
-    api_uri: Optional[AnyHttpUrl] = None
+    uri: AnyHttpUrl | None = None
+    api_uri: AnyHttpUrl | None = None
 
 
 class EcosystemConfig(PluginConfig):
@@ -41,6 +40,7 @@ class EtherscanConfig(PluginConfig):
     fraxtal: EcosystemConfig = EcosystemConfig()
     gnosis: EcosystemConfig = EcosystemConfig()
     kroma: EcosystemConfig = EcosystemConfig()
+    monad: EcosystemConfig = EcosystemConfig()
     moonbeam: EcosystemConfig = EcosystemConfig()
     optimism: EcosystemConfig = EcosystemConfig()
     polygon: EcosystemConfig = EcosystemConfig()

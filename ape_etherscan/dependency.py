@@ -1,16 +1,17 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ape.api.projects import DependencyAPI
-from ape.exceptions import ProjectError
 from hexbytes import HexBytes
 from pydantic import field_validator
 
+from ape.api.projects import DependencyAPI
+from ape.exceptions import ProjectError
 from ape_etherscan.explorer import Etherscan
 
 if TYPE_CHECKING:
-    from ape.types import AddressType
     from ethpm_types import PackageManifest
+
+    from ape.types import AddressType
 
 
 class EtherscanDependency(DependencyAPI):

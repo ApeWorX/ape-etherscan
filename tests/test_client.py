@@ -1,8 +1,8 @@
 import json
 
 import pytest
-from ape.utils import ManagerAccessMixin
 
+from ape.utils import ManagerAccessMixin
 from ape_etherscan.client import AccountClient, ContractClient
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.verify import extract_constructor_arguments_from_creation

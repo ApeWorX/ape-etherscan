@@ -1,4 +1,5 @@
 import pytest
+
 from ape.api.query import ContractCreationQuery
 from ape.utils import ManagerAccessMixin
 
@@ -8,7 +9,7 @@ def query_engine():
     return ManagerAccessMixin.query_manager.engines["etherscan"]
 
 
-def test_contract_creation_metadata_query(query_engine, mock_backend):
+def test_contract_creation_metadata_query(query_engine, mock_backend, mocker):
     address = "0x388C818CA8B9251b393131C08a736A67ccB19297"
     creator = "0xDB65702A9b26f8a643a31a4c84b9392589e03D7c"
     params = {"action": "getcontractcreation", "contractaddresses": [address]}
@@ -24,6 +25,14 @@ def test_contract_creation_metadata_query(query_engine, mock_backend):
         params,
         return_value=[creation_data],
     )
+
+    # The old-API path (no blockNumber in the response) falls back to looking
+    # up the deployment receipt via the chain manager. Stub that out so we
+    # don't need a live RPC connection.
+    fake_receipt = mocker.MagicMock()
+    fake_receipt.block_number = 14834805
+    fake_receipt.sender = creator
+    mocker.patch.object(query_engine.chain_manager, "get_receipt", return_value=fake_receipt)
 
     # Perform query.
     query = ContractCreationQuery(contract=address, columns=["*"])

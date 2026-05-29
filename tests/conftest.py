@@ -1,3 +1,4 @@
+import _io  # type: ignore
 import json
 import os
 import shutil
@@ -10,12 +11,11 @@ from tempfile import mkdtemp
 from typing import IO, TYPE_CHECKING, Any, Optional, Union
 from unittest.mock import MagicMock
 
-import _io  # type: ignore
-import ape
 import pytest
 from ape_solidity._utils import OUTPUT_SELECTION
 from requests import Response
 
+import ape
 from ape_etherscan.client import _APIClient
 from ape_etherscan.types import EtherscanResponse
 from ape_etherscan.verify import LicenseType
@@ -56,7 +56,10 @@ def standard_input_json(library):
                     "": ["ast"],
                     "*": OUTPUT_SELECTION,
                 },
-                "tests/contracts/subcontracts/foo.sol": {"": ["ast"], "*": OUTPUT_SELECTION},
+                "tests/contracts/subcontracts/foo.sol": {
+                    "": ["ast"],
+                    "*": OUTPUT_SELECTION,
+                },
             },
             "remappings": [
                 "@bar=tests/contracts/.cache/bar/local",
@@ -68,23 +71,32 @@ def standard_input_json(library):
 
 
 @pytest.fixture(autouse=True)
-def connection(networks, explorer):
-    with networks.ethereum.mainnet.use_provider("infura") as provider:
-        # TODO: Figure out why this is still needed sometimes,
-        #   even after https://github.com/ApeWorX/ape/pull/2022
-        if not provider.is_connected:
-            provider.connect()
-
-        yield provider
+def connection(mocker, networks):
+    """
+    Stub the active provider so it appears as Ethereum mainnet without
+    opening a real RPC connection. The ``network`` attribute is the real
+    Ethereum mainnet object so things like ``decode_receipt`` and
+    ``decode_address`` work normally.
+    """
+    provider = mocker.MagicMock()
+    provider.network = networks.ethereum.mainnet
+    provider.chain_id = 1
+    provider.is_connected = True
+    saved = networks.active_provider
+    networks.active_provider = provider
+    yield provider
+    networks.active_provider = saved
 
 
 @pytest.fixture
 def mock_provider(networks, mocker):
     @contextmanager
-    def func(ecosystem_name="ethereum", network_name="mock"):
+    def func(ecosystem_name="ethereum", network_name="mock", chain_id=31337):
         mock_provider = mocker.MagicMock()
         mock_provider.network = mocker.MagicMock()
         mock_provider.network.name = network_name
+        mock_provider.network.chain_id = chain_id
+        mock_provider.chain_id = chain_id
         mock_provider.network.ecosystem = mocker.MagicMock()
         mock_provider.network.ecosystem.name = ecosystem_name
         networks.active_provider = mock_provider
@@ -214,10 +226,10 @@ class MockEtherscanBackend:
         module: str,
         action: str,
         expected_params: dict,
-        return_value: Optional[Any] = None,
-        side_effect: Optional[Callable] = None,
+        return_value: Any | None = None,
+        side_effect: Callable | None = None,
     ):
-        if isinstance(return_value, (str, dict)):
+        if isinstance(return_value, str | dict):
             return_value = self.get_mock_response(return_value)
         elif isinstance(return_value, list):
             return_value = self.get_mock_response({"result": return_value})
@@ -386,9 +398,7 @@ class MockEtherscanBackend:
         self.set_network(1)
         return response
 
-    def get_mock_response(
-        self, response_data: Optional[Union[IO, dict, str, MagicMock]] = None, **kwargs
-    ):
+    def get_mock_response(self, response_data: IO | dict | str | MagicMock | None = None, **kwargs):
         if isinstance(response_data, str):
             return self.get_mock_response({"result": response_data, **kwargs})
 
@@ -399,13 +409,13 @@ class MockEtherscanBackend:
             # Mock wasn't set.
             response_data = {**kwargs}
 
-        assert isinstance(response_data, (list, dict))
+        assert isinstance(response_data, list | dict)
         return self._get_mock_response(response_data=response_data, **kwargs)
 
     def _get_mock_response(
         self,
-        response_data: Optional[dict] = None,
-        response_text: Optional[str] = None,
+        response_data: dict | None = None,
+        response_text: str | None = None,
         *args,
         **kwargs,
     ):
@@ -467,7 +477,10 @@ def constructor_arguments():
 
 @pytest.fixture(scope="session")
 def verification_params_with_ctor_args(
-    address_to_verify_with_ctor_args, library, standard_input_json, constructor_arguments
+    address_to_verify_with_ctor_args,
+    library,
+    standard_input_json,
+    constructor_arguments,
 ):
     json_data = standard_input_json.copy()
     json_data["libraryaddress1"] = library.address
@@ -544,8 +557,7 @@ def address_to_verify_with_ctor_args(contract_to_verify_with_ctor_args):
 @pytest.fixture(scope="session")
 def expected_verification_log(address_to_verify):
     return (
-        "Contract verification successful!\n"
-        f"https://etherscan.io/address/{address_to_verify}#code"
+        f"Contract verification successful!\nhttps://etherscan.io/address/{address_to_verify}#code"
     )
 
 

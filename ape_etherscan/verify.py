@@ -4,10 +4,10 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
-from ape.logging import LogLevel, logger
-from ape.utils import ManagerAccessMixin, cached_property
 from ethpm_types import Compiler, ContractType
 
+from ape.logging import LogLevel, logger
+from ape.utils import ManagerAccessMixin, cached_property
 from ape_etherscan.exceptions import (
     ContractVerificationError,
     EtherscanResponseError,
@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from ape.contracts import ContractInstance
     from ape.managers.project import ProjectManager
     from ape.types import AddressType
-
     from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 
 DEFAULT_OPTIMIZATION_RUNS = 200
@@ -59,6 +58,7 @@ ECOSYSTEMS_VERIFY_USING_JSON = (
     "fraxtal",
     "gnosis",
     "kroma",
+    "monad",
     "moonbeam",
     "optimism",
     "polygon",
@@ -343,7 +343,9 @@ class SourceVerifier(ManagerAccessMixin):
         return Compiler(name=self.compiler_name, contractType=[self.contract_name], version="")
 
     def attempt_verification(
-        self, compiler: Optional[Compiler] = None, approach: Optional[VerificationApproach] = None
+        self,
+        compiler: Compiler | None = None,
+        approach: VerificationApproach | None = None,
     ):
         """
         Attempt to verify the source code.
@@ -480,7 +482,10 @@ class SourceVerifier(ManagerAccessMixin):
         return groups[0]
 
     def _get_standard_input_json(
-        self, source_id: str, approach: Optional[VerificationApproach] = None, **settings
+        self,
+        source_id: str,
+        approach: VerificationApproach | None = None,
+        **settings,
     ) -> dict:
         source_path = self.local_project.sources.lookup(source_id)
         compiler = self.compiler_manager.registered_compilers[source_path.suffix]
@@ -601,7 +606,16 @@ def _strip_0x(code: str) -> str:
 
 def extract_constructor_arguments_from_creation(
     creation_input: str, creation_bytecode: str
-) -> Optional[str]:
+) -> str | None:
+    """
+    Extract the ABI-encoded constructor arguments by treating the on-chain creation
+    input as ``<creation_bytecode><constructor_args>``.
+
+    Returns the (possibly empty) constructor arguments when ``creation_bytecode`` is a
+    clean prefix of the creation input. Returns ``None`` when it is not a prefix (e.g.
+    the creation bytecode still contains unlinked library placeholders), so the caller
+    can fall back to another strategy.
+    """
     creation_input = _strip_0x(creation_input)
     creation_bytecode = _strip_0x(creation_bytecode)
     if not creation_bytecode or not creation_input.startswith(creation_bytecode):

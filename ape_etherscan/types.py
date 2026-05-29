@@ -1,12 +1,11 @@
 import json
 import re
 from dataclasses import dataclass
-from typing import Optional, Union
 
-from ape.utils import cached_property
 from ethpm_types import BaseModel
 from pydantic import Field, field_validator
 
+from ape.utils import cached_property
 from ape_etherscan.exceptions import EtherscanResponseError, get_request_error
 
 
@@ -66,13 +65,13 @@ class ContractCreationResponse(BaseModel):
     txHash: str
 
     # Only appears on some networks for some reason.
-    blockNumber: Optional[int] = None
-    timestamp: Optional[int] = None
-    contractFactory: Optional[str] = None
-    creationBytecode: Optional[str] = None
+    blockNumber: int | None = None
+    timestamp: int | None = None
+    contractFactory: str | None = None
+    creationBytecode: str | None = None
 
 
-ResponseValue = Union[list, dict, str]
+ResponseValue = list | dict | str
 
 
 class EtherscanResponse:

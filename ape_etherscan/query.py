@@ -1,11 +1,13 @@
 from collections.abc import Iterator
-from typing import Optional
 
 from ape.api import PluginConfig, QueryAPI, QueryType, ReceiptAPI
-from ape.api.query import AccountTransactionQuery, ContractCreation, ContractCreationQuery
+from ape.api.query import (
+    AccountTransactionQuery,
+    ContractCreation,
+    ContractCreationQuery,
+)
 from ape.exceptions import QueryEngineError
 from ape.utils import singledispatchmethod
-
 from ape_etherscan.client import ClientFactory, get_etherscan_api_uri, get_etherscan_uri
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.utils import NETWORKS
@@ -46,7 +48,7 @@ class EtherscanQueryEngine(QueryAPI):
         )
 
     @singledispatchmethod
-    def estimate_query(self, query: QueryType) -> Optional[int]:  # type: ignore[override]
+    def estimate_query(self, query: QueryType) -> int | None:  # type: ignore[override]
         return None
 
     @property
@@ -55,7 +57,7 @@ class EtherscanQueryEngine(QueryAPI):
         return getattr(config, self.network_manager.ecosystem.name.lower()).rate_limit
 
     @estimate_query.register
-    def estimate_account_transaction_query(self, query: AccountTransactionQuery) -> Optional[int]:
+    def estimate_account_transaction_query(self, query: AccountTransactionQuery) -> int | None:
         if self.network_manager.active_provider:
             # Ignore unsupported networks.
             ecosystem = self.network_manager.provider.network.ecosystem.name
@@ -70,7 +72,7 @@ class EtherscanQueryEngine(QueryAPI):
         return (10000 // self.rate_limit) * (1 + query.stop_nonce - query.start_nonce) // 100
 
     @estimate_query.register
-    def estimate_contract_creation_query(self, query: ContractCreationQuery) -> Optional[int]:
+    def estimate_contract_creation_query(self, query: ContractCreationQuery) -> int | None:
         if self.network_manager.active_provider:
             # Ignore unsupported networks.
             ecosystem = self.network_manager.provider.network.ecosystem.name

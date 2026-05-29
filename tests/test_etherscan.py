@@ -1,8 +1,8 @@
 from collections.abc import Callable
 
 import pytest
-from ape.api.query import AccountTransactionQuery
 
+from ape.api.query import AccountTransactionQuery
 from ape_etherscan.client import get_supported_chains
 from ape_etherscan.exceptions import (
     EtherscanResponseError,
@@ -18,7 +18,7 @@ EXPECTED_CONTRACT_NAME_MAP = {
     "get_contract_response_flattened": "BoredApeYachtClub",
     "get_contract_response_json": "BoredApeYachtClub",
     "get_contract_response_not_verified": "",
-    "get_proxy_contract_response": "MIM-UST-f",
+    "get_proxy_contract_response": "yvDAI",
     "get_vyper_contract_response": "yvDAI",
 }
 TRANSACTION = "0x0da22730986e96aaaf5cedd5082fea9fd82269e41b0ee020d966aa9de491d2e6"
@@ -26,7 +26,7 @@ PUBLISH_GUID = "123"
 
 
 base_url_test = pytest.mark.parametrize(
-    "chain_id,url", [(c["chainid"], c["blockexplorer"]) for c in get_supported_chains()]
+    "chain_id,url", [(c["chainid"], c["blockexplorer"].rstrip("/")) for c in get_supported_chains()]
 )
 
 
@@ -149,14 +149,21 @@ def test_get_contract_type_ecosystems_and_networks(mock_backend, chain_id, get_e
     assert actual == expected
 
 
+@pytest.fixture
+def mock_vyper_symbol(mocker):
+    contract = mocker.MagicMock()
+    contract.symbol.return_value = "yvDAI"
+    mocker.patch("ape_etherscan.explorer.ContractInstance", return_value=contract)
+    return contract
+
+
 @pytest.mark.parametrize(
     "file_name", ("get_proxy_contract_response", ("get_vyper_contract_response"))
 )
-def test_get_contract_type_additional_types(mock_backend, file_name, explorer, connection):
+def test_get_contract_type_additional_types(mock_backend, file_name, explorer, mock_vyper_symbol):
     # This test parametrizes getting edge-case contract types.
     # NOTE: Purposely not merged with test above to avoid adding a new dimension
     #  to the parametrization.
-    _ = connection  # Needed for symbol lookup
     mock_backend.set_network(1)
     response = mock_backend.setup_mock_get_contract_type_response(file_name)
     actual = explorer.get_contract_type(response.expected_address).name
@@ -164,11 +171,10 @@ def test_get_contract_type_additional_types(mock_backend, file_name, explorer, c
     assert actual == expected
 
 
-def test_get_contract_type_with_rate_limiting(mock_backend, explorer, connection):
+def test_get_contract_type_with_rate_limiting(mock_backend, explorer, mock_vyper_symbol):
     """
     This test ensures the rate limiting logic in the Etherscan client works.
     """
-    _ = connection  # Needed for calling symbol() on Vyper_contract
     file_name = "get_vyper_contract_response"
     setter_upper = mock_backend.setup_mock_get_contract_type_response_with_throttling
     throttler, response = setter_upper(file_name)
