@@ -5,7 +5,7 @@ import time
 from collections.abc import Iterator
 from functools import cache
 from io import StringIO
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Literal, Optional
 
 import requests
 from requests import Session
@@ -251,13 +251,13 @@ class ContractClient(_APIClient):
         license_type: int | None = None,
         libraries: dict[str, str] | None = None,
         via_ir: bool = False,
-        language: str | None = None,
+        language: str = "solidity",
     ) -> str:
         libraries = libraries or {}
         if len(libraries) > 10:
             raise ValueError(f"Can only have up to 10 libraries (received {len(libraries)}).")
 
-        language = (language or "solidity").lower()
+        language = language.lower()
 
         if language == "vyper":
             # Etherscan expects e.g. "vyper:0.4.0" (no leading "v" on the number).
