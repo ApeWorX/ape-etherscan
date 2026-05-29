@@ -5,7 +5,7 @@ import time
 from collections.abc import Iterator
 from functools import cache
 from io import StringIO
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Optional
 
 import requests
 from requests import Session
