@@ -7,7 +7,7 @@
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
-    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=44020203" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=9454f7d5" />
     <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,8 @@
   --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
 }
 </style>
-    <meta property="og:type" content="website"/>
+    
+  <meta property="og:type" content="website"/>
   <meta property="og:url" content="ape-etherscan/methoddocs/verify.html"/>
   <meta property="og:title" content="Verify"/>
     <meta name="twitter:card" content="summary"/>
@@ -113,6 +114,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#ape_etherscan.verify.VerificationApproach.STANDARD_JSON"><code class="docutils literal notranslate">STANDARD_JSON</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#ape_etherscan.verify.extract_constructor_arguments_from_creation"><code class="docutils literal notranslate"><span class="pre">extract_constructor_arguments_from_creation()</span></code></a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
@@ -407,6 +409,17 @@ to figuring it out from settings.</p></li>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="ape_etherscan.verify.extract_constructor_arguments_from_creation">
+<span class="sig-prename descclassname"><span class="pre">ape_etherscan.verify.</span></span><span class="sig-name descname"><span class="pre">extract_constructor_arguments_from_creation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">creation_input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">creation_bytecode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ape_etherscan.verify.extract_constructor_arguments_from_creation" title="Link to this definition"></a></dt>
+<dd><p>Extract the ABI-encoded constructor arguments by treating the on-chain creation
+input as <code class="docutils literal notranslate"><span class="pre">&lt;creation_bytecode&gt;&lt;constructor_args&gt;</span></code>.</p>
+<p>Returns the (possibly empty) constructor arguments when <code class="docutils literal notranslate"><span class="pre">creation_bytecode</span></code> is a
+clean prefix of the creation input. Returns <code class="docutils literal notranslate"><span class="pre">None</span></code> when it is not a prefix (e.g.
+the creation bytecode still contains unlinked library placeholders), so the caller
+can fall back to another strategy.</p>
+</dd></dl>
+
 </section>
 
         </article><button class="back-to-top" type="button">
@@ -447,5 +460,5 @@ to figuring it out from settings.</p></li>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script data-domain="docs.apeworx.io" defer="defer" src="https://plausible.io/js/script.js"></script>
-      <script src="../_static/shibuya.js?v=cac61aee"></script></body>
+      <script src="../_static/shibuya.js?v=50760d75"></script></body>
 </html>
