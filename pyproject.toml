@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ape-etherscan"
-description = "ape-etherscan: Ape plugin"
+description = "ape-etherscan: Etherscan Explorer Plugin for Ethereum-based networks"
 readme = "README.md"
 authors = [
     {name = "ApeWorX Ltd.", email = "admin@apeworx.io"}
