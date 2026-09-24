@@ -1,7 +1,7 @@
 import pytest
-
 from ape.exceptions import ProjectError
 from ape.utils import create_tempdir
+
 from ape_etherscan.dependency import EtherscanDependency
 
 
@@ -46,6 +46,5 @@ def test_dependency_not_verified(mock_backend):
         network="mainnet",
     )
     expected = "Etherscan dependency 'apes' not verified."
-    with create_tempdir() as temp_dir:
-        with pytest.raises(ProjectError, match=expected):
-            dependency.fetch(temp_dir)
+    with create_tempdir() as temp_dir, pytest.raises(ProjectError, match=expected):
+        dependency.fetch(temp_dir)

@@ -39,28 +39,27 @@ def __getattr__(name: str):
 
         return Etherscan
 
-    elif name == "EtherscanConfig":
+    if name == "EtherscanConfig":
         from ape_etherscan.config import EtherscanConfig
 
         return EtherscanConfig
 
-    elif name == "EtherscanDependency":
+    if name == "EtherscanDependency":
         from ape_etherscan.dependency import EtherscanDependency
 
         return EtherscanDependency
 
-    elif name == "EtherscanQueryEngine":
+    if name == "EtherscanQueryEngine":
         from ape_etherscan.query import EtherscanQueryEngine
 
         return EtherscanQueryEngine
 
-    elif name == "NETWORKS":
+    if name == "NETWORKS":
         from ape_etherscan.utils import NETWORKS
 
         return NETWORKS
 
-    else:
-        raise AttributeError(name)
+    raise AttributeError(name)
 
 
 __all__ = [

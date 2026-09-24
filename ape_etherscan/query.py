@@ -8,6 +8,7 @@ from ape.api.query import (
 )
 from ape.exceptions import QueryEngineError
 from ape.utils import singledispatchmethod
+
 from ape_etherscan.client import ClientFactory, get_etherscan_api_uri, get_etherscan_uri
 from ape_etherscan.types import EtherscanInstance
 from ape_etherscan.utils import NETWORKS

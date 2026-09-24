@@ -1,7 +1,6 @@
+from ape.api.config import PluginConfig
 from pydantic import AnyHttpUrl, model_validator
 from pydantic_settings import SettingsConfigDict
-
-from ape.api.config import PluginConfig
 
 
 class NetworkConfig(PluginConfig):

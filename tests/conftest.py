@@ -8,14 +8,14 @@ from io import StringIO
 from json import JSONDecodeError
 from pathlib import Path
 from tempfile import mkdtemp
-from typing import IO, TYPE_CHECKING, Any, Optional, Union
+from typing import IO, TYPE_CHECKING, Any
 from unittest.mock import MagicMock
 
+import ape
 import pytest
 from ape_solidity._utils import OUTPUT_SELECTION
 from requests import Response
 
-import ape
 from ape_etherscan.client import _APIClient
 from ape_etherscan.types import EtherscanResponse
 from ape_etherscan.verify import LicenseType
@@ -176,10 +176,7 @@ def get_explorer(networks):
     def fn(chain_id: int) -> "ExplorerAPI":
         for ecosystem in networks.ecosystems.values():
             for network in ecosystem.networks.values():
-                if network.is_dev:
-                    continue
-
-                elif int(network.chain_id) != int(chain_id):
+                if network.is_dev or int(network.chain_id) != int(chain_id):
                     continue
 
                 # Found.
@@ -250,7 +247,7 @@ class MockEtherscanBackend:
                             actual_json = json.loads(text)
                         except JSONDecodeError:
                             pytest.fail(f"Response text is not JSON: '{text}'.")
-                            return
+                            return None
                     else:
                         # Empty.
                         actual_json = {}
@@ -269,7 +266,7 @@ class MockEtherscanBackend:
             if return_value:
                 return return_value
 
-            elif side_effect:
+            if side_effect:
                 result = side_effect()
                 return result if isinstance(result, Response) else self.get_mock_response(result)
 
@@ -402,10 +399,10 @@ class MockEtherscanBackend:
         if isinstance(response_data, str):
             return self.get_mock_response({"result": response_data, **kwargs})
 
-        elif isinstance(response_data, _io.TextIOWrapper):
+        if isinstance(response_data, _io.TextIOWrapper):
             return self.get_mock_response(json.load(response_data), **kwargs)
 
-        elif isinstance(response_data, MagicMock):
+        if isinstance(response_data, MagicMock):
             # Mock wasn't set.
             response_data = {**kwargs}
 
