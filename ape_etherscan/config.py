@@ -17,7 +17,7 @@ class EcosystemConfig(PluginConfig):
     @model_validator(mode="after")
     def verify_extras(self) -> "EcosystemConfig":
         if self.__pydantic_extra__:
-            for aname in self.__pydantic_extra__.keys():
+            for aname in self.__pydantic_extra__:
                 self.__pydantic_extra__[aname] = NetworkConfig.model_validate(
                     self.__pydantic_extra__[aname]
                 )

@@ -499,8 +499,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         def flatten_source(_source_id: str) -> str:
             _source_path = self.local_project.sources.lookup(_source_id)
-            flattened_source = str(compiler.flatten_contract(_source_path))
-            return flattened_source
+            return str(compiler.flatten_contract(_source_path))
 
         build_map(source_id)
 
@@ -564,7 +563,7 @@ class SourceVerifier(ManagerAccessMixin):
         fail_key = "Fail - "
         pass_key = "Pass - "
 
-        for iteration in range(100):
+        for _iteration in range(100):
             try:
                 verification_update = self.contract_client.check_verify_status(guid)
                 guid_did_exist = True
@@ -647,6 +646,4 @@ def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: st
     # Cut the deployment bytecode at the start of the runtime bytecode
     # The remaining part is the constructor arguments
     constructor_args_start_index = start_index + len(runtime_bytecode)
-    constructor_arguments = deployment_bytecode[constructor_args_start_index:]
-
-    return constructor_arguments
+    return deployment_bytecode[constructor_args_start_index:]

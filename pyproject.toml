@@ -45,6 +45,18 @@ test = [
     "pytest-xdist",
     "pytest-cov",
     "hypothesis>=6.2.0,<7",
+    "ape-arbitrum",
+    "ape-base",
+    "ape-blast",
+    "ape-bsc",
+    "ape-fantom",
+    "ape-optimism",
+    "ape-polygon",
+    "ape-infura",
+    "ape-solidity",
+    "pytest-mock",
+    "types-requests",
+
 ]
 lint = [
     "mypy>=1.15.0,<2",
@@ -138,3 +150,12 @@ markers = "fuzzing: Run Hypothesis fuzz test suite"
 
 [tool.mdformat]
 number = true
+
+[[tool.mypy.overrides]]
+module = "ape_solidity.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "ape_solidity._utils"
+ignore_missing_imports = true
+

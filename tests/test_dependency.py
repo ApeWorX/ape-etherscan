@@ -6,7 +6,7 @@ from ape_etherscan.dependency import EtherscanDependency
 
 
 @pytest.mark.parametrize(
-    "verification_type,contract_address,expected_name",
+    ("verification_type", "contract_address", "expected_name"),
     [
         (
             "flattened",

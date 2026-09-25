@@ -50,7 +50,7 @@ class TestAccountClient(ManagerAccessMixin):
 
         fn = account_client.get_all_normal_transactions
         iterator = fn(start_block=start_block, end_block=end_block, offset=1, sort="desc")
-        actual = [x for x in iterator]
+        actual = list(iterator)
         expected = [{"page": 1}, {"page": 2}]
         assert actual == expected
 

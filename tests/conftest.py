@@ -269,6 +269,7 @@ class MockEtherscanBackend:
             if side_effect:
                 result = side_effect()
                 return result if isinstance(result, Response) else self.get_mock_response(result)
+            return None
 
         if module not in self.handlers[method.lower()]:
             self.handlers[method.lower()][module] = {}
