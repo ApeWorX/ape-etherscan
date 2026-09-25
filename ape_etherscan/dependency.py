@@ -1,17 +1,16 @@
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from ape.api.projects import DependencyAPI
+from ape.exceptions import ProjectError
 from hexbytes import HexBytes
 from pydantic import field_validator
 
-from ape.api.projects import DependencyAPI
-from ape.exceptions import ProjectError
 from ape_etherscan.explorer import Etherscan
 
 if TYPE_CHECKING:
-    from ethpm_types import PackageManifest
-
     from ape.types import AddressType
+    from ethpm_types import PackageManifest
 
 
 class EtherscanDependency(DependencyAPI):
@@ -47,8 +46,7 @@ class EtherscanDependency(DependencyAPI):
             if isinstance(explorer, Etherscan):
                 # Could be using a different network.
                 return explorer
-            else:
-                return self.network_manager.ethereum.mainnet.explorer
+            return self.network_manager.ethereum.mainnet.explorer
 
         # Assume Ethereum
         return self.network_manager.ethereum.mainnet.explorer

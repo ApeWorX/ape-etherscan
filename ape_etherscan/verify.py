@@ -4,10 +4,10 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
-from ethpm_types import Compiler, ContractType
-
 from ape.logging import LogLevel, logger
 from ape.utils import ManagerAccessMixin, cached_property
+from ethpm_types import Compiler, ContractType
+
 from ape_etherscan.exceptions import (
     ContractVerificationError,
     EtherscanResponseError,
@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from ape.contracts import ContractInstance
     from ape.managers.project import ProjectManager
     from ape.types import AddressType
+
     from ape_etherscan.client import AccountClient, ClientFactory, ContractClient
 
 DEFAULT_OPTIMIZATION_RUNS = 200
@@ -280,10 +281,9 @@ class SourceVerifier(ManagerAccessMixin):
             if deploy_receipt := next(self.account_client.get_all_normal_transactions(), None):
                 break
 
-            else:
-                logger.debug("Waiting for deploy receipt in Etherscan...")
-                checks_done += 1
-                time.sleep(2.5)
+            logger.debug("Waiting for deploy receipt in Etherscan...")
+            checks_done += 1
+            time.sleep(2.5)
 
         if not deploy_receipt:
             raise ContractVerificationError(
@@ -303,8 +303,7 @@ class SourceVerifier(ManagerAccessMixin):
         if code := self.contract_type.runtime_bytecode:
             runtime_code = code.bytecode or ""
             return extract_constructor_arguments(deployment_code, runtime_code)
-        else:
-            raise ContractVerificationError("Failed to find runtime bytecode.")
+        raise ContractVerificationError("Failed to find runtime bytecode.")
 
     @cached_property
     def license_code(self) -> LicenseType:
@@ -438,8 +437,7 @@ class SourceVerifier(ManagerAccessMixin):
                 logger.warning(str(err))
                 return
 
-            else:
-                raise  # this error
+            raise  # this error
 
         self._wait_for_verification(guid)
 
@@ -501,8 +499,7 @@ class SourceVerifier(ManagerAccessMixin):
 
         def flatten_source(_source_id: str) -> str:
             _source_path = self.local_project.sources.lookup(_source_id)
-            flattened_source = str(compiler.flatten_contract(_source_path))
-            return flattened_source
+            return str(compiler.flatten_contract(_source_path))
 
         build_map(source_id)
 
@@ -566,7 +563,7 @@ class SourceVerifier(ManagerAccessMixin):
         fail_key = "Fail - "
         pass_key = "Pass - "
 
-        for iteration in range(100):
+        for _iteration in range(100):
             try:
                 verification_update = self.contract_client.check_verify_status(guid)
                 guid_did_exist = True
@@ -585,7 +582,7 @@ class SourceVerifier(ManagerAccessMixin):
             if verification_update.startswith(fail_key):
                 err_msg = verification_update.split(fail_key)[-1].strip()
                 raise ContractVerificationError(err_msg)
-            elif verification_update == "Already Verified" or verification_update.startswith(
+            if verification_update == "Already Verified" or verification_update.startswith(
                 pass_key
             ):
                 uri = explorer.get_address_url(self.address)
@@ -649,6 +646,4 @@ def extract_constructor_arguments(deployment_bytecode: str, runtime_bytecode: st
     # Cut the deployment bytecode at the start of the runtime bytecode
     # The remaining part is the constructor arguments
     constructor_args_start_index = start_index + len(runtime_bytecode)
-    constructor_arguments = deployment_bytecode[constructor_args_start_index:]
-
-    return constructor_arguments
+    return deployment_bytecode[constructor_args_start_index:]
