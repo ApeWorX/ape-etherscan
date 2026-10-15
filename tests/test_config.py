@@ -34,15 +34,14 @@ def test_config_uri(account, mock_provider, project):
     explorer_conf = {
         "ethereum": {custom_network_name: {"uri": expected_uri, "api_uri": expected_api_uri}}
     }
-    with project.temp_config(etherscan=explorer_conf):
-        with mock_provider("ethereum", "monkechain"):
-            assert account.query_manager.engines["etherscan"].etherscan_uri == expected_uri
-            assert account.query_manager.engines["etherscan"].etherscan_api_uri == expected_api_uri
-            account_client = account.query_manager.engines[
-                "etherscan"
-            ]._client_factory.get_account_client(account)
-            assert account_client.base_uri == expected_api_uri
-            contract_client = account.query_manager.engines[
-                "etherscan"
-            ]._client_factory.get_contract_client(account)
-            assert contract_client.base_uri == expected_api_uri
+    with project.temp_config(etherscan=explorer_conf), mock_provider("ethereum", "monkechain"):
+        assert account.query_manager.engines["etherscan"].etherscan_uri == expected_uri
+        assert account.query_manager.engines["etherscan"].etherscan_api_uri == expected_api_uri
+        account_client = account.query_manager.engines[
+            "etherscan"
+        ]._client_factory.get_account_client(account)
+        assert account_client.base_uri == expected_api_uri
+        contract_client = account.query_manager.engines[
+            "etherscan"
+        ]._client_factory.get_contract_client(account)
+        assert contract_client.base_uri == expected_api_uri

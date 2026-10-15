@@ -1,8 +1,8 @@
 from collections.abc import Callable
 
 import pytest
-
 from ape.api.query import AccountTransactionQuery
+
 from ape_etherscan.client import get_supported_chains
 from ape_etherscan.exceptions import (
     EtherscanResponseError,
@@ -26,7 +26,8 @@ PUBLISH_GUID = "123"
 
 
 base_url_test = pytest.mark.parametrize(
-    "chain_id,url", [(c["chainid"], c["blockexplorer"].rstrip("/")) for c in get_supported_chains()]
+    ("chain_id", "url"),
+    [(c["chainid"], c["blockexplorer"].rstrip("/")) for c in get_supported_chains()],
 )
 
 
@@ -158,7 +159,7 @@ def mock_vyper_symbol(mocker):
 
 
 @pytest.mark.parametrize(
-    "file_name", ("get_proxy_contract_response", ("get_vyper_contract_response"))
+    "file_name", ["get_proxy_contract_response", ("get_vyper_contract_response")]
 )
 def test_get_contract_type_additional_types(mock_backend, file_name, explorer, mock_vyper_symbol):
     # This test parametrizes getting edge-case contract types.

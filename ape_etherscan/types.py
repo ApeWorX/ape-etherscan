@@ -2,10 +2,10 @@ import json
 import re
 from dataclasses import dataclass
 
+from ape.utils import cached_property
 from ethpm_types import BaseModel
 from pydantic import Field, field_validator
 
-from ape.utils import cached_property
 from ape_etherscan.exceptions import EtherscanResponseError, get_request_error
 
 

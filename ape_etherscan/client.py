@@ -8,11 +8,11 @@ from io import StringIO
 from typing import TYPE_CHECKING, Optional
 
 import requests
+from ape.logging import logger
+from ape.utils import USER_AGENT, ManagerAccessMixin
 from requests import Session
 from yarl import URL
 
-from ape.logging import logger
-from ape.utils import USER_AGENT, ManagerAccessMixin
 from ape_etherscan.exceptions import (
     ContractNotVerifiedError,
     IncompatibleCompilerSettingsError,
@@ -29,6 +29,7 @@ from ape_etherscan.utils import ETHERSCAN_API_KEY_NAME
 
 if TYPE_CHECKING:
     from ape.api import PluginConfig
+
     from ape_etherscan.config import EtherscanConfig
 
 
@@ -197,9 +198,8 @@ class _APIClient(ManagerAccessMixin):
 
         if response:
             return EtherscanResponse(response, self._instance.ecosystem_name, raise_on_exceptions)
-        else:
-            # Not possible (I don't think); just for type-checking.
-            raise ValueError("No response.")
+        # Not possible (I don't think); just for type-checking.
+        raise ValueError("No response.")
 
     def __authorize(self, params_or_data: dict | None = None) -> dict | None:
         api_key = os.environ.get(ETHERSCAN_API_KEY_NAME)
@@ -227,7 +227,7 @@ class ContractClient(_APIClient):
         if not (result_list := result.value):
             return SourceCodeResponse()
 
-        elif len(result_list) > 1:
+        if len(result_list) > 1:
             raise UnhandledResultError(result, result_list)
 
         data = result_list[0]
