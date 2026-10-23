@@ -1,0 +1,16 @@
+name: Commit Message
+
+on:
+  # NOTE: Skip check on PR so as not to confuse contributors
+  # NOTE: Also install a PR title checker so we don't mess up merges
+  push:
+    branches:
+    - main
+
+jobs:
+  commit-msg:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Conventional Commitlint
+      uses: opensource-nepal/commitlint@v1

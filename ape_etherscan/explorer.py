@@ -1,13 +1,13 @@
 import json
-from typing import TYPE_CHECKING, Optional
-
-from ethpm_types import Compiler, PackageManifest
-from ethpm_types.source import Source
+from typing import TYPE_CHECKING
 
 from ape.api import ExplorerAPI, PluginConfig
 from ape.contracts import ContractInstance
 from ape.exceptions import ProviderNotConnectedError
 from ape.types import AddressType, ContractType
+from ethpm_types import Compiler, PackageManifest
+from ethpm_types.source import Source
+
 from ape_etherscan.client import (
     ClientFactory,
     SourceCodeResponse,
@@ -169,6 +169,6 @@ class Etherscan(ExplorerAPI):
     def publish_contract(self, address: AddressType):
         return self._publish_contract(address)
 
-    def _publish_contract(self, address: AddressType, project: Optional["ProjectManager"] = None):
+    def _publish_contract(self, address: AddressType, project: "ProjectManager | None" = None):
         verifier = SourceVerifier(address, self._client_factory, project=project)
         return verifier.attempt_verification()
