@@ -7,7 +7,7 @@
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
-    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=9454f7d5" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
     <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,15 +81,15 @@ data-aria-dark="Switch to auto color mode">
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan"><code class="docutils literal notranslate"><span class="pre">Etherscan</span></code></a><ul>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.etherscan_api_uri"><code class="docutils literal notranslate">etherscan_api_uri</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.etherscan_uri"><code class="docutils literal notranslate">etherscan_uri</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_address_url"><code class="docutils literal notranslate">get_address_url()</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_contract_type"><code class="docutils literal notranslate">get_contract_type()</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_manifest"><code class="docutils literal notranslate">get_manifest()</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_supported_chains"><code class="docutils literal notranslate">get_supported_chains()</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_transaction_url"><code class="docutils literal notranslate">get_transaction_url()</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.publish_contract"><code class="docutils literal notranslate">publish_contract()</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.supports_chain"><code class="docutils literal notranslate">supports_chain()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.etherscan_api_uri"><code class="docutils literal notranslate"><span class="pre">Etherscan.etherscan_api_uri</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.etherscan_uri"><code class="docutils literal notranslate"><span class="pre">Etherscan.etherscan_uri</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_address_url"><code class="docutils literal notranslate"><span class="pre">Etherscan.get_address_url()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_contract_type"><code class="docutils literal notranslate"><span class="pre">Etherscan.get_contract_type()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_manifest"><code class="docutils literal notranslate"><span class="pre">Etherscan.get_manifest()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_supported_chains"><code class="docutils literal notranslate"><span class="pre">Etherscan.get_supported_chains()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.get_transaction_url"><code class="docutils literal notranslate"><span class="pre">Etherscan.get_transaction_url()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.publish_contract"><code class="docutils literal notranslate"><span class="pre">Etherscan.publish_contract()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.explorer.Etherscan.supports_chain"><code class="docutils literal notranslate"><span class="pre">Etherscan.supports_chain()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -158,27 +158,27 @@ data-aria-dark="Switch to auto color mode">
   </div>
 </div><article class="yue" role="main">
           <section id="module-ape_etherscan.explorer">
-<span id="explorer"></span><h1>Explorer<a class="headerlink" href="#module-ape_etherscan.explorer" title="Link to this heading"></a></h1>
+<span id="explorer"></span><h1>Explorer<a class="headerlink" href="#module-ape_etherscan.explorer" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ape_etherscan.explorer.</span></span><span class="sig-name descname"><span class="pre">Etherscan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NetworkAPI</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ape_etherscan.explorer.</span></span><span class="sig-name descname"><span class="pre">Etherscan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">NetworkAPI</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExplorerAPI</span></code></p>
 <p>The explorer API implementation for Etherscan.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.etherscan_api_uri">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">etherscan_api_uri</span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.etherscan_api_uri" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">etherscan_api_uri</span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.etherscan_api_uri" title="Link to this definition">#</a></dt>
 <dd><p>The base URL for the API service.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.etherscan_uri">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">etherscan_uri</span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.etherscan_uri" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">etherscan_uri</span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.etherscan_uri" title="Link to this definition">#</a></dt>
 <dd><p>The base URL of the explorer.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.get_address_url">
-<span class="sig-name descname"><span class="pre">get_address_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_address_url" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_address_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_address_url" title="Link to this definition">#</a></dt>
 <dd><p>Get an address URL, such as for a transaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -195,7 +195,7 @@ data-aria-dark="Switch to auto color mode">
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.get_contract_type">
-<span class="sig-name descname"><span class="pre">get_contract_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">ChecksumAddress</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_AddressValidator</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ContractType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_contract_type" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_contract_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">ChecksumAddress</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_AddressValidator</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ContractType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_contract_type" title="Link to this definition">#</a></dt>
 <dd><p>Get the contract type for a given address if it has been published to this explorer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -212,7 +212,7 @@ data-aria-dark="Switch to auto color mode">
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.get_manifest">
-<span class="sig-name descname"><span class="pre">get_manifest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">ChecksumAddress</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_AddressValidator</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PackageManifest</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_manifest" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_manifest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">ChecksumAddress</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_AddressValidator</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PackageManifest</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_manifest" title="Link to this definition">#</a></dt>
 <dd><p>Get a package manifest.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -230,7 +230,7 @@ published.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.get_supported_chains">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_supported_chains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_supported_chains" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_supported_chains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_supported_chains" title="Link to this definition">#</a></dt>
 <dd><p>Get a list of chain data for all chains Etherscan supports.
 <a class="reference external" href="https://docs.etherscan.io/contract-verification/supported-chains">https://docs.etherscan.io/contract-verification/supported-chains</a></p>
 <dl class="field-list simple">
@@ -242,7 +242,7 @@ published.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.get_transaction_url">
-<span class="sig-name descname"><span class="pre">get_transaction_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transaction_hash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_transaction_url" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_transaction_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transaction_hash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.get_transaction_url" title="Link to this definition">#</a></dt>
 <dd><p>Get the transaction URL for the given transaction.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -259,7 +259,7 @@ published.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.publish_contract">
-<span class="sig-name descname"><span class="pre">publish_contract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">ChecksumAddress</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_AddressValidator</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.publish_contract" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">publish_contract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Annotated</span><span class="p"><span class="pre">[</span></span><span class="pre">ChecksumAddress</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">_AddressValidator</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.publish_contract" title="Link to this definition">#</a></dt>
 <dd><p>Publish a contract to the explorer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -270,7 +270,7 @@ published.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.explorer.Etherscan.supports_chain">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.supports_chain" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supports_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#ape_etherscan.explorer.Etherscan.supports_chain" title="Link to this definition">#</a></dt>
 <dd><p>Returns <code class="docutils literal notranslate"><span class="pre">True</span></code> when the given chain ID is claimed to be
 supported by this explorer. Adhoc / custom networks rely on
 this feature to have automatic-explorer support. Explorer
