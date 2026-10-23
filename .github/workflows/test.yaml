@@ -72,7 +72,7 @@ jobs:
           run: uv sync --group test
 
         - name: Run Tests
-          run: uv run pytest -m "not fuzzing" -s --cov=ape_etherscan -n auto
+          run: uv run ape test -m "not fuzzing" -s --cov=ape_etherscan -n auto
 
 # NOTE: uncomment this block after you've marked tests with @pytest.mark.fuzzing
 #    fuzzing:
@@ -93,4 +93,4 @@ jobs:
 #          run: uv sync --group test
 #
 #        - name: Run Tests
-#          run: uv run pytest -m "fuzzing" --no-cov -s
+#          run: uv run ape test -m "fuzzing" --no-cov -s
