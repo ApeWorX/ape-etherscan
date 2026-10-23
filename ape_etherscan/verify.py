@@ -2,7 +2,7 @@ import json
 import time
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ape.logging import LogLevel, logger
 from ape.utils import ManagerAccessMixin, cached_property
@@ -218,7 +218,7 @@ class SourceVerifier(ManagerAccessMixin):
         self,
         address: "AddressType",
         client_factory: "ClientFactory",
-        project: Optional["ProjectManager"] = None,
+        project: "ProjectManager | None" = None,
     ):
         self.address = address
         self.client_factory = client_factory

@@ -1,5 +1,5 @@
 import os
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 from ape.exceptions import ApeException
 from requests import Response
@@ -39,7 +39,7 @@ class EtherscanResponseError(ApeEtherscanException):
     Raised when the response is not correct.
     """
 
-    def __init__(self, response: Union[Response, "EtherscanResponse"], message: str):
+    def __init__(self, response: "Response | EtherscanResponse", message: str):
         if not isinstance(response, Response):
             response = response.response
 
@@ -52,7 +52,7 @@ class ContractNotVerifiedError(EtherscanResponseError):
     Raised when a contract is not verified on Etherscan.
     """
 
-    def __init__(self, response: Union[Response, "EtherscanResponse"], address: str):
+    def __init__(self, response: "Response | EtherscanResponse", address: str):
         super().__init__(response, f"Contract '{address}' not verified.")
 
 
@@ -62,7 +62,7 @@ class UnhandledResultError(EtherscanResponseError):
     has an unhandled form.
     """
 
-    def __init__(self, response: Union[Response, "EtherscanResponse"], value: "ResponseValue"):
+    def __init__(self, response: "Response | EtherscanResponse", value: "ResponseValue"):
         message = f"Unhandled response format: {value}"
         super().__init__(response, message)
 
@@ -72,7 +72,7 @@ class EtherscanTooManyRequestsError(EtherscanResponseError):
     Raised after being rate-limited by Etherscan.
     """
 
-    def __init__(self, response: Union[Response, "EtherscanResponse"], ecosystem: str):
+    def __init__(self, response: "Response | EtherscanResponse", ecosystem: str):
         message = "Etherscan API server rate limit exceeded."
         if not os.environ.get(ETHERSCAN_API_KEY_NAME):
             message = f"{message}. Try setting {ETHERSCAN_API_KEY_NAME}'."

@@ -5,7 +5,7 @@ import time
 from collections.abc import Iterator
 from functools import cache
 from io import StringIO
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import requests
 from ape.logging import logger
@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 
 def get_network_config(
     etherscan_config: "EtherscanConfig", ecosystem_name: str, network_name: str
-) -> Optional["PluginConfig"]:
+) -> "PluginConfig | None":
     if ecosystem_name in etherscan_config:
         return etherscan_config[ecosystem_name].get(network_name)
     return None
