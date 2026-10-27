@@ -7,7 +7,7 @@
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
-    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=9454f7d5" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=2ceb65ce" />
     <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,10 +81,10 @@ data-aria-dark="Switch to auto color mode">
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency"><code class="docutils literal notranslate"><span class="pre">EtherscanDependency</span></code></a><ul>
-<li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency.fetch"><code class="docutils literal notranslate">fetch()</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency.package_id"><code class="docutils literal notranslate">package_id</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency.uri"><code class="docutils literal notranslate">uri</span></code></a></li>
-<li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency.version_id"><code class="docutils literal notranslate">version_id</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency.fetch"><code class="docutils literal notranslate"><span class="pre">EtherscanDependency.fetch()</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency.package_id"><code class="docutils literal notranslate"><span class="pre">EtherscanDependency.package_id</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency.uri"><code class="docutils literal notranslate"><span class="pre">EtherscanDependency.uri</span></code></a></li>
+<li><a class="reference internal" href="#ape_etherscan.dependency.EtherscanDependency.version_id"><code class="docutils literal notranslate"><span class="pre">EtherscanDependency.version_id</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -153,14 +153,14 @@ data-aria-dark="Switch to auto color mode">
   </div>
 </div><article class="yue" role="main">
           <section id="module-ape_etherscan.dependency">
-<span id="dependency"></span><h1>Dependency<a class="headerlink" href="#module-ape_etherscan.dependency" title="Link to this heading"></a></h1>
+<span id="dependency"></span><h1>Dependency<a class="headerlink" href="#module-ape_etherscan.dependency" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="ape_etherscan.dependency.EtherscanDependency">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ape_etherscan.dependency.</span></span><span class="sig-name descname"><span class="pre">EtherscanDependency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_override:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etherscan:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecosystem:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'ethereum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'mainnet'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ape_etherscan.dependency.</span></span><span class="sig-name descname"><span class="pre">EtherscanDependency</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_override:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etherscan:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ecosystem:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'ethereum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'mainnet'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DependencyAPI</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ape_etherscan.dependency.EtherscanDependency.fetch">
-<span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency.fetch" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency.fetch" title="Link to this definition">#</a></dt>
 <dd><p>Fetch the dependency. E.g. for GitHub dependency,
 download the files to the destination.</p>
 <dl class="field-list simple">
@@ -173,20 +173,20 @@ files.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="ape_etherscan.dependency.EtherscanDependency.package_id">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">package_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency.package_id" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">package_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency.package_id" title="Link to this definition">#</a></dt>
 <dd><p>The full name of the package, used for storage.
 Example: <code class="docutils literal notranslate"><span class="pre">OpenZeppelin/openzeppelin-contracts</span></code>.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="ape_etherscan.dependency.EtherscanDependency.uri">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uri</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency.uri" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uri</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency.uri" title="Link to this definition">#</a></dt>
 <dd><p>The URI for the package.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="ape_etherscan.dependency.EtherscanDependency.version_id">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency.version_id" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#ape_etherscan.dependency.EtherscanDependency.version_id" title="Link to this definition">#</a></dt>
 <dd><p>The ID to use as the sub-directory in the download cache.
 Most often, this is either a version number or a branch name.</p>
 </dd></dl>
